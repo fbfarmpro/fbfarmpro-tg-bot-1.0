@@ -1,0 +1,8 @@
+bot
+dump.rdb
+__pycache__
+.idea
+log.txt
+secret.py
+DB
+greeting_msg.json
