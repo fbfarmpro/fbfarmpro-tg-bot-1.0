@@ -1,23 +1,25 @@
-import datetime
-
-from handlers import *
-from aiogram import types
-import utils.keyboards as keyboards
-import utils.database as database
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.dispatcher import FSMContext
-from loader import storage
-from aiogram.types import InputFile
-from config import ADMIN_ID
 import os
 from zipfile import ZipFile
+from datetime import datetime
+
+from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InputFile
+from aiogram.utils.exceptions import ChatNotFound
+
+import utils.database as database
+import utils.keyboards as keyboards
+from config import ADMIN_ID
+from handlers import *
+from loader import storage
 
 
 @dp.callback_query_handler(lambda c: c.data == "my_profile")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.get_user_lang(userID)
+    lang = database.users.get_language(userID)
     login = callback_query.from_user.mention if callback_query.from_user.username else callback_query.from_user.id
     balance = database.users.get_balance(userID)
     if lang == "RU":
@@ -32,14 +34,13 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.get_user_lang(userID)
+    lang = database.users.get_language(userID)
     if lang == "RU":
-        await callback_query.message.answer("Введите желаемую сумму (в USD)")
+        await callback_query.message.edit_text("Выберите удобный для Вас метод пополнения баланса")
+        await callback_query.message.edit_reply_markup(keyboards.PAYMENT_MENU_RU)
     else:
-        await callback_query.message.answer("Enter the amount (in USD)")
-
-    await storage.update_data(user=userID, data={"lang": lang})
-    await storage.set_state(user=userID, state="payment")
+        await callback_query.message.edit_text("Choose method")
+        await callback_query.message.edit_reply_markup(keyboards.PAYMENT_MENU_EN)
 
 
 @dp.callback_query_handler(lambda c: c.data == "my_preorders")
@@ -58,7 +59,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.get_user_lang(userID)
+    lang = database.users.get_language(userID)
     await storage.update_data(user=callback_query.from_user.id, data={"lang": lang})
     kb = InlineKeyboardMarkup(row_width=1)
     for category in database.products.get_categories():
@@ -131,6 +132,7 @@ async def _(message: types.Message, state: FSMContext):
 async def _(message: types.Message, state: FSMContext):
     userID = message.from_user.id
     userData = await state.get_data()
+    await state.finish()
     userLang = userData["lang"]
     userBalance = userData["user_balance"]
     amount = userData["amount"]
@@ -143,9 +145,12 @@ async def _(message: types.Message, state: FSMContext):
             zip_path = os.path.join("DB", "bought", zip_filename)
             zipObj = ZipFile(zip_path, "w")
             for file in database.products.get_N_products(category_name, amount):
-                zipObj.write(os.path.join("DB", category_name, file[0]))
+                path = os.path.join("DB", category_name, file[0])
+                zipObj.write(path, os.path.basename(path))
                 database.products.set_isBought(file[0], category_name)
+            zipObj.close()
             await message.answer_document(InputFile(zip_path))
+            database.users.add_purchase(userID, category_name, amount, category_price*amount, zip_filename)
             if userLang == "RU":
                 await message.answer("Спасибо за покупку!\n"
                                      "Время работы поддержки @fbfarmpro 09:00-19:00 gmt+3.",
@@ -155,8 +160,14 @@ async def _(message: types.Message, state: FSMContext):
                                      "Support hours @fbfarmpro 09:00-19:00 gmt+3.",
                                      reply_markup=keyboards.MAIN_MENU_EN)
             for admin in ADMIN_ID:
-                await bot.send_mesasge(admin, text=f"{message.from_user.mention if message.from_user.username else userID}"
-                                                   f"purchased {1} filename, {category_price*amount}$\n{datetime.datetime.now()}")
+                try:
+                    await bot.send_message(admin, text=f"{message.from_user.mention if message.from_user.username else userID} "
+                                                       f"purchased {amount} files\n"
+                                                       f"category: {category_name}\n"
+                                                       f"price: {category_price*amount}$\n"
+                                                       f"time: {datetime.now().isoformat()}")
+                except ChatNotFound:
+                    continue
         else:
             if userLang == "RU":
                 await message.answer("Не хватает денег.", reply_markup=keyboards.MAIN_MENU_RU)
@@ -167,7 +178,6 @@ async def _(message: types.Message, state: FSMContext):
             await message.answer("Ок.", reply_markup=keyboards.MAIN_MENU_RU)
         else:
             await message.answer("Okay.", reply_markup=keyboards.MAIN_MENU_EN)
-    await state.finish()
 
 
 @dp.callback_query_handler(lambda c: c.data == "rules")
@@ -240,7 +250,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.get_user_lang(userID)
+    lang = database.users.get_language(userID)
     if lang == "RU":
         await callback_query.message.edit_text("Main menu")
         await callback_query.message.edit_reply_markup(keyboards.MAIN_MENU_EN)

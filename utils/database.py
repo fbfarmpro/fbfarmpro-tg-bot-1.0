@@ -16,14 +16,25 @@ import os
 def create_random_filename_zip():
     # choose from all lowercase letter
     letters = ascii_letters + digits
-    return "".join(choice(letters) for i in range(config.FINAL_ZIP_NAME_LEN))+".zip"
+    return "".join(choice(letters) for _ in range(config.FINAL_ZIP_NAME_LEN))+".zip"
 
 
 class UsersDB:
     def __init__(self):
         self.db = sqlite3.connect("DB/users.db")
         self.cur = self.db.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS users (userID TEXT NOT NULL, language TEXT NOT NULL, balance INT NOT NULL, payment_ids TEXT, isBanned INT NOT NULL)")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS users (userID TEXT NOT NULL,
+                                                              language TEXT NOT NULL,
+                                                              balance INT NOT NULL,
+                                                              payment_ids TEXT,
+                                                              isBanned INT NOT NULL)""")
+
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS purchaseHistory (userID TEXT NOT NULL,
+                                                                        time TEXT NOT NULL,
+                                                                        category TEXT NOT NULL,
+                                                                        amount INT NOT NULL,
+                                                                        price INT NOT NULL,
+                                                                        filename TEXT)""")
         self.db.commit()
 
     def get_payments(self, userID):
@@ -55,7 +66,6 @@ class UsersDB:
     def get_banned(self, userID):
         return int(self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()[0])
 
-
     def change_language(self, userID):
         lang = self.get_language(userID)
         self.cur.execute("UPDATE users SET language = ? WHERE userID = ?", ("RU" if lang == "EN" else "EN", userID))
@@ -65,7 +75,6 @@ class UsersDB:
         status = self.get_banned(userID)
         self.cur.execute("UPDATE users SET isBanned = ? WHERE userID = ?", (1 if status == 0 else 0, userID))
         self.db.commit()
-
 
     def get_balance(self, userID):
         return int(self.cur.execute("SELECT balance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
@@ -82,6 +91,17 @@ class UsersDB:
     def get_regular_customers(self):
         return self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users WHERE balance > 0").fetchone()[0]
 
+    def get_purchases(self):
+        return iter(self.cur.execute("SELECT * FROM purchaseHistory").fetchall())
+
+    def add_purchase(self, userID, category_name, amount, price, filename):
+        self.cur.execute("INSERT INTO purchaseHistory VALUES (?, ?, ?, ?, ?, ?)", (
+            userID, datetime.isoformat(datetime.now()), category_name, amount, price, filename))
+        self.db.commit()
+
+    def remove_purchase_archive(self, filename):
+        self.cur.execute("UPDATE purchaseHistory SET filename = ? WHERE filename = ?", (None, filename))
+        self.db.commit()
 
     def __iter__(self):
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
@@ -91,8 +111,13 @@ class ProductsDB:
     def __init__(self):
         self.db = sqlite3.connect("DB/products.db")
         self.cur = self.db.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS categories (name TEXT NOT NULL, description TEXT NOT NULL, price INTEGER NOT NULL);")
-        self.cur.execute("CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL, category TEXT NOT NULL, boughtAt TEXT);")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS categories (name TEXT NOT NULL,
+                                                                   description TEXT NOT NULL,
+                                                                   price INTEGER NOT NULL);""")
+
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL,
+                                                                 category TEXT NOT NULL,
+                                                                 boughtAt TEXT);""")
         self.db.commit()
 
     def create_category(self, name, desc, price):
@@ -106,8 +131,15 @@ class ProductsDB:
         self.cur.execute("INSERT INTO products VALUES (?, ?, ?)", (product_name, category_name, None))
         self.db.commit()
 
+    def remove_product(self, category_name, product_name):
+        self.cur.execute("DELETE FROM products WHERE name = ? AND category = ?", (product_name, category_name))
+        self.db.commit()
+
     def product_exists(self, product_name):
         return bool(self.cur.execute("SELECT * FROM products WHERE name = ?", (product_name,)).fetchone()[0])
+
+    def get_product_category(self, product_name):
+        return self.cur.execute("SELECT category FROM products WHERE name = ?", (product_name,)).fetchone()[0]
 
     def change_product_category(self, product_name, category_name):
         self.cur.execute("UPDATE products SET category = ? WHERE name = ?", (category_name, product_name))
@@ -117,7 +149,7 @@ class ProductsDB:
         return int(self.cur.execute("SELECT COUNT(DISTINCT name) name FROM products WHERE category = ? AND boughtAt IS NULL", (category_name,)).fetchone()[0])
 
     def set_isBought(self, product_name, category_name):
-        self.cur.execute("UPDATE products SET boughtAt = ? WHERE name = ? and category = ?", (datetime.now(), product_name, category_name))
+        self.cur.execute("UPDATE products SET boughtAt = ? WHERE name = ? and category = ?", (datetime.now().isoformat(), product_name, category_name))
         self.db.commit()
 
     def get_categories(self):
@@ -131,11 +163,14 @@ class ProductsDB:
     def get_category_price(self, category_name):
         return int(self.cur.execute("SELECT price FROM categories WHERE name = ?", (category_name,)).fetchone()[0])
 
+    def __iter__(self):
+        return iter(self.cur.execute("SELECT * FROM products").fetchall())
+
 
 class AsyncPayment:
     def __init__(self, api_key):
-        self.url = "https://app-demo.payadmit.com/api/v1/payments/"
-        # self.url = "https://mp.payadmit.com/api/v1/payments/"
+        # self.url = "https://app-demo.payadmit.com/api/v1/payments/" # test
+        self.url = "https://mp.payadmit.com/api/v1/payments/" # prod
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
@@ -147,6 +182,9 @@ class AsyncPayment:
                 "paymentType": "DEPOSIT",
                 "paymentMethod": paymentMethod}, headers=self.headers) as req:
                 resp = await req.text()
+                with open("test.html", "w") as file:
+                    file.write(resp)
+                print(resp)
                 return loads(resp)
 
     async def get_payment(self, paymentID):
@@ -165,6 +203,3 @@ class AsyncPayment:
 users = UsersDB()
 products = ProductsDB()
 payment = AsyncPayment(APIKEY)
-
-def get_user_lang(userID: int | str) -> str:
-    return users.get_language(str(userID))

@@ -8,6 +8,11 @@ MY_PROFILE_BTN_EN = InlineKeyboardButton("My profile", callback_data="my_profile
 
 ADD_BALANCE_BTN_RU = InlineKeyboardButton("Пополнить баланс", callback_data="add_balance")
 ADD_BALANCE_BTN_EN = InlineKeyboardButton("Add balance", callback_data="add_balance")
+ADD_BALANCE_CARD_BTN_RU = InlineKeyboardButton("Картой", callback_data="add_balance_card")
+ADD_BALANCE_CARD_BTN_EN = InlineKeyboardButton("Card", callback_data="add_balance_card")
+
+ADD_BALANCE_CRYPTO_BTN_RU = InlineKeyboardButton("Криптой", callback_data="add_balance_crypto")
+ADD_BALANCE_CRYPTO_BTN_EN = InlineKeyboardButton("Crypto", callback_data="add_balance_crypto")
 
 MY_PREORDERS_BTN_RU = InlineKeyboardButton("Мои предзаказы", callback_data="my_preorders")
 MY_PREORDERS_BTN_EN = InlineKeyboardButton("My preorders", callback_data="my_preorders")
@@ -80,6 +85,12 @@ MAIN_MENU_EN.add(MY_PROFILE_BTN_EN, ADD_BALANCE_BTN_EN)
 MAIN_MENU_EN.add(MY_PREORDERS_BTN_EN, PREORDER_BTN_EN)
 MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(REPLACEMENT_BTN_EN)
 MAIN_MENU_EN.add(RULES_BTN_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
+
+PAYMENT_MENU_RU = InlineKeyboardMarkup(row_width=2)
+PAYMENT_MENU_RU.add(ADD_BALANCE_CARD_BTN_RU, ADD_BALANCE_CRYPTO_BTN_RU)
+
+PAYMENT_MENU_EN = InlineKeyboardMarkup(row_width=2)
+PAYMENT_MENU_EN.add(ADD_BALANCE_CARD_BTN_EN, ADD_BALANCE_CRYPTO_BTN_EN)
 
 ADMIN_MENU = InlineKeyboardMarkup(row_width=1)
 ADMIN_MENU.add(GREETING_MSG_BTN, MAILING_BTN)

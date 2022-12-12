@@ -501,14 +501,14 @@ async def _(message: types.Message, state: FSMContext):
 @dp.message_handler(state="product_replace_category")
 async def _(message: types.Message, state: FSMContext):
     category = message.text
-    cats = database.products.get_categories()
-    print(cats)
     if category not in database.products.get_categories():
         await message.answer("No such category. Enter again")
         await state.set_state("product_replace_category")
         return
     userData = await state.get_data()
     product = userData["product_filename"]
+    old_category = database.products.get_product_category(product)
     database.products.change_product_category(product, category)
+    os.rename(os.path.join("DB", old_category, product), os.path.join("DB", category, product))
     await message.answer("Success")
     await state.finish()
