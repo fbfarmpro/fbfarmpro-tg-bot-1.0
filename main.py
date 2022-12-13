@@ -37,7 +37,10 @@ async def check_for_payments():
             payment_ids = database.users.get_payments(userID)
             for payment_id in payment_ids:
                 payment_data = await database.payment.get_payment(payment_id)
-                payment_data = payment_data["result"]
+                payment_data = payment_data.get("result", None)
+                if not payment_data:
+                    database.users.remove_payment(userID, payment_id)
+                    continue
                 id = payment_data["id"]
                 if id not in payment_ids:
                     continue

@@ -179,21 +179,20 @@ class ProductsDB:
 class AsyncPayment:
     def __init__(self, api_key):
         # self.url = "https://app-demo.payadmit.com/api/v1/payments/" # test
-        self.url = "https://mp.payadmit.com/api/v1/payments/" # prod
+        self.url = "https://app.payadmit.com/api/v1/payments" # prod
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
     async def create_payment(self, amount, paymentMethod):
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, json={
-                "amount": amount,
-                "currency": "USD",
-                "paymentType": "DEPOSIT",
-                "paymentMethod": paymentMethod}, headers=self.headers) as req:
+            json = { "amount": amount,
+                     "paymentType": "DEPOSIT",
+                     "paymentMethod": paymentMethod
+                     }
+
+            json.update({"currency": "USD" if paymentMethod != "CRYPTO" else "BTC"})
+            async with session.post(self.url, json=json, headers=self.headers) as req:
                 resp = await req.text()
-                with open("test.html", "w") as file:
-                    file.write(resp)
-                print(resp)
                 return loads(resp)
 
     async def get_payment(self, paymentID):

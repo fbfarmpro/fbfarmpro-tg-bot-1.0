@@ -12,7 +12,7 @@ async def _(callback_query: types.CallbackQuery):
 
     if callback_query.data.endswith("card"):
         await storage.update_data(user=userID, data={"paymentMethod": "BASIC_CARD", "lang": lang})
-    else:
+    elif callback_query.data.endswith("crypto"):
         await storage.update_data(user=userID, data={"paymentMethod": "CRYPTO", "lang": lang})
 
     if lang == "RU":
@@ -31,9 +31,11 @@ async def process_amount(message: types.Message, state: FSMContext):
         assert paymentMethod in ["BASIC_CARD", "CRYPTO"]
 
     response = await database.payment.create_payment(int(message.text), paymentMethod)
-    payment_id = response_card["result"]["id"]
+    print(response)
+    payment_id = response["result"]["id"]
     database.users.add_payment(userID, payment_id)
-    url = response_card["result"]["redirectUrl"]
+    url = response["result"]["redirectUrl"]
+    await message.answer(paymentMethod)
     if lang == "RU":
         await bot.send_message(userID, f"Оплатите по ссылке:\n{url}\n"
                                         f"❗️ Вы должны пополнить счет в течении 20 минут\n"
