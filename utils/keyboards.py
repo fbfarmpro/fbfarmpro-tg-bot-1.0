@@ -8,11 +8,14 @@ MY_PROFILE_BTN_EN = InlineKeyboardButton("My profile", callback_data="my_profile
 
 ADD_BALANCE_BTN_RU = InlineKeyboardButton("Пополнить баланс", callback_data="add_balance")
 ADD_BALANCE_BTN_EN = InlineKeyboardButton("Add balance", callback_data="add_balance")
+
 ADD_BALANCE_CARD_BTN_RU = InlineKeyboardButton("Картой", callback_data="add_balance_card")
 ADD_BALANCE_CARD_BTN_EN = InlineKeyboardButton("Card", callback_data="add_balance_card")
-
 ADD_BALANCE_CRYPTO_BTN_RU = InlineKeyboardButton("Криптой", callback_data="add_balance_crypto")
 ADD_BALANCE_CRYPTO_BTN_EN = InlineKeyboardButton("Crypto", callback_data="add_balance_crypto")
+
+MY_PURCHASE_HISTORY_RU = InlineKeyboardButton("История покупок", callback_data="purchase_history")
+MY_PURCHASE_HISTORY_EN = InlineKeyboardButton("Purchase history", callback_data="purchase_history")
 
 MY_PREORDERS_BTN_RU = InlineKeyboardButton("Мои предзаказы", callback_data="my_preorders")
 MY_PREORDERS_BTN_EN = InlineKeyboardButton("My preorders", callback_data="my_preorders")
@@ -22,9 +25,6 @@ PREORDER_BTN_EN = InlineKeyboardButton("Preorder", callback_data="preorder")
 
 PURCHASE_BTN_RU = InlineKeyboardButton("Покупка", callback_data="purchase")
 PURCHASE_BTN_EN = InlineKeyboardButton("Purchase", callback_data="purchase")
-
-REPLACEMENT_BTN_RU = InlineKeyboardButton("Замена", callback_data="replacement")
-REPLACEMENT_BTN_EN = InlineKeyboardButton("Replacement", callback_data="replacement")
 
 RULES_BTN_RU = InlineKeyboardButton("Правила", callback_data="rules")
 RULES_BTN_EN = InlineKeyboardButton("Rules", callback_data="rules")
@@ -64,11 +64,8 @@ CHANGE_USER_DATA_BTN = InlineKeyboardButton("Change user data", callback_data="c
 CHANGE_USER_DATA_BAN_BTN = InlineKeyboardButton("Ban", callback_data="change_user_ban")
 CHANGE_USER_DATA_BALANCE_BTN = InlineKeyboardButton("Change balance", callback_data="change_user_balance")
 
-
 CATEGORY_ADD_BTN = InlineKeyboardButton("Add category", callback_data="category_add")
-
 PRODUCT_ADD_BTN = InlineKeyboardButton("Add product", callback_data="product_add")
-
 PRODUCT_REPLACE_BTN = InlineKeyboardButton("Change product category", callback_data="product_replace")
 
 BACK_BTN = InlineKeyboardButton("Back", callback_data="back")
@@ -77,13 +74,13 @@ BACK_BTN = InlineKeyboardButton("Back", callback_data="back")
 MAIN_MENU_RU = InlineKeyboardMarkup(row_width=2)
 MAIN_MENU_RU.add(MY_PROFILE_BTN_RU, ADD_BALANCE_BTN_RU)
 MAIN_MENU_RU.add(MY_PREORDERS_BTN_RU, PREORDER_BTN_RU)
-MAIN_MENU_RU.add(PURCHASE_BTN_RU).add(REPLACEMENT_BTN_RU)
+MAIN_MENU_RU.add(PURCHASE_BTN_RU).add(MY_PURCHASE_HISTORY_RU)
 MAIN_MENU_RU.add(RULES_BTN_RU).add(HELP_BTN_RU, LANGUAGE_BTN_RU)
 
 MAIN_MENU_EN = InlineKeyboardMarkup(row_width=2)
 MAIN_MENU_EN.add(MY_PROFILE_BTN_EN, ADD_BALANCE_BTN_EN)
 MAIN_MENU_EN.add(MY_PREORDERS_BTN_EN, PREORDER_BTN_EN)
-MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(REPLACEMENT_BTN_EN)
+MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(MY_PURCHASE_HISTORY_EN)
 MAIN_MENU_EN.add(RULES_BTN_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
 
 PAYMENT_MENU_RU = InlineKeyboardMarkup(row_width=2)

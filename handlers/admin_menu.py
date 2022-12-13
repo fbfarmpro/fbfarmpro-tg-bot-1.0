@@ -7,6 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from json import loads, dumps
 from loader import storage
+from aiogram.utils.exceptions import BotBlocked
 
 
 @dp.callback_query_handler(lambda c: c.data == "back")
@@ -178,7 +179,6 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("successfully deleted button")
 
 
-
 @dp.callback_query_handler(lambda c: c.data == "mailing_change_buttons_back")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
@@ -259,7 +259,6 @@ async def _(callback_query: types.CallbackQuery):
                                             disable_notification=data.get("disable_sound", False),
                                             protect_content=data.get("protect_content", False),
                                             reply_markup=kb)
-
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_priority")
@@ -355,13 +354,36 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
     count_of_users = database.users.get_count_of_users()
-    count_of_regular_customers = database.users.get_regular_customers()
-    banned_users = 0 # TODO
+    count_of_regular_customers = database.users.get_count_of_regular_customers()
+    banned_by_admins_users = database.users.get_count_of_banned()
+    total_cost_of_products = database.products.get_total_cost_of_products()
+    total_products = len(database.products.get_all_products())
+    purchases_sum = sum(int(data[4]) for data in database.users.get_purchases())
+    purchases_count = len(database.users.get_purchases())
+    users_who_ban_bot = 0
+    """
+    purchases_sum = 0
+    for purchase in database.users.get_purchases():
+        purchases_sum += int(purchase[4])
+    """
+    for user in database.users:
+        try:
+            await bot.send_message(user[0], "Проводим тестирование кто забанил бота. Если вы получили это сообщение, то вы молодец")
+        except (BotBlocked, ChatNotFound) as _:
+            users_who_ban_bot += 1
 
-    await callback_query.message.answer(f"users:{count_of_users}\n"
-                                        f"regular:{count_of_regular_customers}\n"
-                                        f"banned: {banned_users}\n"
-                                        f"")
+    who_ban_bot_count = (users_who_ban_bot/count_of_users)*100
+
+    await callback_query.message.answer(f"users: {count_of_users}\n"
+                                        f"who ban bot: {users_who_ban_bot} ({who_ban_bot_count}%)\n"
+                                        f"who not ban bot: {count_of_users-users_who_ban_bot} ({100-who_ban_bot_count}%)\n"
+                                        f"banned by admins: {banned_by_admins_users}\n"
+                                        f"total count of products: {total_products}\n"
+                                        f"total cost of products: {total_cost_of_products}\n"
+                                        f"regular: {count_of_regular_customers}\n"
+                                        f"purchases count: {purchases_count}\n"
+                                        f"purchases sum: {purchases_sum}"
+                                        )
 
 
 @dp.callback_query_handler(lambda c: c.data == "change_user")

@@ -68,7 +68,6 @@ async def check_for_payments():
 async def check_for_bought_products():
     while True:
         for product in database.users.get_purchases():
-            print(product)
             difference = datetime.now() - datetime.fromisoformat(product[1])
             zip_filename = product[5]
             zip_path = os.path.join("DB", "bought", zip_filename)

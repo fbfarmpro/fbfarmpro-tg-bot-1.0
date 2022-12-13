@@ -234,10 +234,23 @@ async def _(callback_query: types.CallbackQuery):
 """)
 
 
-@dp.callback_query_handler(lambda c: c.data == "replacement")
+@dp.callback_query_handler(lambda c: c.data == "purchase_history")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("На этапе разработки")
+    userID = str(callback_query.from_user.id)
+    lang = database.users.get_language(userID)
+    purchases = filter(lambda t: t[0] == userID, database.users.get_purchases())
+    if purchases:
+        if lang == "RU":
+            result = f"\n\n".join(f"Дата: {t[1]}\nКатегория: {t[2]}\nКатегория: {t[3]}\nЦена: {t[4]}" for t in purchases)
+        else:
+            result = f"\n\n".join(f"Date: {t[1]}\nCategory: {t[2]}\nAmount: {t[3]}\nPrice: {t[4]}" for t in purchases)
+        await callback_query.message.answer(result)
+    else:
+        if lang == "RU":
+            await callback_query.message.answer("Ваша история покупой пуста")
+        else:
+            await callback_query.message.answer("Your purchase history is empty")
 
 
 @dp.callback_query_handler(lambda c: c.data == "help")

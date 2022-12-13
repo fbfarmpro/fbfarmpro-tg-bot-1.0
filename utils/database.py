@@ -86,13 +86,16 @@ class UsersDB:
         self.db.commit()
 
     def get_count_of_users(self):
-        return self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users;").fetchone()[0]
+        return int(self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users").fetchone()[0])
 
-    def get_regular_customers(self):
-        return self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users WHERE balance > 0").fetchone()[0]
+    def get_count_of_banned(self):
+        return int(self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users WHERE isBanned = 1").fetchone()[0])
+
+    def get_count_of_regular_customers(self):
+        return int(self.cur.execute("SELECT COUNT(DISTINCT userID) FROM users WHERE balance > 0").fetchone()[0])
 
     def get_purchases(self):
-        return iter(self.cur.execute("SELECT * FROM purchaseHistory").fetchall())
+        return self.cur.execute("SELECT * FROM purchaseHistory").fetchall()
 
     def add_purchase(self, userID, category_name, amount, price, filename):
         self.cur.execute("INSERT INTO purchaseHistory VALUES (?, ?, ?, ?, ?, ?)", (
@@ -113,11 +116,11 @@ class ProductsDB:
         self.cur = self.db.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS categories (name TEXT NOT NULL,
                                                                    description TEXT NOT NULL,
-                                                                   price INTEGER NOT NULL);""")
+                                                                   price INTEGER NOT NULL)""")
 
         self.cur.execute("""CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL,
                                                                  category TEXT NOT NULL,
-                                                                 boughtAt TEXT);""")
+                                                                 boughtAt TEXT)""")
         self.db.commit()
 
     def create_category(self, name, desc, price):
@@ -162,6 +165,12 @@ class ProductsDB:
 
     def get_category_price(self, category_name):
         return int(self.cur.execute("SELECT price FROM categories WHERE name = ?", (category_name,)).fetchone()[0])
+
+    def get_all_products(self):
+        return self.cur.execute("SELECT * FROM products WHERE boughtAt IS NULL").fetchall()
+
+    def get_total_cost_of_products(self):
+        return sum(self.get_category_price(i[1]) for i in self.get_all_products())
 
     def __iter__(self):
         return iter(self.cur.execute("SELECT * FROM products").fetchall())
