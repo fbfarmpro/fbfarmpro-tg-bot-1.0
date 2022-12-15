@@ -17,11 +17,21 @@ async def _(message: types.Message):
             await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
         else:
             await message.answer(greeting_msg["en"]["text"])
-            await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
+            await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
         database.users.register(userID)
         await message.answer(greeting_msg["ru"]["text"])
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
+
+
+@dp.message_handler(commands=["menu"])
+async def _(message: types.Message):
+    userID = message.from_user.id
+    userLang = database.users.get_language(userID)
+    if userLang == "RU":
+        await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
+    else:
+        await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
 
 
 @dp.message_handler(lambda msg: msg.from_user.id in config.ADMIN_ID, commands=["admin"])
@@ -37,8 +47,10 @@ async def check_for_payments():
             payment_ids = database.users.get_payments(userID)
             for payment_id in payment_ids:
                 payment_data = await database.payment.get_payment(payment_id)
+                # print(payment_data)
                 payment_data = payment_data.get("result", None)
                 if not payment_data:
+                    print(payment_id, "NO DATA")
                     database.users.remove_payment(userID, payment_id)
                     continue
                 id = payment_data["id"]
@@ -73,6 +85,8 @@ async def check_for_bought_products():
         for product in database.users.get_purchases():
             difference = datetime.now() - datetime.fromisoformat(product[1])
             zip_filename = product[5]
+            if not zip_filename:
+                continue
             zip_path = os.path.join("DB", "bought", zip_filename)
             category_name = product[2]
             if difference.days >= 3 and zip_filename:

@@ -9,10 +9,12 @@ MY_PROFILE_BTN_EN = InlineKeyboardButton("My profile", callback_data="my_profile
 ADD_BALANCE_BTN_RU = InlineKeyboardButton("Пополнить баланс", callback_data="add_balance")
 ADD_BALANCE_BTN_EN = InlineKeyboardButton("Add balance", callback_data="add_balance")
 
-ADD_BALANCE_CARD_BTN_RU = InlineKeyboardButton("Картой", callback_data="add_balance_card")
-ADD_BALANCE_CARD_BTN_EN = InlineKeyboardButton("Card", callback_data="add_balance_card")
-ADD_BALANCE_CRYPTO_BTN_RU = InlineKeyboardButton("Криптой", callback_data="add_balance_crypto")
-ADD_BALANCE_CRYPTO_BTN_EN = InlineKeyboardButton("Crypto", callback_data="add_balance_crypto")
+TRON_COIN_BTN = InlineKeyboardButton("Tron", callback_data="trx_coin")
+ETHEREUM_COIN_BTN = InlineKeyboardButton("Ethereum", callback_data="eth_coin")
+USDT_COIN_BTN = InlineKeyboardButton("USDT TRC20", callback_data="usdt_coin")
+BINANCE_COIN_BTN = InlineKeyboardButton("Binance (BSC)", callback_data="bnb_coin")
+BITCOIN_COIN_BTN = InlineKeyboardButton("Bitcoin", callback_data="btc_coin")
+LITECOIN_COIN_BTN = InlineKeyboardButton("Litecoin", callback_data="ltc_coin")
 
 MY_PURCHASE_HISTORY_RU = InlineKeyboardButton("История покупок", callback_data="purchase_history")
 MY_PURCHASE_HISTORY_EN = InlineKeyboardButton("Purchase history", callback_data="purchase_history")
@@ -71,6 +73,12 @@ PRODUCT_REPLACE_BTN = InlineKeyboardButton("Change product category", callback_d
 BACK_BTN = InlineKeyboardButton("Back", callback_data="back")
 
 # keyboards
+
+COINS_MENU = InlineKeyboardMarkup(row_width=2)
+COINS_MENU.add(TRON_COIN_BTN, USDT_COIN_BTN)
+COINS_MENU.add(ETHEREUM_COIN_BTN, BINANCE_COIN_BTN)
+COINS_MENU.add(BITCOIN_COIN_BTN, LITECOIN_COIN_BTN)
+
 MAIN_MENU_RU = InlineKeyboardMarkup(row_width=2)
 MAIN_MENU_RU.add(MY_PROFILE_BTN_RU, ADD_BALANCE_BTN_RU)
 MAIN_MENU_RU.add(MY_PREORDERS_BTN_RU, PREORDER_BTN_RU)
@@ -82,12 +90,6 @@ MAIN_MENU_EN.add(MY_PROFILE_BTN_EN, ADD_BALANCE_BTN_EN)
 MAIN_MENU_EN.add(MY_PREORDERS_BTN_EN, PREORDER_BTN_EN)
 MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(MY_PURCHASE_HISTORY_EN)
 MAIN_MENU_EN.add(RULES_BTN_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
-
-PAYMENT_MENU_RU = InlineKeyboardMarkup(row_width=2)
-PAYMENT_MENU_RU.add(ADD_BALANCE_CARD_BTN_RU, ADD_BALANCE_CRYPTO_BTN_RU)
-
-PAYMENT_MENU_EN = InlineKeyboardMarkup(row_width=2)
-PAYMENT_MENU_EN.add(ADD_BALANCE_CARD_BTN_EN, ADD_BALANCE_CRYPTO_BTN_EN)
 
 ADMIN_MENU = InlineKeyboardMarkup(row_width=1)
 ADMIN_MENU.add(GREETING_MSG_BTN, MAILING_BTN)

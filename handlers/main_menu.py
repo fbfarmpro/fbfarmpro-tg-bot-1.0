@@ -15,6 +15,10 @@ from handlers import *
 from loader import storage
 
 
+@dp.callback_query_handler(lambda c: int(database.users.get_banned(c.from_user.id)))
+async def _(callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+
 @dp.callback_query_handler(lambda c: c.data == "my_profile")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
@@ -36,17 +40,19 @@ async def _(callback_query: types.CallbackQuery):
     userID = callback_query.from_user.id
     lang = database.users.get_language(userID)
     if lang == "RU":
-        await callback_query.message.edit_text("Выберите удобный для Вас метод пополнения баланса")
-        await callback_query.message.edit_reply_markup(keyboards.PAYMENT_MENU_RU)
+        await callback_query.message.answer("Выберите монету", reply_markup=keyboards.COINS_MENU)
     else:
-        await callback_query.message.edit_text("Choose method")
-        await callback_query.message.edit_reply_markup(keyboards.PAYMENT_MENU_EN)
+        await callback_query.message.answer("Choose coin", reply_markup=keyboards.COINS_MENU)
 
 
 @dp.callback_query_handler(lambda c: c.data == "my_preorders")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
+    lang = database.users.get_language()
+    if lang == "RU":
+        await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
+    else:
+        await bot.send_message(callback_query.from_user.id, "Developing...")
 
 
 @dp.callback_query_handler(lambda c: c.data == "preorder")

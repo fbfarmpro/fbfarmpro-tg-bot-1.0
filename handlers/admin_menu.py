@@ -93,6 +93,40 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_reply_markup(keyboards.MAILING_MENU)
 
+async def show_mailing(message: types.Message):
+    userID = message.from_user.id
+    data = await storage.get_data(user=userID)
+
+    if data.get("keyboard", 0):
+        kb = InlineKeyboardMarkup()
+        for button in data["keyboard"]:
+            kb.add(InlineKeyboardButton(button["text"], url=button["url"]))
+    else:
+        kb = None
+    text = f"""text:\n{data.get('text', 'You did not specify text')}
+disable notification: {data.get('disable_sound', False)}
+protect content: {data.get('protect_content', False)}
+priority: {data.get('priority', 'user')}
+"""
+    await message.answer("Preview:")
+    if data.get("animation", 0):
+        await message.answer_animation(caption=text,
+                                       disable_notification=data.get("disable_sound", False),
+                                       protect_content=data.get("protect_content", False),
+                                       reply_markup=kb,
+                                       animation=data["animation"])
+    elif data.get("photo", 0):
+        await message.answer_photo(caption=text,
+                                   disable_notification=data.get("disable_sound", False),
+                                   protect_content=data.get("protect_content", False),
+                                   reply_markup=kb,
+                                   photo=data["photo"])
+    else:
+        await message.answer(text=text,
+                             disable_notification=data.get("disable_sound", False),
+                             protect_content=data.get("protect_content", False),
+                             reply_markup=kb)
+    await message.answer("What do you want to do next", reply_markup=keyboards.MAILING_MENU)
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_sound")
 async def _(callback_query: types.CallbackQuery):
@@ -105,6 +139,7 @@ async def _(callback_query: types.CallbackQuery):
     else:
         await storage.update_data(user=callback_query.from_user.id, data={"disable_sound": False})
         await callback_query.message.answer("sound successfully enabled")
+    await show_mailing(callback_query.message, )
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_protect_content")
@@ -118,12 +153,14 @@ async def _(callback_query: types.CallbackQuery):
     else:
         await storage.update_data(user=userID, data={"protect_content": False})
         await callback_query.message.answer("protect content disabled")
+    await show_mailing(callback_query.message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_change_buttons")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_reply_markup(keyboards.MAILING_CHANGE_BUTTONS_MENU)
+    await show_mailing(callback_query.message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_change_buttons_add")
@@ -154,6 +191,7 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
     await storage.update_data(user=userID, data=data)
     await message.answer(f"Button successfully added")
+    await show_mailing(message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_change_buttons_del")
@@ -177,6 +215,7 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
     await storage.update_data(user=userID, data=data)
     await message.answer("successfully deleted button")
+    await show_mailing(message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_change_buttons_back")
@@ -203,6 +242,7 @@ async def _(message: types.Message, state: FSMContext):
     # I should do state.finish because I want to give user ability to press inline keyboard buttons
     await state.finish()
     await storage.update_data(user=userID, data=data)
+    await show_mailing(message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_add_media")
@@ -225,6 +265,7 @@ async def _(message: types.Message, state: FSMContext):
         data["animation"] = None
     await storage.update_data(user=userID, data=data)
     await message.answer("successfully added media")
+    await show_mailing(message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_preview")
@@ -259,6 +300,12 @@ async def _(callback_query: types.CallbackQuery):
                                             disable_notification=data.get("disable_sound", False),
                                             protect_content=data.get("protect_content", False),
                                             reply_markup=kb)
+    text = f"""
+disable notification: {data.get('disable_sound', False)}
+protect content: {data.get('protect_content', False)}
+priority: {data.get('priority', 'user')}
+"""
+    await callback_query.message.answer(f"Properties:\n{text}")
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_priority")
@@ -272,6 +319,7 @@ async def _(callback_query: types.CallbackQuery):
     else:
         await storage.update_data(user=userID, data={"priority": "user"})
         await callback_query.message.answer("priority: user")
+    await show_mailing(callback_query.message)
 
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_start")

@@ -19,6 +19,13 @@ def create_random_filename_zip():
     return "".join(choice(letters) for _ in range(config.FINAL_ZIP_NAME_LEN))+".zip"
 
 
+async def get_crypto_currency(coin_name: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT") as req:
+            text = await req.json()
+            return float(text["price"])
+
+
 class UsersDB:
     def __init__(self):
         self.db = sqlite3.connect("DB/users.db")
@@ -179,21 +186,21 @@ class ProductsDB:
 class AsyncPayment:
     def __init__(self, api_key):
         # self.url = "https://app-demo.payadmit.com/api/v1/payments/" # test
-        self.url = "https://app.payadmit.com/api/v1/payments" # prod
+        self.url = "https://app.payadmit.com/api/v1/payments/" # prod
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
-    async def create_payment(self, amount, paymentMethod):
+    async def create_payment(self, amount, currency):
         async with aiohttp.ClientSession() as session:
             json = { "amount": amount,
                      "paymentType": "DEPOSIT",
-                     "paymentMethod": paymentMethod
+                     "paymentMethod": "CRYPTO",
+                     "currency": currency
                      }
 
-            json.update({"currency": "USD" if paymentMethod != "CRYPTO" else "BTC"})
             async with session.post(self.url, json=json, headers=self.headers) as req:
-                resp = await req.text()
-                return loads(resp)
+                resp = await req.json()
+                return resp
 
     async def get_payment(self, paymentID):
         async with aiohttp.ClientSession() as session:
