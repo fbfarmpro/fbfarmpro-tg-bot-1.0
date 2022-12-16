@@ -7,4 +7,3 @@ settings.py
 secret.py
 DB
 greeting_msg.json
-site
