@@ -1,25 +1,45 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
+# from django.contrib.auth import login, authenticate
+from django.core.exceptions import ValidationError
+from .forms import RegisterForm, LoginForm
+import random
 
 
-def index(response):
-    return render(response, "main/index.html", {})
+def home(response):
+    return render(response, "main/index.html")#, {"register_form": RegisterForm(), "login_form": LoginForm()})
+
+def rules(response):
+    return render(response, "main/index.html")#, {"register_form": RegisterForm(), "login_form": LoginForm()})
+
+def login(response):
+    return render(response, "main/index.html")#, {"register_form": RegisterForm(), "login_form": LoginForm()})
 
 def register(response):
     print(response)
     if response.method == "POST":
+        print("POST REQUEST")
         if response.POST.get('submit') == 'Register':
-            print("HERE")
-            # your sign in logic goes here
-        elif response.POST.get('submit') == 'Enter':
+            print("REGISTER POST REQUEST")
+            form = RegisterForm(response.POST)
+            print(form)
+            if form.is_valid():
+                print("is valid")
+                form.instance.username = f'{random.randrange(10000000)}'
+                form.save()
+                # return redirect(response, "main/")
+            else:
+                print("AAAA"*100)
+                print(form.errors)
+                return render(response, "main/index.html", {"register_form": form, "login_form": LoginForm(), "anchor": "registration"})
+        elif response.POST.get('submit') == 'Login':
             print("THERE")
-            # your sign up logic goes here
-        form = UserCreationForm()
-        if form.is_valid():
-            form.save()
-            return redirect("/")
+        # that's for testing.
+        return render(response, "main/index.html", {"register_form": form, "login_form": LoginForm()})
     else:
-        form = UserCreationForm()
+        return redirect("main/index.html", {"register_form": RegisterForm(), "login_form": LoginForm()})
 
-    return render(response, "main/index.html", {"register_form":form})
+def profile(response):
+    return render(response, "main/index.html")#, {"register_form": RegisterForm(), "login_form": LoginForm()})
+
+def buy(response):
+    return render(response, "main/index.html")#, {"register_form": RegisterForm(), "login_form": LoginForm()})

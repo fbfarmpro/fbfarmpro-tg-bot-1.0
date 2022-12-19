@@ -84,7 +84,7 @@ class UsersDB:
         self.db.commit()
 
     def get_balance(self, userID):
-        return int(self.cur.execute("SELECT balance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
+        return float(self.cur.execute("SELECT balance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
 
     def add_balance(self, userID, amount):
         balance = self.get_balance(userID)

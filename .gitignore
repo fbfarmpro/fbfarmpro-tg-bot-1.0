@@ -6,4 +6,4 @@ log.txt
 settings.py
 secret.py
 DB
-greeting_msg.json
+greeting_msg*

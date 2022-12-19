@@ -42,12 +42,12 @@ async def _(message: types.Message, state: FSMContext):
         with open(config.GREETING_MSG_FILENAME) as file:
             content = loads(file.read())
     except FileNotFoundError:
-        content = {"ru": {"text": None}, "en": {"text": None}}
+        content = {"ru": {"text": None, "gif": None}, "en": {"text": None, "gif": None}}
     content["ru"]["text"] = message.text
     with open(config.GREETING_MSG_FILENAME, "w") as file:
         file.write(dumps(content, indent=2))
-    await message.answer("Success")
-    await state.finish()
+    await message.answer("Success. Now send me please gif")
+    await storage.set_state(user=message.from_user.id, state="edit_msg_gif_ru")
 
 
 @dp.message_handler(state="edit_msg_en")
@@ -56,11 +56,36 @@ async def _(message: types.Message, state: FSMContext):
         with open(config.GREETING_MSG_FILENAME) as file:
             content = loads(file.read())
     except FileNotFoundError:
-        content = {"ru": {"text": None}, "en": {"text": None}}
+        content = {"ru": {"text": None, "gif": None}, "en": {"text": None, "gif": None}}
     content["en"]["text"] = message.text
     with open(config.GREETING_MSG_FILENAME, "w") as file:
         file.write(dumps(content, indent=2))
-    await message.answer("Success")
+    await message.answer("Success. now send me gif")
+    await storage.set_state(user=message.from_user.id, state="edit_msg_gif_en")
+
+
+@dp.message_handler(state="edit_msg_gif_ru", content_types=["animation"])
+async def _(message: types.Message, state: FSMContext):
+    await message.answer("RUSSIAN GIF")
+    await message.animation.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
+    with open(config.GREETING_MSG_FILENAME) as file:
+        content = loads(file.read())
+    content["ru"]["gif"] = config.GREETING_MSG_GIF_RU_FILENAME
+    with open(config.GREETING_MSG_FILENAME, "w") as file:
+        file.write(dumps(content, indent=2))
+    await message.answer("Success.")
+    await state.finish()
+
+
+@dp.message_handler(state="edit_msg_gif_en", content_types=["animation"])
+async def _(message: types.Message, state: FSMContext):
+    await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
+    with open(config.GREETING_MSG_FILENAME) as file:
+        content = loads(file.read())
+    content["en"]["gif"] = config.GREETING_MSG_GIF_EN_FILENAME
+    with open(config.GREETING_MSG_FILENAME, "w") as file:
+        file.write(dumps(content, indent=2))
+    await message.answer("Success.")
     await state.finish()
 
 

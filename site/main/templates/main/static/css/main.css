@@ -17,7 +17,6 @@ body {
     color: #fff;
     min-height: 100vh;
     padding-bottom: 75px;
-
 }
 
 * {
@@ -114,6 +113,15 @@ p {
 .header-soc-item-icon {
     margin-right: 10px;
 }
+
+.header-profile-btn{
+    display: none;
+}
+.header-profile-btn .h-btn{
+    width: 170px;
+    height: 49px;
+}
+
 
 .header-inner {
     display: flex;
@@ -1029,5 +1037,8 @@ p {
     .modal-three .header-btn {
         width: 100%;
         margin-top: 20px
+    }
+    .header-profile-btn .h-btn{
+        width: 100%;
     }
 }

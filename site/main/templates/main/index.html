@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load crispy_forms_tags %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="shortcut icon" href="32.ico" type="image/x-icon">
@@ -65,6 +66,11 @@
                             </a>
                         </div>
                         <div class="header-inner">
+                            <div class="header-profile-btn change-btn" data-change=".fiveth">
+                                <div class="h-btn">
+                                    Profile
+                                </div>
+                            </div>
                             <div class="header-link">
                                 <a href="#" class="header-link-item change-btn" data-change=".third">
                                     <div class="header-link-item-icon">
@@ -230,20 +236,15 @@
                                         Registration
                                     </h2>
                                     {% block content %}
-                                    <form action="#" method="POST">
-                                        {{form}}
+                                    <form method="POST" class="form-group">
+                                        {% csrf_token %}
                                         <div class="reg-input">
-                                            <input type="email" placeholder="E-mail" name="r-email" required>
+                                            {{ register_form|crispy }}
+                                            <!-- <input type="email" placeholder="E-mail" name="a-email" required> -->
                                         </div>
-                                        <div class="reg-input">
-                                            <input type="text" placeholder="Password" name="r-password" required>
-                                        </div>
-                                        <div class="reg-input">
-                                            <input type="text" placeholder="Repeat password" name="r-password-repeat" required>
-                                        </div>
-                                        <div class="reg-sub">
-                                            <input type="submit" value="Register" class="h-btn">
-                                        </div>
+                                       <div class="reg-sub">
+                                            <input type="submit" value="Enter" class="h-btn">
+                                       </div>
                                         <a href="#" class="reg-btn">
                                             <div class="reg-btn-title">
                                                 Log in via Telegram
@@ -1000,7 +1001,7 @@
                     </div>
                     <div class="header-inner">
                         <div class="header-link">
-                            <a href="#" class="header-link-item change-btn h-close" data-change=".third">
+                            <a href="/login" class="header-link-item change-btn h-close" data-change=".third">
                                 <div class="header-link-item-icon">
                                     {% load static %}
                                     <img width="14" height="20" src="{% static 'img/lock-icon.png' %}" alt="">
@@ -1009,7 +1010,7 @@
                                     Authorization
                                 </div>
                             </a>
-                            <a href="#" class="header-link-item change-btn h-close" data-change=".fourth">
+                            <a href="/register" class="header-link-item change-btn h-close" data-change=".fourth">
                                 <div class="header-link-item-icon">
                                     {% load static %}
                                     <img width="19" height="19" src="{% static 'img/profile-icon.png' %}" alt="">
@@ -1018,6 +1019,11 @@
                                     Registration
                                 </div>
                             </a>
+                        </div>
+                        <div class="header-profile-btn change-btn" data-change=".fiveth">
+                            <div class="h-btn">
+                                Profile
+                            </div>
                         </div>
                         <a href="#" class="header-btn change-btn h-close" data-change=".second">
                             Replacement rules
