@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from json import loads, dumps
 from loader import storage
-from aiogram.utils.exceptions import BotBlocked
+from aiogram.utils.exceptions import BotBlocked, FileIsTooBig
 import os
 
 
@@ -84,7 +84,12 @@ async def _(message: types.Message, state: FSMContext):
     if message.content_type == "animation":
         await message.animation.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
     else:
-        await message.document.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
+        try:
+            await message.document.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
+        except FileIsTooBig:
+            await message.answer("File is too big")
+            await state.set_state("edit_msg_gif_ru")
+            return
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
     content["ru"]["gif"] = config.GREETING_MSG_GIF_RU_FILENAME
@@ -99,7 +104,12 @@ async def _(message: types.Message, state: FSMContext):
     if message.content_type == "animation":
         await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
     else:
-        await message.document.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
+        try:
+            await message.document.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
+        except FileIsTooBig:
+            await message.answer("File is too big")
+            await state.set_state("edit_msg_gif_ru")
+            return
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
     content["en"]["gif"] = config.GREETING_MSG_GIF_EN_FILENAME
