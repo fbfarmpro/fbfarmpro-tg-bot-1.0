@@ -71,7 +71,8 @@ class UsersDB:
         return self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
 
     def get_banned(self, userID):
-        return int(self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()[0])
+        data = self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()
+        return int(data[0]) if data else list()
 
     def change_language(self, userID):
         lang = self.get_language(userID)
