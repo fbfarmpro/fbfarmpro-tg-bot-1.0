@@ -46,6 +46,8 @@ GREETING_MSG_EDIT_EN_BTN = InlineKeyboardButton("Edit greeting msg EN", callback
 GREETING_MSG_PREVIEW_RU_BTN = InlineKeyboardButton("Greeting msg preview RU", callback_data="greeting_msg_preview_ru")
 GREETING_MSG_PREVIEW_EN_BTN = InlineKeyboardButton("Greeting msg preview EN", callback_data="greeting_msg_preview_en")
 
+PURCHASE_GIF_CHANGE = InlineKeyboardButton("Change purchase gif", callback_data="purchase_gif_change")
+
 MAILING_BTN = InlineKeyboardButton("Mailing", callback_data="mailing")
 # await message.reply(text="No sound!", disable_notification=True)
 MAILING_SOUND_BTN = InlineKeyboardButton("Sound on/off", callback_data="mailing_sound")
@@ -92,7 +94,7 @@ MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(MY_PURCHASE_HISTORY_EN)
 MAIN_MENU_EN.add(RULES_BTN_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
 
 ADMIN_MENU = InlineKeyboardMarkup(row_width=1)
-ADMIN_MENU.add(GREETING_MSG_BTN, MAILING_BTN)
+ADMIN_MENU.add(GREETING_MSG_BTN, PURCHASE_GIF_CHANGE, MAILING_BTN)
 ADMIN_MENU.add(CHANGE_USER_DATA_BTN, STATISTIC_BTN)
 ADMIN_MENU.add(CATEGORY_ADD_BTN, PRODUCT_ADD_BTN)
 ADMIN_MENU.add(PRODUCT_REPLACE_BTN)

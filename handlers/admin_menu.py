@@ -8,12 +8,27 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from json import loads, dumps
 from loader import storage
 from aiogram.utils.exceptions import BotBlocked
+import os
 
 
 @dp.callback_query_handler(lambda c: c.data == "back")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_reply_markup(keyboards.ADMIN_MENU)
+
+
+@dp.callback_query_handler(lambda c: c.data == "purchase_gif_change")
+async def _(callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+    await callback_query.message.answer("Send me gif")
+    await storage.set_state(user=callback_query.from_user.id, state="purchase_gif_data")
+
+
+@dp.message_handler(state="purchase_gif_data", content_types=["animation"])
+async def _(message: types.Message, state: FSMContext):
+    await message.animation.download(destination="purchase_gif.gif")
+    await message.answer("Success.")
+    await state.finish()
 
 
 @dp.callback_query_handler(lambda c: c.data == "greeting_msg")
