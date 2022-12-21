@@ -47,7 +47,7 @@ async def process_amount(message: types.Message, state: FSMContext):
         await state.set_state("payment")
         return
 
-    price = await database.get_crypto_currency(coin) if coin != "usdt" else 1
+    price = database.get_crypto_currency(coin) if coin != "usdt" else 1
     amount = amount/price
     response = await database.payment.create_payment(amount, coin.upper())
     print(response)

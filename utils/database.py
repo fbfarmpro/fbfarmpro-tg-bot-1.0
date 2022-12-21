@@ -4,7 +4,7 @@ import config
 from handlers import *
 from config import *
 import sqlite3
-import aiohttp
+import requests
 from secret import APIKEY
 from json import loads
 from secrets import choice
@@ -19,11 +19,9 @@ def create_random_filename_zip():
     return "".join(choice(letters) for _ in range(config.FINAL_ZIP_NAME_LEN))+".zip"
 
 
-async def get_crypto_currency(coin_name: str):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT") as req:
-            text = await req.json()
-            return float(text["price"])
+def get_crypto_currency(coin_name: str):
+    r = requests.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT")
+    return float(r.json()["price"])
 
 
 class UsersDB:
