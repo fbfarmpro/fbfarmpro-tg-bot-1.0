@@ -72,7 +72,7 @@ class UsersDB:
 
     def get_banned(self, userID):
         data = self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()
-        return int(data[0]) if data else list()
+        return int(data[0]) if data else 0
 
     def change_language(self, userID):
         lang = self.get_language(userID)
