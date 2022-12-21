@@ -69,7 +69,8 @@ async def _(callback_query: types.CallbackQuery):
     await storage.update_data(user=callback_query.from_user.id, data={"lang": lang})
     kb = InlineKeyboardMarkup(row_width=1)
     for category in database.products.get_categories():
-        kb.add(InlineKeyboardButton(text=category, callback_data="purchase_category " + category))
+        cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
+        kb.add(InlineKeyboardButton(text=cat_text, callback_data="purchase_category " + category))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
@@ -86,6 +87,12 @@ async def _(callback_query: types.CallbackQuery):
     userBalance = database.users.get_balance(userID)
     category_price = database.products.get_category_price(category_name)
     count_of_products = database.products.get_count_of_products(category_name)
+    if count_of_products == 0:
+        if userLang == "RU":
+            await callback_query.message.answer("В данной категории пока нет продуктов")
+        else:
+            await callback_query.message.answer("No products in this category")
+        return
     await storage.update_data(user=userID, data={
         "count_of_products": count_of_products,
         "category_name": category_name,
