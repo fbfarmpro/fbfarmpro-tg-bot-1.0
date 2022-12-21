@@ -79,9 +79,9 @@ async def _(message: types.Message, state: FSMContext):
     await storage.set_state(user=message.from_user.id, state="edit_msg_gif_en")
 
 
-@dp.message_handler(state="edit_msg_gif_ru", content_types=["animation"])
+@dp.message_handler(state="edit_msg_gif_ru")  # , content_types=["animation"])
 async def _(message: types.Message, state: FSMContext):
-    await message.answer("RUSSIAN GIF")
+    await message.answer(message.content_type)
     await message.animation.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
@@ -92,8 +92,9 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(state="edit_msg_gif_en", content_types=["animation"])
+@dp.message_handler(state="edit_msg_gif_en")  # , content_types=["animation"])
 async def _(message: types.Message, state: FSMContext):
+    await message.answer(message.content_type)
     await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
