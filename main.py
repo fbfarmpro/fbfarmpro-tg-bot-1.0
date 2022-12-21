@@ -14,16 +14,16 @@ async def _(message: types.Message):
         greeting_msg = loads(file.read())
     if database.users.is_registered(userID):
         if database.users.get_language(userID) == "RU":
-            await message.answer(greeting_msg["ru"]["text"])
+            # await message.answer(greeting_msg["ru"]["text"])
             await message.answer_animation(InputFile(greeting_msg["ru"]["gif"]))
             await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
         else:
-            await message.answer(greeting_msg["en"]["text"])
+            # await message.answer(greeting_msg["en"]["text"])
             await message.answer_animation(InputFile(greeting_msg["en"]["gif"]))
             await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
         database.users.register(userID)
-        await message.answer(greeting_msg["ru"]["text"])
+        # await message.answer(greeting_msg["ru"]["text"])
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
 
 
