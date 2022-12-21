@@ -40,14 +40,14 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "greeting_msg_edit_ru")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("send text for russian greeting message")
+    await callback_query.message.answer(f"send text for russian greeting message (send {config.GREETING_NO_TEXT} to disable)")
     await storage.set_state(user=callback_query.from_user.id, state="edit_msg_ru")
 
 
 @dp.callback_query_handler(lambda c: c.data == "greeting_msg_edit_en")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("send text for english greeting message")
+    await callback_query.message.answer(f"send text for english greeting message (send {config.GREETING_NO_TEXT} to disable)")
     await storage.set_state(user=callback_query.from_user.id, state="edit_msg_en")
 
 
@@ -58,7 +58,7 @@ async def _(message: types.Message, state: FSMContext):
             content = loads(file.read())
     except FileNotFoundError:
         content = {"ru": {"text": None, "gif": None}, "en": {"text": None, "gif": None}}
-    content["ru"]["text"] = message.text
+    content["ru"]["text"] = message.text if message.text.lower() != config.GREETING_NO_TEXT else None
     with open(config.GREETING_MSG_FILENAME, "w") as file:
         file.write(dumps(content, indent=2))
     await message.answer("Success. Now send me please gif")
@@ -72,17 +72,19 @@ async def _(message: types.Message, state: FSMContext):
             content = loads(file.read())
     except FileNotFoundError:
         content = {"ru": {"text": None, "gif": None}, "en": {"text": None, "gif": None}}
-    content["en"]["text"] = message.text
+    content["en"]["text"] = message.text if message.text.lower() != config.GREETING_NO_TEXT else None
     with open(config.GREETING_MSG_FILENAME, "w") as file:
         file.write(dumps(content, indent=2))
     await message.answer("Success. now send me gif")
     await storage.set_state(user=message.from_user.id, state="edit_msg_gif_en")
 
 
-@dp.message_handler(state="edit_msg_gif_ru" , content_types=["animation", "document", "photo", "video"])
+@dp.message_handler(state="edit_msg_gif_ru", content_types=["animation", "document"])
 async def _(message: types.Message, state: FSMContext):
-    await message.answer(message.content_type)
-    await message.animation.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
+    if message.content_type == "animation":
+        await message.animation.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
+    else:
+        await message.document.download(destination=config.GREETING_MSG_GIF_RU_FILENAME)
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
     content["ru"]["gif"] = config.GREETING_MSG_GIF_RU_FILENAME
@@ -94,8 +96,10 @@ async def _(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state="edit_msg_gif_en" , content_types=["animation", "document", "photo", "video"])
 async def _(message: types.Message, state: FSMContext):
-    await message.answer(message.content_type)
-    await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
+    if message.content_type == "animation":
+        await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
+    else:
+        await message.document.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
     with open(config.GREETING_MSG_FILENAME) as file:
         content = loads(file.read())
     content["en"]["gif"] = config.GREETING_MSG_GIF_EN_FILENAME
