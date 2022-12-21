@@ -118,6 +118,7 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.edit_reply_markup(keyboards.MAILING_MENU)
 
+
 async def show_mailing(message: types.Message):
     userID = message.from_user.id
     data = await storage.get_data(user=userID)
@@ -152,6 +153,7 @@ priority: {data.get('priority', 'user')}
                              protect_content=data.get("protect_content", False),
                              reply_markup=kb)
     await message.answer("What do you want to do next", reply_markup=keyboards.MAILING_MENU)
+
 
 @dp.callback_query_handler(lambda c: c.data == "mailing_sound")
 async def _(callback_query: types.CallbackQuery):
@@ -548,7 +550,12 @@ async def _(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state="category_price")
 async def _(message: types.Message, state: FSMContext):
-    price = message.text
+    try:
+        price = float(message.text)
+    except ValueError:
+        await message.answer("You should enter number")
+        await state.set_state("category_price")
+        return
     data = await state.get_data()
     database.products.create_category(data["category_name"], data["category_description"], price)
     await message.answer("Success")

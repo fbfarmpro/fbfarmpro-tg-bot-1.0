@@ -9,7 +9,7 @@ GREETING_MSG_GIF_EN_FILENAME = "greeting_msg_gif_en.gif"
 FINAL_ZIP_NAME_LEN = 20
 MAX_MONEY_PER_BUY = 1488
 MIN_MONEY_PER_BUY = {
-    "tron": 1,
+    "trx": 1,
     "usdt": 10,
     "bnb": 10,
     "ltc": 10,
