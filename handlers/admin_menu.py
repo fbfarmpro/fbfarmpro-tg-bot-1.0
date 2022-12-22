@@ -505,7 +505,6 @@ async def _(message: types.Message, state: FSMContext):
         if not msg:
             await message.answer("I can't get user. Please, send userID")
             await state.set_state("change_user_userID")
-            # await AdminPanel.change_user_userID.set()
             return
         userID = msg.id
         username = msg.username
@@ -531,8 +530,8 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.message.text.split("\n")[0].split()[-1]
     if int(userID) not in config.ADMIN_ID:
-        database.users.change_banned(userID)
-        status = database.users.get_banned(userID)
+        database.users.change_banned(userID=userID)
+        status = database.users.get_banned(userID=userID)
         await callback_query.message.answer(f"Success. Now user {userID} {'banned' if status else 'unbanned'}")
     else:
         await callback_query.message.answer("You can't ban admins")
@@ -547,13 +546,18 @@ async def _(callback_query: types.CallbackQuery):
     await storage.set_state(user=callback_query.from_user.id, state="change_user_userID_balance")
 
 
-@dp.message_handler(lambda msg: msg.text.isdigit(), state="change_user_userID_balance")
+@dp.message_handler(state="change_user_userID_balance")
 async def _(message: types.Message, state: FSMContext):
-    num = int(message.text)
+    try:
+        num = float(message.text)
+    except ValueError:
+        await state.set_state("change_user_userID_balance")
+        await message.answer("Send me number, please")
+        return
     userData = await storage.get_data(user=message.from_user.id)
     userID = userData["balance_userID"]
-    database.users.add_balance(userID, num)
-    await message.answer(f"Success. Now this user has {database.users.get_balance(userID)}$")
+    database.users.add_balance(num, userID=userID)
+    await message.answer(f"Success. Now this user has {database.users.get_balance(userID=userID)}$")
     await state.finish()
 
 
