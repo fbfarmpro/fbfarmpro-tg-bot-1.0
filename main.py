@@ -60,12 +60,12 @@ async def check_for_payments():
             if not userID:
                 continue
             userLang = user[4]
-            payment_ids = database.users.get_payments(userID)
+            payment_ids = database.users.get_payments(userID=userID)
             for payment_id in payment_ids:
                 payment_data = await database.payment.get_payment(payment_id)
                 payment_data = payment_data.get("result", None)
                 if not payment_data:
-                    database.users.remove_payment(userID, payment_id)
+                    database.users.remove_payment(payment_id, userID=userID)
                     continue
                 id = payment_data["id"]
                 if id not in payment_ids:
@@ -78,8 +78,8 @@ async def check_for_payments():
                 """
                 if status == "COMPLETED":
                     amount = payment_data["amount"]
-                    database.users.add_balance(userID, amount)
-                    database.users.remove_payment(userID, payment_id)
+                    database.users.add_balance(amount, userID=userID)
+                    database.users.remove_payment(payment_id, userID=userID)
                     if userLang == "RU":
                         await bot.send_message(userID, f"Ваш счет успешно пополнено на {amount}$")
                     else:
@@ -89,7 +89,7 @@ async def check_for_payments():
                         await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
                     else:
                         await bot.send_message(userID, f"You payment {id}, declined/cancelled")
-                    database.users.remove_payment(userID, id)
+                    database.users.remove_payment(id, userID=userID)
 
         await asyncio.sleep(30)
 
