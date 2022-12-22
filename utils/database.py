@@ -6,6 +6,7 @@ from secrets import choice
 from string import ascii_letters, digits
 
 import aiohttp
+from aiogram import types
 from passlib.hash import pbkdf2_sha256 as sha256
 
 from handlers import *
