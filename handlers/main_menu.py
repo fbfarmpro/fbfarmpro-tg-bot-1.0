@@ -10,7 +10,7 @@ from aiogram.utils.exceptions import ChatNotFound
 
 import utils.database as database
 import utils.keyboards as keyboards
-from config import ADMIN_ID
+from config import ADMIN_ID, PURCHASE_GIF_FILENAME
 from handlers import *
 from loader import storage
 
@@ -173,7 +173,7 @@ async def _(message: types.Message, state: FSMContext):
                 await message.answer("Thank you for purchase!"
                                      "Support hours @fbfarmpro 09:00-19:00 gmt+3.",
                                      reply_markup=keyboards.MAIN_MENU_EN)
-            await message.answer_animation(InputFile(config.PURCHASE_GIF_FILENAME))
+            await message.answer_animation(InputFile(PURCHASE_GIF_FILENAME))
             for admin in ADMIN_ID:
                 try:
                     await bot.send_message(admin, text=f"{message.from_user.mention if message.from_user.username else userID} "
