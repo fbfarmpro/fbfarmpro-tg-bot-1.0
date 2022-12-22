@@ -19,7 +19,7 @@ def create_random_filename_zip():
     return "".join(choice(letters) for _ in range(config.FINAL_ZIP_NAME_LEN))+".zip"
 
 
-def get_crypto_currency(coin_name: str):
+async def get_crypto_currency(coin_name: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT") as r:
             data = await r.json()
