@@ -71,14 +71,14 @@ async def _(callback_query: types.CallbackQuery):
     kb = InlineKeyboardMarkup(row_width=1)
     for category in database.products.get_categories():
         cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
-        kb.add(InlineKeyboardButton(text=cat_text, callback_data="purchase_category " + category))
+        kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
         await callback_query.message.edit_text("Choose category", reply_markup=kb)
 
 
-@dp.callback_query_handler(lambda c: c.data.startswith("purchase_category"))
+@dp.callback_query_handler(lambda c: c.data.startswith("category"))
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
