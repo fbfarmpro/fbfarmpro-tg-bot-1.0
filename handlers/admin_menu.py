@@ -520,7 +520,7 @@ async def _(message: types.Message, state: FSMContext):
     if not database.users.is_registered(userID=userID):
         await message.answer(f"There is no {userID} in my database")
     else:
-        await message.answer(f"userID: {userID}\nusername: {username}\nbalance: {database.users.get_balance(userID)}",
+        await message.answer(f"userID: {userID}\nusername: {username}\nbalance: {database.users.get_balance(userID=userID)}",
                              reply_markup=keyboards.CHANGE_USER_DATA_MENU)
 
     await state.finish()
