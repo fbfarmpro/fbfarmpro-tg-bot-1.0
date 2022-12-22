@@ -44,7 +44,7 @@ class UsersDB:
                                                               isBanned INT NOT NULL)""")
 
         self.cur.execute("""CREATE TABLE IF NOT EXISTS purchaseHistory (userID TEXT,
-                                                                        email TEXT
+                                                                        email TEXT,
                                                                         time TEXT NOT NULL,
                                                                         category TEXT NOT NULL,
                                                                         amount REAL NOT NULL,
