@@ -9,7 +9,7 @@ from aiogram.dispatcher import FSMContext
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID)
+    lang = database.users.get_language(userID=userID)
 
     min_pay = config.MIN_MONEY_PER_BUY[callback_query.data.split("_")[0]]
     await storage.update_data(user=callback_query.from_user.id, data={
@@ -52,7 +52,7 @@ async def process_amount(message: types.Message, state: FSMContext):
     response = await database.payment.create_payment(amount, coin.upper())
     print(response)
     payment_id = response["result"]["id"]
-    database.users.add_payment(userID, payment_id)
+    database.users.add_payment(payment_id, userID=userID)
     url = response["result"]["redirectUrl"]
     if lang == "RU":
         await bot.send_message(userID, f"Оплатите по ссылке:\n{url}\n"

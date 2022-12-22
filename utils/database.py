@@ -176,9 +176,12 @@ class UsersDB:
         self.cur.execute("UPDATE purchaseHistory SET filename = ? WHERE filename = ?", (None, filename))
         self.db.commit()
 
+    def get_regular_customers(self):
+        return iter(self.cur.execute("SELECT * FROM users WHERE balance > 0"))
+
     def __iter__(self):
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
-        return iter(self.cur.execute("SELECT * FROM USERS").fetchall())
+        return iter(self.cur.execute("SELECT * FROM users").fetchall())
 
 
 class ProductsDB:

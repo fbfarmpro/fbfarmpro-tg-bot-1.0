@@ -403,7 +403,7 @@ async def _(callback_query: types.CallbackQuery):
         if data.get("animation", 0):
             animation = data["animation"]
             for user in database.users:
-                await bot.send_animation(chat_id=user[0],
+                await bot.send_animation(chat_id=user[1],
                                          caption=text,
                                          disable_notification=disable_notification,
                                          protect_content=protect_content,
