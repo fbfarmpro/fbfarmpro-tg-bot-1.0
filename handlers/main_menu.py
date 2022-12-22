@@ -85,7 +85,7 @@ async def _(callback_query: types.CallbackQuery):
         await callback_query.message.edit_text("Choose category", reply_markup=kb)
 
 
-@dp.callback_query_handler(lambda c: c.data.startswith("category"))
+@dp.callback_query_handler(lambda c: c.data.startswith("category "))
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
