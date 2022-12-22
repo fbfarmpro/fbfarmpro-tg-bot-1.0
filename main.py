@@ -12,8 +12,8 @@ async def _(message: types.Message):
     userID = message.from_user.id
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
-    if database.users.is_registered(userID):
-        if database.users.get_language(userID) == "RU":
+    if database.users.is_registered(userID=userID):
+        if database.users.get_language(userID=userID) == "RU":
             text = greeting_msg["ru"]["text"]
             if text:
                 await message.answer(text)
@@ -32,15 +32,16 @@ async def _(message: types.Message):
                 await message.answer_document(InputFile(greeting_msg["en"]["gif"]))
             await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
-        database.users.register(userID)
-        # await message.answer(greeting_msg["ru"]["text"])
+        database.users.register(userID=userID)
+        if greeting_msg["ru"]["text"]:
+            await message.answer(greeting_msg["ru"]["text"])
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
 
 
 @dp.message_handler(commands=["menu"])
 async def _(message: types.Message):
     userID = message.from_user.id
-    userLang = database.users.get_language(userID)
+    userLang = database.users.get_language(userID=userID)
     if userLang == "RU":
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
     else:
@@ -55,8 +56,10 @@ async def _(message: types.Message):
 async def check_for_payments():
     while True:
         for user in database.users:
-            userID = user[0]
-            userLang = user[1]
+            userID = user[1]
+            if not userID:
+                continue
+            userLang = user[4]
             payment_ids = database.users.get_payments(userID)
             for payment_id in payment_ids:
                 payment_data = await database.payment.get_payment(payment_id)

@@ -15,7 +15,7 @@ from handlers import *
 from loader import storage
 
 
-@dp.callback_query_handler(lambda c: int(database.users.get_banned(c.from_user.id)))
+@dp.callback_query_handler(lambda c: int(database.users.get_banned(userID=c.from_user.id)))
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
@@ -23,9 +23,9 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID)
+    lang = database.users.get_language(userID=userID)
     login = callback_query.from_user.mention if callback_query.from_user.username else callback_query.from_user.id
-    balance = database.users.get_balance(userID)
+    balance = database.users.get_balance(userID=userID)
     if lang == "RU":
         await bot.send_message(userID, f"Ваш логин: {login}\nВаш баланс: `{balance} USD`",
                                    parse_mode="MarkdownV2")
@@ -38,7 +38,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID)
+    lang = database.users.get_language(userID=userID)
     if lang == "RU":
         await callback_query.message.answer("Выберите монету", reply_markup=keyboards.COINS_MENU)
     else:
@@ -48,7 +48,7 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "my_preorders")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    lang = database.users.get_language()
+    lang = database.users.get_language(userID=userID)
     if lang == "RU":
         await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
     else:
@@ -65,7 +65,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID)
+    lang = database.users.get_language(userID=userID)
     await storage.update_data(user=callback_query.from_user.id, data={"lang": lang})
     kb = InlineKeyboardMarkup(row_width=1)
     for category in database.products.get_categories():
@@ -84,7 +84,7 @@ async def _(callback_query: types.CallbackQuery):
     category_name = callback_query.data.split()[-1]
     userData = await storage.get_data(user=userID)
     userLang = userData["lang"]
-    userBalance = database.users.get_balance(userID)
+    userBalance = database.users.get_balance(userID=userID)
     category_price = database.products.get_category_price(category_name)
     count_of_products = database.products.get_count_of_products(category_name)
     if count_of_products == 0:
@@ -153,7 +153,7 @@ async def _(message: types.Message, state: FSMContext):
     category_name = userData["category_name"]
     if message.text.lower() in ["да", "yes"]:
         if userBalance >= amount * category_price:
-            database.users.add_balance(userID, -(category_price * amount))
+            database.users.add_balance(-(category_price * amount), userID=userID)
             zip_filename = database.create_random_filename_zip()
             zip_path = os.path.join("DB", "bought", zip_filename)
             zipObj = ZipFile(zip_path, "w")
@@ -163,7 +163,7 @@ async def _(message: types.Message, state: FSMContext):
                 database.products.set_isBought(file[0], category_name)
             zipObj.close()
             await message.answer_document(InputFile(zip_path))
-            database.users.add_purchase(userID, category_name, amount, category_price*amount, zip_filename)
+            database.users.add_purchase(category_name, amount, category_price*amount, zip_filename, userID=userID)
             if userLang == "RU":
                 await message.answer("Спасибо за покупку!\n"
                                      "Время работы поддержки @fbfarmpro 09:00-19:00 gmt+3.",
@@ -197,7 +197,7 @@ async def _(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda c: c.data == "rules")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    lang = database.users.get_language(callback_query.from_user.id)
+    lang = database.users.get_language(userID=callback_query.from_user.id)
     if lang == "RU":
         await callback_query.message.answer("""
         Гарантия:
@@ -252,8 +252,8 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = str(callback_query.from_user.id)
-    lang = database.users.get_language(userID)
-    purchases = filter(lambda t: t[0] == userID, database.users.get_purchases())
+    lang = database.users.get_language(userID=userID)
+    purchases = filter(lambda t: t[1] == userID, database.users.get_purchases())
     if purchases:
         if lang == "RU":
             result = f"\n\n".join(f"Дата: {t[1]}\nКатегория: {t[2]}\nКатегория: {t[3]}\nЦена: {t[4]}" for t in purchases)
@@ -273,11 +273,11 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID)
+    lang = database.users.get_language(userID=userID)
     if lang == "RU":
         await callback_query.message.edit_text("Main menu")
         await callback_query.message.edit_reply_markup(keyboards.MAIN_MENU_EN)
     else:
         await callback_query.message.edit_text("Главное меню")
         await callback_query.message.edit_reply_markup(keyboards.MAIN_MENU_RU)
-    database.users.change_language(userID)
+    database.users.change_language(userID=userID)

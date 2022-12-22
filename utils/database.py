@@ -1,16 +1,16 @@
-from aiogram import types
-
-import config
-from handlers import *
-from config import *
+import os
 import sqlite3
-import requests
-from secret import APIKEY
+from datetime import datetime
 from json import loads
 from secrets import choice
 from string import ascii_letters, digits
-from datetime import datetime
-import os
+
+import aiohttp
+from passlib.hash import pbkdf2_sha256 as sha256
+
+from handlers import *
+from secret import APIKEY
+import config
 
 
 def create_random_filename_zip():
@@ -20,75 +20,137 @@ def create_random_filename_zip():
 
 
 def get_crypto_currency(coin_name: str):
-    r = requests.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT")
-    return float(r.json()["price"])
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api.binance.com/api/v3/ticker/price?symbol={coin_name.upper()}USDT") as r:
+            data = await r.json()
+            return float(data["price"])
 
 
 class UsersDB:
-    def __init__(self):
-        self.db = sqlite3.connect("DB/users.db")
+    def __init__(self, method):
+        if method not in ["tg", "site"]:
+            raise ValueError("Method should be 'tg' or 'site'")
+        self.method = method
+        self.db = sqlite3.connect("DB/users.db", check_same_thread=False)
         self.cur = self.db.cursor()
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS users (userID TEXT NOT NULL,
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS users (method TEXT NOT NULL,
+                                                              userID TEXT,
+                                                              email TEXT,
+                                                              password TEXT,
                                                               language TEXT NOT NULL,
-                                                              balance INT NOT NULL,
+                                                              balance REAL NOT NULL,
                                                               payment_ids TEXT,
                                                               isBanned INT NOT NULL)""")
 
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS purchaseHistory (userID TEXT NOT NULL,
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS purchaseHistory (userID TEXT,
+                                                                        email TEXT
                                                                         time TEXT NOT NULL,
                                                                         category TEXT NOT NULL,
-                                                                        amount INT NOT NULL,
-                                                                        price INT NOT NULL,
+                                                                        amount REAL NOT NULL,
+                                                                        price REAL NOT NULL,
                                                                         filename TEXT)""")
         self.db.commit()
 
-    def get_payments(self, userID):
-        data = self.cur.execute("SELECT payment_ids from users where userID = ?", (userID,)).fetchone()[0]
+    def get_payments(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            data = self.cur.execute("SELECT payment_ids from users where userID = ?", (userID,)).fetchone()[0]
+        else:
+            assert email is not None
+            data = self.cur.execute("SELECT payment_ids from users where email = ?", (email,)).fetchone()[0]
         return data.split(",") if data else list()
 
-    def add_payment(self, userID, paymentID):
-        payments = self.get_payments(userID)
+    def add_payment(self, paymentID, *, userID=None, email=None):
+        payments = self.get_payments(userID=userID, email=email)
         payments.append(paymentID)
-        self.cur.execute("UPDATE users SET payment_ids = ? WHERE userID = ?", (",".join(payments), userID))
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET payment_ids = ? WHERE userID = ?", (",".join(payments), userID))
+        else:
+            self.cur.execute("UPDATE users SET payment_ids = ? WHERE email = ?", (",".join(payments), email))
         self.db.commit()
 
-    def remove_payment(self, userID, paymentID):
-        payments = self.get_payments(userID)
+    def remove_payment(self, paymentID, *, userID=None, email=None):
+        payments = self.get_payments(userID=userID, email=email)
         payments.remove(paymentID)
-        self.cur.execute("UPDATE users SET payment_ids = ? WHERE userID = ?", (",".join(payments), userID))
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET payment_ids = ? WHERE userID = ?", (",".join(payments), userID))
+        else:
+            self.cur.execute("UPDATE users SET payment_ids = ? WHERE email = ?", (",".join(payments), email))
         self.db.commit()
 
-    def register(self, userID):
-        self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?)", (userID, "RU", 0, None, "0"))
+    def register(self, *, userID=None, email=None, password=None):
+        """If you pass email and password, this function will calculate hash for this password and store it to db"""
+        if self.method == "tg":
+            assert userID is not None
+            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("tg", userID, None,
+                                                                                   None, "RU", 0,
+                                                                                   None, 0))
+        else:
+            assert password is not None and email is not None
+            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", None, email,
+                                                                                   sha256.hash(password), "EN", 0,
+                                                                                   None, 0))
         self.db.commit()
 
-    def is_registered(self, userID):
-        return self.cur.execute("SELECT * from users WHERE userID = ?", (userID,)).fetchone()
+    def is_registered(self, *, userID=None, email=None, password=None):
+        if self.method == "tg":
+            assert userID is not None
+            return self.cur.execute("SELECT * FROm users WHERE userID = ?", (userID,)).fetchone()
+        elif password:
+            assert email is not None and password is not None
+            return self.cur.execute("SELECT * FROM users WHERE email = ? and password = ?", (email, sha256.hash(password))).fetchone()
+        else:
+            assert email is not None
+            return self.cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
-    def get_language(self, userID):
-        return self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+    def get_language(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            return self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+        else:
+            assert email is not None
+            return self.cur.execute("SELECT language FROM users WHERE email = ?", (email,)).fetchone()[0]
 
-    def get_banned(self, userID):
-        data = self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()
+    def get_banned(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            data = self.cur.execute("SELECT isBanned FROM users WHERE userID = ?", (userID,)).fetchone()
+        else:
+            assert email is not None
+            data = self.cur.execute("SELECT isBanned FROM users WHERE email = ?", (email,)).fetchone()
         return int(data[0]) if data else 0
 
-    def change_language(self, userID):
-        lang = self.get_language(userID)
-        self.cur.execute("UPDATE users SET language = ? WHERE userID = ?", ("RU" if lang == "EN" else "EN", userID))
+    def change_language(self, *, userID=None, email=None):
+        lang = self.get_language(userID=userID, email=email)
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET language = ? WHERE userID = ?", ("RU" if lang == "EN" else "EN", userID))
+        else:
+            self.cur.execute("UPDATE users SET language = ? WHERE email = ?", ("RU" if lang == "EN" else "EN", email))
         self.db.commit()
 
-    def change_banned(self, userID):
-        status = self.get_banned(userID)
-        self.cur.execute("UPDATE users SET isBanned = ? WHERE userID = ?", (1 if status == 0 else 0, userID))
+    def change_banned(self, *, userID=None, email=None):
+        status = self.get_banned(userID=userID, email=email)
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET isBanned = ? WHERE userID = ?", (1 if status == 0 else 0, userID))
+        else:
+            self.cur.execute("UPDATE users SET isBanned = ? WHERE email = ?", (1 if status == 0 else 0, email))
         self.db.commit()
 
-    def get_balance(self, userID):
-        return float(self.cur.execute("SELECT balance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
+    def get_balance(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            return float(self.cur.execute("SELECT balance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
+        else:
+            assert email is not None
+            return float(self.cur.execute("SELECT balance FROM users WHERE email = ?", (email,)).fetchone()[0])
 
-    def add_balance(self, userID, amount):
-        balance = self.get_balance(userID)
+    def add_balance(self, amount, *, userID=None, email=None):
+        balance = self.get_balance(userID=userID, email=email)
         result = balance + amount
-        self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
+        else:
+            self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
         self.db.commit()
 
     def get_count_of_users(self):
@@ -103,9 +165,10 @@ class UsersDB:
     def get_purchases(self):
         return self.cur.execute("SELECT * FROM purchaseHistory").fetchall()
 
-    def add_purchase(self, userID, category_name, amount, price, filename):
-        self.cur.execute("INSERT INTO purchaseHistory VALUES (?, ?, ?, ?, ?, ?)", (
-            userID, datetime.isoformat(datetime.now()), category_name, amount, price, filename))
+    def add_purchase(self, category_name, amount, price, filename, *, userID=None, email=None):
+        assert userID is not None or email is not None
+        self.cur.execute("INSERT INTO purchaseHistory VALUES (?, ?, ?, ?, ?, ?, ?)", (
+            userID, email, datetime.isoformat(datetime.now()), category_name, amount, price, filename))
         self.db.commit()
 
     def remove_purchase_archive(self, filename):
@@ -116,13 +179,14 @@ class UsersDB:
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
         return iter(self.cur.execute("SELECT * FROM USERS").fetchall())
 
+
 class ProductsDB:
     def __init__(self):
-        self.db = sqlite3.connect("DB/products.db")
+        self.db = sqlite3.connect("DB/products.db", check_same_thread=False)
         self.cur = self.db.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS categories (name TEXT NOT NULL,
                                                                    description TEXT NOT NULL,
-                                                                   price INTEGER NOT NULL)""")
+                                                                   price REAL NOT NULL)""")
 
         self.cur.execute("""CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL,
                                                                  category TEXT NOT NULL,
@@ -165,7 +229,6 @@ class ProductsDB:
         data = self.cur.execute("SELECT name FROM categories").fetchall()
         return [item for t in data for item in t]
 
-
     def get_N_products(self, category_name, amount):
         return self.cur.execute("SELECT name FROM products WHERE category = ? AND boughtAt IS NULL LIMIT ?", (category_name, amount)).fetchall()
 
@@ -191,11 +254,11 @@ class AsyncPayment:
 
     async def create_payment(self, amount, currency):
         async with aiohttp.ClientSession() as session:
-            json = { "amount": amount,
-                     "paymentType": "DEPOSIT",
-                     "paymentMethod": "CRYPTO",
-                     "currency": currency
-                     }
+            json = {"amount": amount,
+                    "paymentType": "DEPOSIT",
+                    "paymentMethod": "CRYPTO",
+                    "currency": currency
+                    }
 
             async with session.post(self.url, json=json, headers=self.headers) as req:
                 resp = await req.json()
@@ -214,6 +277,6 @@ class AsyncPayment:
                 return loads(resp)["result"]
 
 
-users = UsersDB()
+users = UsersDB("tg")
 products = ProductsDB()
 payment = AsyncPayment(APIKEY)
