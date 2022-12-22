@@ -99,7 +99,7 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(state="edit_msg_gif_en" , content_types=["animation", "document", "photo", "video"])
+@dp.message_handler(state="edit_msg_gif_en", content_types=["animation", "document", "photo", "video"])
 async def _(message: types.Message, state: FSMContext):
     if message.content_type == "animation":
         await message.animation.download(destination=config.GREETING_MSG_GIF_EN_FILENAME)
@@ -342,16 +342,16 @@ async def _(callback_query: types.CallbackQuery):
     await callback_query.message.answer("Preview:")
     if data.get("animation", 0):
         await callback_query.message.answer_animation(caption=data["text"],
-                                            disable_notification=data.get("disable_sound", False),
-                                            protect_content=data.get("protect_content", False),
-                                            reply_markup=kb,
-                                            animation=data["animation"])
-    elif data.get("photo", 0):
-        await callback_query.message.answer_photo(caption=data["text"],
                                                       disable_notification=data.get("disable_sound", False),
                                                       protect_content=data.get("protect_content", False),
                                                       reply_markup=kb,
-                                                      photo=data["photo"])
+                                                      animation=data["animation"])
+    elif data.get("photo", 0):
+        await callback_query.message.answer_photo(caption=data["text"],
+                                                  disable_notification=data.get("disable_sound", False),
+                                                  protect_content=data.get("protect_content", False),
+                                                  reply_markup=kb,
+                                                  photo=data["photo"])
     else:
         await callback_query.message.answer(data["text"],
                                             disable_notification=data.get("disable_sound", False),
@@ -564,14 +564,23 @@ async def _(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda c: c.data == "category_add")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("enter category name")
-    await storage.set_state(user=callback_query.from_user.id, state="category")
+    await callback_query.message.answer("enter category name (russian)")
+    await storage.set_state(user=callback_query.from_user.id, state="category_add_ru")
 
 
-@dp.message_handler(state="category")
+@dp.message_handler(state="category_add_ru")
 async def _(message: types.Message, state: FSMContext):
     await state.update_data(data={"category_name": message.text})
-    await message.answer("enter category description")
+    await message.answer("enter category name (english)")
+    await state.set_state("category_add_en")
+
+
+@dp.message_handler(state="category_add_en")
+async def _(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    category_name = data["category_name"] + "|" + message.text
+    await state.update_data(data={"category_name": category_name})
+    await message.answer("enter category description", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state("category_description")
 
 
@@ -599,13 +608,21 @@ async def _(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda c: c.data == "product_add")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("enter product category")
+    kb = types.ReplyKeyboardMarkup(row_width=1)
+    for category in database.products.get_categories():
+        kb.add(category)
+    await callback_query.message.answer("enter product category", reply_markup=kb)
     await storage.set_state(user=callback_query.from_user.id, state="product_category")
+
 
 @dp.message_handler(state="product_category")
 async def _(message: types.Message, state: FSMContext):
+    if message.text not in database.products.get_categories():
+        await message.answer("No such category")
+        await state.set_state("product_category")
+        return
     await state.update_data(data={"category_name": message.text})
-    await message.answer("send file")
+    await message.answer("send file", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state("product_file")
 
 
@@ -623,6 +640,7 @@ async def _(callback_query: types.CallbackQuery):
     await callback_query.message.answer("enter product name")
     await storage.set_state(user=callback_query.from_user.id, state="product_replace_filename")
 
+
 @dp.message_handler(state="product_replace_filename")
 async def _(message: types.Message, state: FSMContext):
     product = message.text
@@ -631,8 +649,12 @@ async def _(message: types.Message, state: FSMContext):
         await state.set_state("product_replace_filename")
         return
     await state.update_data(data={"product_filename": message.text})
-    await message.answer("enter product category")
+    kb = types.ReplyKeyboardMarkup(row_width=1)
+    for category in database.products.get_categories():
+        kb.add(category)
+    await message.answer("enter product category", reply_markup=kb)
     await state.set_state("product_replace_category")
+
 
 @dp.message_handler(state="product_replace_category")
 async def _(message: types.Message, state: FSMContext):

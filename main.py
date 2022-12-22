@@ -97,7 +97,7 @@ async def check_for_payments():
 async def check_for_bought_products():
     while True:
         for product in database.users.get_purchases():
-            difference = datetime.now() - datetime.fromisoformat(product[1])
+            difference = datetime.now() - datetime.fromisoformat(product[2])
             zip_filename = product[5]
             if not zip_filename:
                 continue

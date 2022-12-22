@@ -69,9 +69,16 @@ async def _(callback_query: types.CallbackQuery):
     lang = database.users.get_language(userID=userID)
     await storage.update_data(user=callback_query.from_user.id, data={"lang": lang})
     kb = InlineKeyboardMarkup(row_width=1)
-    for category in database.products.get_categories():
-        cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
-        kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
+    if lang == "RU":
+        for category in database.products.get_categories():
+            category = category.split("|")[0]
+            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
+            kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
+    else:
+        for category in database.products.get_categories():
+            category = category.split("|")[1]
+            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
+            kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
@@ -83,11 +90,16 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
     category_name = " ".join(callback_query.data.split()[1::])
+    full_category_name = None
+    for category in database.products.get_categories():
+        if category_name in category:
+            full_category_name = category
+            break
     userData = await storage.get_data(user=userID)
     userLang = userData["lang"]
     userBalance = database.users.get_balance(userID=userID)
-    category_price = database.products.get_category_price(category_name)
-    count_of_products = database.products.get_count_of_products(category_name)
+    category_price = database.products.get_category_price(full_category_name)
+    count_of_products = database.products.get_count_of_products(full_category_name)
     if count_of_products == 0:
         if userLang == "RU":
             await callback_query.message.answer("В данной категории пока нет продуктов")
@@ -96,7 +108,7 @@ async def _(callback_query: types.CallbackQuery):
         return
     await storage.update_data(user=userID, data={
         "count_of_products": count_of_products,
-        "category_name": category_name,
+        "category_name": full_category_name,
         "category_price": category_price,
         "user_balance": userBalance
     })
@@ -138,7 +150,6 @@ async def _(message: types.Message, state: FSMContext):
                              f"Final price: {amount*category_price}\nPurchase?(yes/no)")
 
     await state.update_data(data={"amount": amount})
-
     await state.set_state("purchase_accept")
 
 
