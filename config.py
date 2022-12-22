@@ -1,7 +1,7 @@
 import logging
 
 
-ADMIN_ID = [1787686208,730161327]
+ADMIN_ID = [1787686208,730161327,5639593336]
 
 GREETING_MSG_FILENAME = "greeting_msg.json"
 GREETING_MSG_GIF_RU_FILENAME = "greeting_msg_gif_ru.gif"

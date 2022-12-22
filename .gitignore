@@ -7,3 +7,5 @@ settings.py
 secret.py
 DB
 greeting_msg*
+purchase_gif.gif
+venv
