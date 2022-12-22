@@ -51,9 +51,9 @@ async def _(callback_query: types.CallbackQuery):
     userID = callback_query.from_user.id
     lang = database.users.get_language(userID=userID)
     if lang == "RU":
-        await message.answer("услуга находится на этапе разработки")
+        await callback_query.message.answer("услуга находится на этапе разработки")
     else:
-        await message.answer("Developing...")
+        await callback_query.message.answer("Developing...")
 
 
 @dp.callback_query_handler(lambda c: c.data == "preorder")
