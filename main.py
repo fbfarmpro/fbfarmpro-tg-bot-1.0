@@ -98,7 +98,7 @@ async def check_for_bought_products():
     while True:
         for product in database.users.get_purchases():
             difference = datetime.now() - datetime.fromisoformat(product[2])
-            zip_filename = product[5]
+            zip_filename = product[6]
             if not zip_filename:
                 continue
             zip_path = os.path.join("DB", "bought", zip_filename)

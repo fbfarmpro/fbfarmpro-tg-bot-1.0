@@ -608,7 +608,7 @@ async def _(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda c: c.data == "product_add")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    kb = types.ReplyKeyboardMarkup(row_width=1)
+    kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     for category in database.products.get_categories():
         kb.add(category)
     await callback_query.message.answer("enter product category", reply_markup=kb)
@@ -649,7 +649,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.set_state("product_replace_filename")
         return
     await state.update_data(data={"product_filename": message.text})
-    kb = types.ReplyKeyboardMarkup(row_width=1)
+    kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     for category in database.products.get_categories():
         kb.add(category)
     await message.answer("enter product category", reply_markup=kb)
