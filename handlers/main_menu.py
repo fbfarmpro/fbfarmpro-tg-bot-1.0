@@ -266,7 +266,7 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "help")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("На этапе разработки")
+    await callback_query.message.answer("@fbfarmpro")
 
 
 @dp.callback_query_handler(lambda c: c.data == "language")
