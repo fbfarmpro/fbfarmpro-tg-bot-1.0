@@ -48,11 +48,12 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "my_preorders")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
+    userID = callback_query.from_user.id
     lang = database.users.get_language(userID=userID)
     if lang == "RU":
-        await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
+        await message.answer("услуга находится на этапе разработки")
     else:
-        await bot.send_message(callback_query.from_user.id, "Developing...")
+        await message.answer("Developing...")
 
 
 @dp.callback_query_handler(lambda c: c.data == "preorder")
