@@ -82,7 +82,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    category_name = "".join(callback_query.data.split()[1::])
+    category_name = " ".join(callback_query.data.split()[1::])
     userData = await storage.get_data(user=userID)
     userLang = userData["lang"]
     userBalance = database.users.get_balance(userID=userID)
