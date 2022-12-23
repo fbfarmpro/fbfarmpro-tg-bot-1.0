@@ -115,8 +115,8 @@ async def _(callback_query: types.CallbackQuery):
         "category_price": category_price,
         "user_balance": userBalance
     })
-    formatted_category_name = category_name.replace("+", "\+")
-    formatted_category_desc = category_desc.replace("+", "\+")
+    formatted_category_name = category_name.replace("+", "\+").replace("-", "\-")
+    formatted_category_desc = category_desc.replace("+", "\+").replace("-", "\-")
     if userLang == "RU":
         await callback_query.message.answer(f"""
 💥{formatted_category_name}\n
