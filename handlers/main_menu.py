@@ -128,11 +128,11 @@ async def _(callback_query: types.CallbackQuery):
         await callback_query.message.answer("Введите количество продуктов")
     else:
         await callback_query.message.answer(f"""
-{category_name}
+💥{category_name}
 *Description:*
 {category_desc.split('|')[1]}
 --
-*There are {count_of_products} products, which costs {category_price}$*
+*Avaliable: {count_of_products} items at {category_price}$ each*
 *Your balance: {userBalance}$*""".replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,"),
                                             parse_mode="MarkdownV2")
         await callback_query.message.answer("Enter count of products")
