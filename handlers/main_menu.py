@@ -77,8 +77,9 @@ async def _(callback_query: types.CallbackQuery):
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
     else:
         for category in database.products.get_categories():
+            full_category_name = category
             category = category.split("|")[1]
-            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(category) else category
+            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(full_category_name) else category
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
