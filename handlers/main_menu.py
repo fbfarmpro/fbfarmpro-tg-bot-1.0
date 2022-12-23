@@ -99,6 +99,7 @@ async def _(callback_query: types.CallbackQuery):
     userLang = userData["lang"]
     userBalance = database.users.get_balance(userID=userID)
     category_price = database.products.get_category_price(full_category_name)
+    category_desc = database.products.get_category_description(full_category_name)
     count_of_products = database.products.get_count_of_products(full_category_name)
     if count_of_products == 0:
         if userLang == "RU":
@@ -113,11 +114,11 @@ async def _(callback_query: types.CallbackQuery):
         "user_balance": userBalance
     })
     if userLang == "RU":
-        await callback_query.message.answer(f"{category_name}\nДоступно {count_of_products} продуктов по {category_price}$ каждый\n"
+        await callback_query.message.answer(f"{category_name}\nОписание:\n{category_desc.split('|')[0]}\nДоступно {count_of_products} продуктов по {category_price}$ каждый\n"
                                             f"Ваш баланс: {userBalance}")
         await callback_query.message.answer("Введите количество продуктов")
     else:
-        await callback_query.message.answer(f"{category_name}\nThere are {count_of_products} products, which costs {category_price}$\n"
+        await callback_query.message.answer(f"{category_name}\nDescription:{category_desc.split('|')[1]}\nThere are {count_of_products} products, which costs {category_price}$\n"
                                             f"Your balance: {userBalance}")
         await callback_query.message.answer("Enter count of products")
     await storage.set_state(user=userID, state="purchase_category_amount")
@@ -273,12 +274,6 @@ async def _(callback_query: types.CallbackQuery):
         else:
             result = f"\n\n".join(f"Date: {t[1]}\nCategory: {t[2]}\nAmount: {t[3]}\nPrice: {t[4]}" for t in purchases)
             await callback_query.message.answer(result or "Your purchase history is empty")
-
-
-@dp.callback_query_handler(lambda c: c.data == "help")
-async def _(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer("@fbfarmpro")
 
 
 @dp.callback_query_handler(lambda c: c.data == "language")

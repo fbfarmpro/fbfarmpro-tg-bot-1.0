@@ -580,13 +580,22 @@ async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
     category_name = data["category_name"] + "|" + message.text
     await state.update_data(data={"category_name": category_name})
-    await message.answer("enter category description", reply_markup=types.ReplyKeyboardRemove())
-    await state.set_state("category_description")
+    await message.answer("enter category description (russian)", reply_markup=types.ReplyKeyboardRemove())
+    await state.set_state("category_description_ru")
 
 
-@dp.message_handler(state="category_description")
+@dp.message_handler(state="category_description_ru")
 async def _(message: types.Message, state: FSMContext):
     await state.update_data(data={"category_description": message.text})
+    await message.answer("enter category description (english)")
+    await state.set_state("category_description_en")
+
+
+@dp.message_handler(state="category_description_en")
+async def _(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    category_description = data["category_description"] + "|" + message.text
+    await state.update_data(data={"category_description": category_description})
     await message.answer("enter category price")
     await state.set_state("category_price")
 

@@ -31,8 +31,8 @@ PURCHASE_BTN_EN = InlineKeyboardButton("Purchase", callback_data="purchase")
 RULES_BTN_RU = InlineKeyboardButton("Правила", callback_data="rules")
 RULES_BTN_EN = InlineKeyboardButton("Rules", callback_data="rules")
 
-HELP_BTN_RU = InlineKeyboardButton("Помощь", callback_data="help")
-HELP_BTN_EN = InlineKeyboardButton("Help", callback_data="help")
+HELP_BTN_RU = InlineKeyboardButton("Помощь", url="tg://openmessage?user_id=5597114355")
+HELP_BTN_EN = InlineKeyboardButton("Help", url="tg://openmessage?user_id=5597114355")
 
 LANGUAGE_BTN_RU = InlineKeyboardButton("🏴‍☠️=>🇺🇸", callback_data="language")
 LANGUAGE_BTN_EN = InlineKeyboardButton("🇺🇸=>🏴‍☠️", callback_data="language")

@@ -199,7 +199,7 @@ class ProductsDB:
 
     def create_category(self, name, desc, price):
         os.mkdir(os.path.join("DB", name))
-        self.cur.execute("INSERT INTO categories VALUES (?, ?, ?)", (name, desc, price))
+        self.cur.execute("INSERT INTO categories VALUES (?, ?, ?)", (name, desc, float(price)))
         self.db.commit()
 
     async def add_product(self, category_name, file: types.Document):
@@ -238,6 +238,9 @@ class ProductsDB:
 
     def get_category_price(self, category_name):
         return int(self.cur.execute("SELECT price FROM categories WHERE name = ?", (category_name,)).fetchone()[0])
+
+    def get_category_description(self, category_name):
+        return self.cur.execute("SELECT description FROM categories WHERE name = ?", (category_name,)).fetchone()[0]
 
     def get_all_products(self):
         return self.cur.execute("SELECT * FROM products WHERE boughtAt IS NULL").fetchall()
