@@ -82,10 +82,11 @@ async def _(callback_query: types.CallbackQuery):
     else:
         for category in database.products.get_categories():
             full_category_name = category
-            category = category.split("|")[1]
-            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(full_category_name) else category
-            print(full_category_name, category, cat_text)
-            kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
+            category_en = category.split("|")[1]
+            category_ru = category.split("|")[0]
+            cat_text = "✅" + category_en + "✅" if database.products.get_count_of_products(full_category_name) else category_en
+            print(full_category_name, "||||", category_ru, "|||", category_en "|||", cat_text)
+            kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category_ru))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
