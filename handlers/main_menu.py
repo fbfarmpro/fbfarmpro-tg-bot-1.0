@@ -158,13 +158,13 @@ async def _(callback_query: types.CallbackQuery):
         await callback_query.message.answer("Enter count of products")
     await storage.set_state(user=userID, state="purchase_category_amount")
 
-@dp.message_handler(lambda msg: msg.text.isdigit() and int(msg.text) != 0, state="purchase_category_amount")
+@dp.message_handler(lambda msg: msg.text.isdigit(), state="purchase_category_amount")
 async def _(message: types.Message, state: FSMContext):
     amount = int(message.text)
     userData = await state.get_data()
     userLang = userData["lang"]
     category_price = userData["category_price"]
-    if amount == 0:
+    if amount <= 0:
         if userLang == "RU":
             await message.answer("Минимум 1")
         else:
