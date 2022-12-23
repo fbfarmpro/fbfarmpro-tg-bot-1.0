@@ -284,7 +284,7 @@ async def _(callback_query: types.CallbackQuery):
     purchases = filter(lambda t: int(t[0]) == int(userID), database.users.get_purchases())
     if purchases:
         if lang == "RU":
-            result = f"\n\n".join(f"Дата: {t[2]}\nКатегория: {t[3]}\Количество: {t[4]}\nЦена: {t[5]}" for t in purchases)
+            result = f"\n\n".join(f"Дата: {t[2]}\nКатегория: {t[3]}\nКоличество: {t[4]}\nЦена: {t[5]}" for t in purchases)
             await callback_query.message.answer(result or "Ваша история покупок пуста")
         else:
             result = f"\n\n".join(f"Date: {t[2]}\nCategory: {t[3]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
