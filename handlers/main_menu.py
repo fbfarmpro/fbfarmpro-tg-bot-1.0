@@ -118,19 +118,21 @@ async def _(callback_query: types.CallbackQuery):
     formatted_category_name = category_name.replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,")
     formatted_category_desc = category_desc.replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,")
     if userLang == "RU":
+        desc = formatted_category_desc.split('|')[0]
         await callback_query.message.answer(f"""
 💥{formatted_category_name}
 *Описание:*
-{formatted_category_desc.split('|')[0]}
+{desc}
 \-\-
-*Доступно {count_of_products} товара по {category_price}$ каждый\n
+*Доступно {count_of_products} товара по {category_price}$ каждый
 *Ваш баланс: {userBalance}$*""", parse_mode="MarkdownV2")
         await callback_query.message.answer("Введите количество продуктов")
     else:
+        desc = formatted_category_desc.split('|')[1]
         await callback_query.message.answer(f"""
 {formatted_category_name}
 *Description:*
-{formatted_category_desc.split('|')[1]}
+{desc}
 \-\-
 *There are {count_of_products} products, which costs {category_price}$*
 *Your balance: {userBalance}$*""", parse_mode="MarkdownV2")
