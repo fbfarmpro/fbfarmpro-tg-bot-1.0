@@ -106,6 +106,7 @@ async def _(callback_query: types.CallbackQuery):
     userData = await storage.get_data(user=userID)
     userLang = userData["lang"]
     userBalance = database.users.get_balance(userID=userID)
+    category_name = full_category_name.split("|")[0] if userLang == "RU" else full_category_name.split("|")[1]
     category_price = database.products.get_category_price(full_category_name)
     category_desc = database.products.get_category_description(full_category_name)
     count_of_products = database.products.get_count_of_products(full_category_name)
