@@ -115,27 +115,26 @@ async def _(callback_query: types.CallbackQuery):
         "category_price": category_price,
         "user_balance": userBalance
     })
-    formatted_category_name = category_name.replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,")
     formatted_category_desc = category_desc.replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,")
     if userLang == "RU":
-        desc = formatted_category_desc.split('|')[0]
         await callback_query.message.answer(f"""
-💥{formatted_category_name}
+💥{category_name}
 *Описание:*
-{desc}
-\-\-
-*Доступно {count_of_products} товара по {category_price}$ каждый
-*Ваш баланс: {userBalance}$*""", parse_mode="MarkdownV2")
+{category_desc.split('|')[0]}
+--
+*Доступно {count_of_products} товара по {category_price}$ каждый*
+*Ваш баланс: {userBalance}$*""".replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,"),
+                                            parse_mode="MarkdownV2")
         await callback_query.message.answer("Введите количество продуктов")
     else:
-        desc = formatted_category_desc.split('|')[1]
         await callback_query.message.answer(f"""
-{formatted_category_name}
+{category_name}
 *Description:*
-{desc}
-\-\-
+{category_desc.split('|')[1]}
+--
 *There are {count_of_products} products, which costs {category_price}$*
-*Your balance: {userBalance}$*""", parse_mode="MarkdownV2")
+*Your balance: {userBalance}$*""".replace("+", "\+").replace("-", "\-").replace(".", "\.").replace(",", "\,"),
+                                            parse_mode="MarkdownV2")
         await callback_query.message.answer("Enter count of products")
     await storage.set_state(user=userID, state="purchase_category_amount")
 
