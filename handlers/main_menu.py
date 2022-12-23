@@ -66,6 +66,18 @@ async def _(callback_query: types.CallbackQuery):
         await bot.send_message(callback_query.from_user.id, "Developing...")
 
 
+@dp.callback_query_handler(lambda c: c.data == "back_category")
+async def _(callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+    lang = database.users.get_language(userID=callback_query.from_user.id)
+    if lang == "RU":
+        await callback_query.message.edit_text(text="Главное меню")
+        await callback_query.message.edit_reply_markup(reply_markup=keyboards.MAIN_MENU_RU)
+    else:
+        await callback_query.message.edit_text(text="Main menu")
+        await callback_query.message.edit_reply_markup(reply_markup=keyboards.MAIN_MENU_EN)
+
+
 @dp.callback_query_handler(lambda c: c.data == "purchase")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
@@ -79,6 +91,7 @@ async def _(callback_query: types.CallbackQuery):
             category = category.split("|")[0]
             cat_text = "✅" + category + "✅" if database.products.get_count_of_products(full_category_name) else category
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
+        kb.add(InlineKeyboardButton(text="Назад", callback_data="back_category"))
     else:
         for category in database.products.get_categories():
             full_category_name = category
@@ -86,6 +99,7 @@ async def _(callback_query: types.CallbackQuery):
             category_ru = category.split("|")[0]
             cat_text = "✅" + category_en + "✅" if database.products.get_count_of_products(full_category_name) else category_en
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category_ru))
+    kb.add(InlineKeyboardButton(text="Back", callback_data="back_category"))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
