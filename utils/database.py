@@ -237,7 +237,7 @@ class ProductsDB:
         return self.cur.execute("SELECT name FROM products WHERE category = ? AND boughtAt IS NULL LIMIT ?", (category_name, amount)).fetchall()
 
     def get_category_price(self, category_name):
-        return int(self.cur.execute("SELECT price FROM categories WHERE name = ?", (category_name,)).fetchone()[0])
+        return float(self.cur.execute("SELECT price FROM categories WHERE name = ?", (category_name,)).fetchone()[0])
 
     def get_category_description(self, category_name):
         return self.cur.execute("SELECT description FROM categories WHERE name = ?", (category_name,)).fetchone()[0]
