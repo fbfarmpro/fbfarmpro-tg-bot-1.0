@@ -122,7 +122,7 @@ async def _(callback_query: types.CallbackQuery):
 💥{formatted_category_name}\n
 *Описание:*
 {formatted_category_desc.split('|')[0]}
---
+\-\-
 *Доступно {count_of_products} продуктов по {category_price}$ каждый\n
 *Ваш баланс: {userBalance}$*""", parse_mode="MarkdownV2")
         await callback_query.message.answer("Введите количество продуктов")
@@ -131,7 +131,7 @@ async def _(callback_query: types.CallbackQuery):
 {formatted_category_name}
 *Description:*
 {formatted_category_desc.split('|')[1]}
---
+\-\-
 *There are {count_of_products} products, which costs {category_price}$*
 *Your balance: {userBalance}$*""", parse_mode="MarkdownV2")
         await callback_query.message.answer("Enter count of products")
