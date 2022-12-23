@@ -59,7 +59,11 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "preorder")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
+    lang = database.users.get_language(userID=callback_query.from_user.id)
+    if lang == "RU":
+        await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
+    else:
+        await bot.send_message(callback_query.from_user.id, "Developing...")
 
 
 @dp.callback_query_handler(lambda c: c.data == "purchase")
@@ -80,6 +84,7 @@ async def _(callback_query: types.CallbackQuery):
             full_category_name = category
             category = category.split("|")[1]
             cat_text = "✅" + category + "✅" if database.products.get_count_of_products(full_category_name) else category
+            print(full_category_name, category, cat_text)
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
