@@ -116,12 +116,22 @@ async def _(callback_query: types.CallbackQuery):
         "user_balance": userBalance
     })
     if userLang == "RU":
-        await callback_query.message.answer(f"{category_name}\nОписание:\n{category_desc.split('|')[0]}\nДоступно {count_of_products} продуктов по {category_price}$ каждый\n"
-                                            f"Ваш баланс: {userBalance}")
+        await callback_query.message.answer(f"""
+💥{category_name}\n
+*Описание:*
+{category_desc.split('|')[0]}
+--
+*Доступно {count_of_products} продуктов по {category_price}$ каждый\n
+*Ваш баланс: {userBalance}$*""", parse_mode="MarkdownV2")
         await callback_query.message.answer("Введите количество продуктов")
     else:
-        await callback_query.message.answer(f"{category_name}\nDescription:\n{category_desc.split('|')[1]}\nThere are {count_of_products} products, which costs {category_price}$\n"
-                                            f"Your balance: {userBalance}")
+        await callback_query.message.answer(f"""
+{category_name}
+*Description:*
+{category_desc.split('|')[1]}
+--
+*There are {count_of_products} products, which costs {category_price}$*
+*Your balance: {userBalance}$*""", parse_mode="MarkdownV2")
         await callback_query.message.answer("Enter count of products")
     await storage.set_state(user=userID, state="purchase_category_amount")
 
