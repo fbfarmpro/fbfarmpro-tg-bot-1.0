@@ -25,7 +25,7 @@ $('.pay-amount-btn.minus').click(function(){
     var amountVal = $(this).closest('.pay-amount').find('.pay-amount-input input').val();
     if (amountVal > 1) {
         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal - 1);
-        document.getElementById("cost").value = document.getElementById("cost").value + 
+        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").innerHTML;
     }
 });
 $('.pay-amount-btn.plus').click(function(){

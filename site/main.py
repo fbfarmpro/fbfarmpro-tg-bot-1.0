@@ -1,9 +1,10 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
-from database import UsersDB, ProductsDB, AsyncPayment, get_crypto_currency
+from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency
 
 
 
-users = UsersDB("site")
+users = UsersDB("site", "../DB/users.db")
+products = ProductsDB("../DB/users.db")
 
 
 app = Flask(__name__)
@@ -37,7 +38,7 @@ def rules():
 def profile():
     if 'userLogged' in session:
         payments = users.get_payments(email=session['email'])
-        return render_template("index.html", sost=5, username=session['email'].split('@')[1], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0)
+        return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0)
     else:
         return redirect(url_for("loginpage"))
 
@@ -116,8 +117,9 @@ def logout():
 @app.route("/buy", methods= ['POST'])
 async def pay():
     if request.method == "POST":
+        currency = request.form['currency']
         amount = 99 / await get_crypto_currency("btc")
-        x = await payment.create_payment(amount, "btc")
+        x = await payment.create_payment(amount, "btc".upper())
         #print(x)
         z = await payment.get_payment('38e5bbf032364feda3a31b3aeef8af7e')
         return x

@@ -28,11 +28,11 @@ async def get_crypto_currency(coin_name: str):
 
 
 class UsersDB:
-    def __init__(self, method):
+    def __init__(self, method, path):
         if method not in ["tg", "site"]:
             raise ValueError("Method should be 'tg' or 'site'")
         self.method = method
-        self.db = sqlite3.connect("DB/users.db", check_same_thread=False)
+        self.db = sqlite3.connect(path, check_same_thread=False)
         self.cur = self.db.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS users (method TEXT NOT NULL,
                                                               userID TEXT,
@@ -185,8 +185,8 @@ class UsersDB:
 
 
 class ProductsDB:
-    def __init__(self):
-        self.db = sqlite3.connect("DB/products.db", check_same_thread=False)
+    def __init__(self, path):
+        self.db = sqlite3.connect(path, check_same_thread=False)
         self.cur = self.db.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS categories (name TEXT NOT NULL,
                                                                    description TEXT NOT NULL,
@@ -284,6 +284,6 @@ class AsyncPayment:
                 return loads(resp)["result"]
 
 
-users = UsersDB("tg")
-products = ProductsDB()
+#users = UsersDB("tg", "DB/users.db")
+#products = ProductsDB("DB/products.db")
 payment = AsyncPayment(APIKEY)
