@@ -44,7 +44,8 @@ def profile():
 
 @app.route("/shop/category<id>")
 def category():
-    return render_template()
+    x = products.get_categories()
+    return render_template("index.html", sost=6, items= items, logined = 1 if 'userLogged' in session else 0)
 
 
 
