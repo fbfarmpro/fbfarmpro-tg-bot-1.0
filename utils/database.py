@@ -9,7 +9,7 @@ import aiohttp
 from aiogram import types
 from passlib.hash import pbkdf2_sha256 as sha256
 
-from handlers import *
+# from handlers import *
 from secret import APIKEY
 import config
 
@@ -254,8 +254,8 @@ class ProductsDB:
 
 class AsyncPayment:
     def __init__(self, api_key):
-        # self.url = "https://app-demo.payadmit.com/api/v1/payments/" # test
-        self.url = "https://app.payadmit.com/api/v1/payments/" # prod
+        # self.url = "https://app-demo.payadmit.com/api/v1/payments/"  # test
+        self.url = "https://app.payadmit.com/api/v1/payments/"  # prod
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
 
