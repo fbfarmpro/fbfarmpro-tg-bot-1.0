@@ -93,10 +93,16 @@ class UsersDB:
                                                                                    None, 0))
         self.db.commit()
 
+    def register_site_via_tg(self, userID):
+        self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", userID, None,
+                                                                               None, "RU", 0,
+                                                                               None, 0))
+        self.db.commit()
+
     def is_registered(self, *, userID=None, email=None, password=None):
-        if self.method == "tg":
+        if self.method == "tg" or userID:
             assert userID is not None
-            return self.cur.execute("SELECT * FROm users WHERE userID = ?", (userID,)).fetchone()
+            return self.cur.execute("SELECT * FROM users WHERE userID = ?", (userID,)).fetchone()
         elif password:
             assert email is not None and password is not None
             return self.cur.execute("SELECT * FROM users WHERE email = ? and password = ?", (email, sha256.hash(password))).fetchone()

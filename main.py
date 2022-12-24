@@ -15,13 +15,17 @@ tokens = Tokens("DB/tokens.db")
 
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
-    token = message.get_args()
-    await message.answer(token if token else "TEST!!! THERE ARE NO TOKEN")
-    if token:
-        tokens.set_status(token, "registered")
-        await message.answer("done")
-        return
     userID = message.from_user.id
+    token = message.get_args()
+    if token:
+        if not users.is_registered(userID=userID):
+            tokens.set_status(token, userID)
+            users.register_site_via_tg(userID)
+            await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
+        else:
+            tokens.set_status(token, f"already|{userID}")
+            await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
+        return
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
     if users.is_registered(userID=userID):
