@@ -16,6 +16,7 @@ tokens = Tokens("DB/tokens.db")
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
     token = message.get_args()
+    await message.answer(token if token else "TEST!!! THERE ARE NO TOKEN")
     if token:
         tokens.set_status(token, "registered")
         await message.answer("done")
