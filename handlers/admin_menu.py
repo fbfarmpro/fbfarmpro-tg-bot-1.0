@@ -2,13 +2,17 @@ import config
 from handlers import *
 from aiogram import types
 import utils.keyboards as keyboards
-import utils.database as database
+from utils.database import UsersDB, ProductsDB
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from json import loads, dumps
 from loader import storage
 from aiogram.utils.exceptions import BotBlocked, FileIsTooBig
 import os
+
+
+users = UsersDB("tg", "../DB/users.db")
+products = ProductsDB("../DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: c.data == "back")
@@ -402,7 +406,7 @@ async def _(callback_query: types.CallbackQuery):
     if data.get("priority", "user") == "user":
         if data.get("animation", 0):
             animation = data["animation"]
-            for user in database.users:
+            for user in users:
                 await bot.send_animation(chat_id=user[1],
                                          caption=text,
                                          disable_notification=disable_notification,
@@ -411,7 +415,7 @@ async def _(callback_query: types.CallbackQuery):
                                          animation=animation)
         elif data.get("photo", 0):
             photo = data["photo"]
-            for user in database.users:
+            for user in users:
                 await bot.send_photo(chat_id=user[0],
                                      caption=text,
                                      disable_notification=disable_notification,
@@ -419,7 +423,7 @@ async def _(callback_query: types.CallbackQuery):
                                      reply_markup=kb,
                                      photo=photo)
         else:
-            for user in database.users:
+            for user in users:
                 await bot.send_message(chat_id=user[0],
                                        text=text,
                                        disable_notification=data.get("disable_sound", False),
@@ -428,7 +432,7 @@ async def _(callback_query: types.CallbackQuery):
     else:
         if data.get("animation", 0):
             animation = data["animation"]
-            for user in database.users.get_regular_customers():
+            for user in users.get_regular_customers():
                 await bot.send_animation(chat_id=user[0],
                                          caption=text,
                                          disable_notification=disable_notification,
@@ -437,7 +441,7 @@ async def _(callback_query: types.CallbackQuery):
                                          animation=animation)
         elif data.get("photo", 0):
             photo = data["photo"]
-            for user in database.users.get_regular_customers():
+            for user in users.get_regular_customers():
                 await bot.send_photo(chat_id=user[0],
                                      caption=text,
                                      disable_notification=disable_notification,
@@ -445,7 +449,7 @@ async def _(callback_query: types.CallbackQuery):
                                      reply_markup=kb,
                                      photo=photo)
         else:
-            for user in database.users.get_regular_customers():
+            for user in users.get_regular_customers():
                 await bot.send_message(chat_id=user[0],
                                        text=text,
                                        disable_notification=data.get("disable_sound", False),
@@ -458,20 +462,20 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
-    count_of_users = database.users.get_count_of_users()
-    count_of_regular_customers = database.users.get_count_of_regular_customers()
-    banned_by_admins_users = database.users.get_count_of_banned()
-    total_cost_of_products = database.products.get_total_cost_of_products()
-    total_products = len(database.products.get_all_products())
-    purchases_sum = sum(int(data[4]) for data in database.users.get_purchases())
-    purchases_count = len(database.users.get_purchases())
+    count_of_users = users.get_count_of_users()
+    count_of_regular_customers = users.get_count_of_regular_customers()
+    banned_by_admins_users = users.get_count_of_banned()
+    total_cost_of_products = products.get_total_cost_of_products()
+    total_products = len(products.get_all_products())
+    purchases_sum = sum(int(data[4]) for data in users.get_purchases())
+    purchases_count = len(users.get_purchases())
     users_who_ban_bot = 0
     """
     purchases_sum = 0
-    for purchase in database.users.get_purchases():
+    for purchase in users.get_purchases():
         purchases_sum += int(purchase[4])
     """
-    for user in database.users:
+    for user in users:
         try:
             await bot.send_message(user[0], "Проводим тестирование кто забанил бота. Если вы получили это сообщение, то вы молодец")
         except (BotBlocked, ChatNotFound) as _:
@@ -516,10 +520,10 @@ async def _(message: types.Message, state: FSMContext):
         userID = message.text
         username = "not found"
 
-    if not database.users.is_registered(userID=userID):
+    if not users.is_registered(userID=userID):
         await message.answer(f"There is no {userID} in my database")
     else:
-        await message.answer(f"userID: {userID}\nusername: {username}\nbalance: {database.users.get_balance(userID=userID)}",
+        await message.answer(f"userID: {userID}\nusername: {username}\nbalance: {users.get_balance(userID=userID)}",
                              reply_markup=keyboards.CHANGE_USER_DATA_MENU)
 
     await state.finish()
@@ -530,8 +534,8 @@ async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.message.text.split("\n")[0].split()[-1]
     if int(userID) not in config.ADMIN_ID:
-        database.users.change_banned(userID=userID)
-        status = database.users.get_banned(userID=userID)
+        users.change_banned(userID=userID)
+        status = users.get_banned(userID=userID)
         await callback_query.message.answer(f"Success. Now user {userID} {'banned' if status else 'unbanned'}")
     else:
         await callback_query.message.answer("You can't ban admins")
@@ -556,8 +560,8 @@ async def _(message: types.Message, state: FSMContext):
         return
     userData = await storage.get_data(user=message.from_user.id)
     userID = userData["balance_userID"]
-    database.users.add_balance(num, userID=userID)
-    await message.answer(f"Success. Now this user has {database.users.get_balance(userID=userID)}$")
+    users.add_balance(num, userID=userID)
+    await message.answer(f"Success. Now this user has {users.get_balance(userID=userID)}$")
     await state.finish()
 
 
@@ -609,7 +613,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.set_state("category_price")
         return
     data = await state.get_data()
-    database.products.create_category(data["category_name"], data["category_description"], price)
+    products.create_category(data["category_name"], data["category_description"], price)
     await message.answer("Success")
     await state.finish()
 
@@ -618,7 +622,7 @@ async def _(message: types.Message, state: FSMContext):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    for category in database.products.get_categories():
+    for category in products.get_categories():
         kb.add(category)
     await callback_query.message.answer("enter product category", reply_markup=kb)
     await storage.set_state(user=callback_query.from_user.id, state="product_category")
@@ -626,7 +630,7 @@ async def _(callback_query: types.CallbackQuery):
 
 @dp.message_handler(state="product_category")
 async def _(message: types.Message, state: FSMContext):
-    if message.text not in database.products.get_categories():
+    if message.text not in products.get_categories():
         await message.answer("No such category")
         await state.set_state("product_category")
         return
@@ -638,7 +642,7 @@ async def _(message: types.Message, state: FSMContext):
 @dp.message_handler(content_types=["document"], state="product_file")
 async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    await database.products.add_product(data["category_name"], message.document)
+    await products.add_product(data["category_name"], message.document)
     await message.answer("Successfully added product to category")
     await state.finish()
 
@@ -653,13 +657,13 @@ async def _(callback_query: types.CallbackQuery):
 @dp.message_handler(state="product_replace_filename")
 async def _(message: types.Message, state: FSMContext):
     product = message.text
-    if not database.products.product_exists(product):
+    if not products.product_exists(product):
         await message.answer("No such product. Enter again")
         await state.set_state("product_replace_filename")
         return
     await state.update_data(data={"product_filename": message.text})
     kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    for category in database.products.get_categories():
+    for category in products.get_categories():
         kb.add(category)
     await message.answer("enter product category", reply_markup=kb)
     await state.set_state("product_replace_category")
@@ -668,14 +672,14 @@ async def _(message: types.Message, state: FSMContext):
 @dp.message_handler(state="product_replace_category")
 async def _(message: types.Message, state: FSMContext):
     category = message.text
-    if category not in database.products.get_categories():
+    if category not in products.get_categories():
         await message.answer("No such category. Enter again")
         await state.set_state("product_replace_category")
         return
     userData = await state.get_data()
     product = userData["product_filename"]
-    old_category = database.products.get_product_category(product)
-    database.products.change_product_category(product, category)
+    old_category = products.get_product_category(product)
+    products.change_product_category(product, category)
     os.rename(os.path.join("DB", old_category, product), os.path.join("DB", category, product))
     await message.answer("Success")
     await state.finish()

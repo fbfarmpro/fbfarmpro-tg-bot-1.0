@@ -1,15 +1,18 @@
 import config
 from handlers import *
 from aiogram import types
-import utils.database as database
+from utils.database import UsersDB, ProductsDB, get_crypto_currency, payment
 from aiogram.dispatcher import FSMContext
+
+users = UsersDB("tg", "../DB/users.db")
+products = ProductsDB("../DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: c.data.endswith("coin"))
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
 
     min_pay = config.MIN_MONEY_PER_BUY[callback_query.data.split("_")[0]]
     await storage.update_data(user=callback_query.from_user.id, data={
@@ -47,12 +50,12 @@ async def process_amount(message: types.Message, state: FSMContext):
         await state.set_state("payment")
         return
 
-    price = await database.get_crypto_currency(coin) if coin != "usdt" else 1
+    price = await get_crypto_currency(coin) if coin != "usdt" else 1
     amount = amount/price
-    response = await database.payment.create_payment(amount, coin.upper())
+    response = await payment.create_payment(amount, coin.upper())
     print(response)
     payment_id = response["result"]["id"]
-    database.users.add_payment(payment_id, userID=userID)
+    users.add_payment(payment_id, userID=userID)
     url = response["result"]["redirectUrl"]
     if lang == "RU":
         await bot.send_message(userID, f"Оплатите по ссылке:\n{url}\n"

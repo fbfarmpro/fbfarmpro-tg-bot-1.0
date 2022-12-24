@@ -8,14 +8,18 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types import InputFile
 from aiogram.utils.exceptions import ChatNotFound
 
-import utils.database as database
+from utils.database import UsersDB, ProductsDB
 import utils.keyboards as keyboards
 from config import ADMIN_ID, PURCHASE_GIF_FILENAME
 from handlers import *
 from loader import storage
 
 
-@dp.callback_query_handler(lambda c: int(database.users.get_banned(userID=c.from_user.id)))
+users = UsersDB("tg", "../DB/users.db")
+products = ProductsDB("../DB/products.db")
+
+
+@dp.callback_query_handler(lambda c: int(users.get_banned(userID=c.from_user.id)))
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
@@ -23,9 +27,9 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
     login = callback_query.from_user.mention if callback_query.from_user.username else callback_query.from_user.id
-    balance = database.users.get_balance(userID=userID)
+    balance = users.get_balance(userID=userID)
     if lang == "RU":
         await bot.send_message(userID, f"Ваш логин: {login}\nВаш баланс: `{balance} USD`",
                                    parse_mode="MarkdownV2")
@@ -38,7 +42,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
     if lang == "RU":
         await callback_query.message.answer("Выберите монету", reply_markup=keyboards.COINS_MENU)
     else:
@@ -49,7 +53,7 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
     if lang == "RU":
         await callback_query.message.answer("услуга находится на этапе разработки")
     else:
@@ -59,7 +63,7 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "preorder")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    lang = database.users.get_language(userID=callback_query.from_user.id)
+    lang = users.get_language(userID=callback_query.from_user.id)
     if lang == "RU":
         await bot.send_message(callback_query.from_user.id, "услуга находится на этапе разработки")
     else:
@@ -69,7 +73,7 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "back_category")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    lang = database.users.get_language(userID=callback_query.from_user.id)
+    lang = users.get_language(userID=callback_query.from_user.id)
     if lang == "RU":
         await callback_query.message.edit_text(text="Главное меню")
         await callback_query.message.edit_reply_markup(reply_markup=keyboards.MAIN_MENU_RU)
@@ -82,22 +86,22 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
     await storage.update_data(user=callback_query.from_user.id, data={"lang": lang})
     kb = InlineKeyboardMarkup(row_width=1)
     if lang == "RU":
-        for category in database.products.get_categories():
+        for category in products.get_categories():
             full_category_name = category
             category = category.split("|")[0]
-            cat_text = "✅" + category + "✅" if database.products.get_count_of_products(full_category_name) else category
+            cat_text = "✅" + category + "✅" if products.get_count_of_products(full_category_name) else category
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category))
         kb.add(InlineKeyboardButton(text="Назад", callback_data="back_category"))
     else:
-        for category in database.products.get_categories():
+        for category in products.get_categories():
             full_category_name = category
             category_en = category.split("|")[1]
             category_ru = category.split("|")[0]
-            cat_text = "✅" + category_en + "✅" if database.products.get_count_of_products(full_category_name) else category_en
+            cat_text = "✅" + category_en + "✅" if products.get_count_of_products(full_category_name) else category_en
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category_ru))
     kb.add(InlineKeyboardButton(text="Back", callback_data="back_category"))
     if lang == "RU":
@@ -112,17 +116,17 @@ async def _(callback_query: types.CallbackQuery):
     userID = callback_query.from_user.id
     category_name = " ".join(callback_query.data.split()[1::])
     full_category_name = None
-    for category in database.products.get_categories():
+    for category in products.get_categories():
         if category_name in category:
             full_category_name = category
             break
     userData = await storage.get_data(user=userID)
     userLang = userData["lang"]
-    userBalance = database.users.get_balance(userID=userID)
+    userBalance = users.get_balance(userID=userID)
     category_name = full_category_name.split("|")[0] if userLang == "RU" else full_category_name.split("|")[1]
-    category_price = database.products.get_category_price(full_category_name)
-    category_desc = database.products.get_category_description(full_category_name)
-    count_of_products = database.products.get_count_of_products(full_category_name)
+    category_price = products.get_category_price(full_category_name)
+    category_desc = products.get_category_description(full_category_name)
+    count_of_products = products.get_count_of_products(full_category_name)
     if count_of_products == 0:
         if userLang == "RU":
             await callback_query.message.answer("В данной категории пока нет продуктов")
@@ -201,17 +205,17 @@ async def _(message: types.Message, state: FSMContext):
     category_name = userData["category_name"]
     if message.text.lower() in ["да", "yes"]:
         if userBalance >= amount * category_price:
-            database.users.add_balance(-(category_price * amount), userID=userID)
-            zip_filename = database.create_random_filename_zip()
+            users.add_balance(-(category_price * amount), userID=userID)
+            zip_filename = create_random_filename_zip()
             zip_path = os.path.join("DB", "bought", zip_filename)
             zipObj = ZipFile(zip_path, "w")
-            for file in database.products.get_N_products(category_name, amount):
+            for file in products.get_N_products(category_name, amount):
                 path = os.path.join("DB", category_name, file[0])
                 zipObj.write(path, os.path.basename(path))
-                database.products.set_isBought(file[0], category_name)
+                products.set_isBought(file[0], category_name)
             zipObj.close()
             await message.answer_document(InputFile(zip_path))
-            database.users.add_purchase(category_name, amount, category_price*amount, zip_filename, userID=userID)
+            users.add_purchase(category_name, amount, category_price*amount, zip_filename, userID=userID)
             if userLang == "RU":
                 await message.answer("Спасибо за покупку!\n"
                                      "Время работы поддержки @fbfarmpro 09:00-19:00 gmt+3.",
@@ -245,7 +249,7 @@ async def _(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(lambda c: c.data == "rules")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    lang = database.users.get_language(userID=callback_query.from_user.id)
+    lang = users.get_language(userID=callback_query.from_user.id)
     if lang == "RU":
         await callback_query.message.answer("""
 ❗️Гарантия❗️
@@ -300,8 +304,8 @@ If you have linked business manager to your account and for some reason Facebook
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = str(callback_query.from_user.id)
-    lang = database.users.get_language(userID=userID)
-    purchases = filter(lambda t: int(t[0]) == int(userID), database.users.get_purchases())
+    lang = users.get_language(userID=userID)
+    purchases = filter(lambda t: int(t[0]) == int(userID), users.get_purchases())
     if purchases:
         if lang == "RU":
             result = f"\n\n".join(f"Дата: {t[2]}\nКатегория: {t[3].split('|')[0]}\nКоличество: {t[4]}\nЦена: {t[5]}" for t in purchases)
@@ -315,11 +319,11 @@ async def _(callback_query: types.CallbackQuery):
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     userID = callback_query.from_user.id
-    lang = database.users.get_language(userID=userID)
+    lang = users.get_language(userID=userID)
     if lang == "RU":
         await callback_query.message.edit_text("Main menu")
         await callback_query.message.edit_reply_markup(keyboards.MAIN_MENU_EN)
     else:
         await callback_query.message.edit_text("Главное меню")
         await callback_query.message.edit_reply_markup(keyboards.MAIN_MENU_RU)
-    database.users.change_language(userID=userID)
+    users.change_language(userID=userID)
