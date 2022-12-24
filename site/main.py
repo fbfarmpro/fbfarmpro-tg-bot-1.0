@@ -1,9 +1,12 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
-from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens
 import threading
 import time
 from secrets import choice
 from string import ascii_letters, digits
+import sys
+sys.path.append("/root/fbfarmpro-tg-bot-1.0")
+
+from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens
 
 tokens = Tokens("../DB/tokens.db")
 users = UsersDB("site", "../DB/users.db")
@@ -150,4 +153,5 @@ async def pay():
         return x
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    app.run(host="0.0.0.0", port=1001)
