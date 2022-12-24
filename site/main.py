@@ -1,6 +1,8 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
 import threading
+import asyncio
 import time
+import webbrowser
 from secrets import choice
 from string import ascii_letters, digits
 import sys
@@ -23,13 +25,14 @@ app.secret_key = 'asdasdas?'
 
 
 
-def checker_token(session):
+async def checker_token():
     while True:
         if tokens.get(session['token'])[1] == "registered":
-            flash('Logined succesfully!')
-            redirect('/profile')
-            thread.join()
-        time.sleep(3)
+
+
+            result = await get_crypto_currency("btc")
+            break
+
 @app.route("/")
 def index():
     if 'userLogged' in session:
@@ -136,10 +139,13 @@ def logout():
 @app.route("/telegram")
 def tg_login():
     session['token'] = create_random_token()
+
     tokens.add(session['token'])
-    thread = threading.Thread(target=checker_token, args=(session))
-    thread.start()
-    return redirect(f"https://t.me/fbfarmprobot?start={session['token']}")
+    webbrowser.open_new_tab(f"https://t.me/fbfarmprobot?start={session['token']}")
+    loop = asyncio.new_event_loop()
+
+    loop.run_until_complete(checker_token())
+    return redirect('/profile')
 
 
 @app.route("/buy", methods= ['POST'])
@@ -154,4 +160,4 @@ async def pay():
 
 if __name__ == '__main__':
     # app.run()
-    app.run(host="0.0.0.0", port=1001)
+    app.run(host="0.0.0.0", port=1001, debug=True)
