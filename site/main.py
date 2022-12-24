@@ -27,12 +27,15 @@ app.secret_key = 'asdasdas?'
 
 async def checker_token():
     while True:
-        if tokens.get(session['token'])[1] == "registered":
+        try:
+            if tokens.get(session['token'])[1] == "registered":
 
+                result = await get_crypto_currency("btc")
 
+                break
+        except:
+            asyncio.sleep(1)
             result = await get_crypto_currency("btc")
-            break
-
 @app.route("/")
 def index():
     if 'userLogged' in session:
@@ -136,16 +139,19 @@ def logout():
     session.pop("userLogged", None)
     return redirect(url_for("index"))
 
-@app.route("/telegram")
-def tg_login():
+@app.route("/tglogin")
+def tg():
     session['token'] = create_random_token()
-
     tokens.add(session['token'])
-    webbrowser.open_new_tab(f"https://t.me/fbfarmprobot?start={session['token']}")
     loop = asyncio.new_event_loop()
-
     loop.run_until_complete(checker_token())
     return redirect('/profile')
+
+@app.route("/telegram")
+def tg_login():
+
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
+
 
 
 @app.route("/buy", methods= ['POST'])
