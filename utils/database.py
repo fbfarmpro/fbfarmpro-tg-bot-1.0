@@ -266,8 +266,6 @@ class AsyncPayment:
                     "paymentMethod": "CRYPTO",
                     "currency": currency
                     }
-            if currency.lower() == "usdt":
-                json.update({"additionalParameters": {"blockchain": "TRX"}})
             async with session.post(self.url, json=json, headers=self.headers) as req:
                 resp = await req.json()
                 return resp
