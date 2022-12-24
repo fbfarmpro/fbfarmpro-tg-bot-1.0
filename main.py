@@ -18,6 +18,7 @@ async def _(message: types.Message):
     token = message.get_args()
     if token:
         tokens.set_status(token, "registered")
+        await message.answer("done")
         return
     userID = message.from_user.id
     with open(config.GREETING_MSG_FILENAME) as file:
