@@ -37,7 +37,9 @@ async def checker_token():
 
                 break
         except:
-            asyncio.sleep(2)
+            # asyncio.sleep(2)
+            tokens.db.close()
+            tokens.db.connect("../DB/products.db")
             result = await get_crypto_currency("btc")
 @app.route("/")
 def index():
@@ -144,7 +146,6 @@ def logout():
 
 @app.route("/tglogin")
 def tg():
-    session['token'] = create_random_token()
     tokens.add(session['token'])
     loop = asyncio.new_event_loop()
     loop.run_until_complete(checker_token())
@@ -152,7 +153,7 @@ def tg():
 
 @app.route("/telegram")
 def tg_login():
-
+    session['token'] = create_random_token()
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); </script>"
 
