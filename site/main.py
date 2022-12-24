@@ -1,10 +1,18 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
-from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency
+from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens
+import threading
+import time
+from secrets import choice
+from string import ascii_letters, digits
 
-
-
+tokens = Tokens("../DB/tokens.db")
 users = UsersDB("site", "../DB/users.db")
-products = ProductsDB("../DB/users.db")
+products = ProductsDB("../DB/products.db")
+
+def create_random_token():
+    # choose from all lowercase letter
+    letters = ascii_letters + digits
+    return "".join(choice(letters) for _ in range(10))
 
 
 app = Flask(__name__)
@@ -12,6 +20,13 @@ app.secret_key = 'asdasdas?'
 
 
 
+def checker_token(session):
+    while True:
+        if tokens.get(session['token'])[1] == "registered":
+            flash('Logined succesfully!')
+            redirect('/profile')
+            thread.join()
+        time.sleep(3)
 @app.route("/")
 def index():
     if 'userLogged' in session:
@@ -114,6 +129,15 @@ def test():
 def logout():
     session.pop("userLogged", None)
     return redirect(url_for("index"))
+
+@app.route("/telegram")
+def tg_login():
+    session['token'] = create_random_token()
+    tokens.add(session['token'])
+    thread = threading.Thread(target=checker_token, args=(session))
+    thread.start()
+    return redirect(f"https://t.me/fbfarmprobot?start={session['token']}")
+
 
 @app.route("/buy", methods= ['POST'])
 async def pay():
