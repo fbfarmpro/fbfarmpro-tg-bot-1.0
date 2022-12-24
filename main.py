@@ -5,15 +5,20 @@ from handlers import *
 from utils import keyboards
 from datetime import datetime
 import zipfile
-from utils.database import UsersDB, ProductsDB
+from utils.database import UsersDB, ProductsDB, Tokens
 
 
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
+tokens = Tokens("DB/tokens.db")
 
 
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
+    token = message.get_args()
+    if token:
+        tokens.set_status(token, "registered")
+        return
     userID = message.from_user.id
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())

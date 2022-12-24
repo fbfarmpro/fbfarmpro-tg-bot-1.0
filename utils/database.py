@@ -183,6 +183,7 @@ class UsersDB:
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
         return iter(self.cur.execute("SELECT * FROM users").fetchall())
 
+
 class Tokens:
     def __init__(self, path):
         self.db = sqlite3.connect(path, check_same_thread=False)
@@ -190,6 +191,7 @@ class Tokens:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS tokens (token TEXT NOT NULL,
                                                                status TEXT NOT NULL)""")
         self.db.commit()
+
     def get(self, token):
         return self.cur.execute("SELECT * FROM tokens WHERE token = ?", (token,)).fetchone()
 
@@ -204,6 +206,8 @@ class Tokens:
     def remove(self, token):
         self.cur.execute("DELETE FROM tokens WHERE token = ?", (token,))
         self.db.commit()
+
+
 class ProductsDB:
     def __init__(self, path):
         self.db = sqlite3.connect(path, check_same_thread=False)
