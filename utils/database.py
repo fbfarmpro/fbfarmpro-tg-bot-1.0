@@ -284,6 +284,11 @@ class AsyncPayment:
                 return loads(resp)["result"]
 
 
+<<<<<<< HEAD
 #users = UsersDB("tg", "DB/users.db")
 #products = ProductsDB("DB/products.db")
+=======
+users = UsersDB("tg", "DB/users.db")
+products = ProductsDB("DB/products.db")
+>>>>>>> 70e33cdb2ab24e03051447ca527d0b345b39562e
 payment = AsyncPayment(APIKEY)
