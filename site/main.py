@@ -37,7 +37,7 @@ async def checker_token():
 
                 break
         except:
-            asyncio.sleep(1)
+            asyncio.sleep(2)
             result = await get_crypto_currency("btc")
 @app.route("/")
 def index():
@@ -153,7 +153,8 @@ def tg():
 @app.route("/telegram")
 def tg_login():
 
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
+    # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); </script>"
 
 
 
