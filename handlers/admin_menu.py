@@ -11,8 +11,8 @@ from aiogram.utils.exceptions import BotBlocked, FileIsTooBig
 import os
 
 
-users = UsersDB("tg", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+users = UsersDB("tg", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: c.data == "back")

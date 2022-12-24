@@ -4,8 +4,8 @@ from aiogram import types
 from utils.database import UsersDB, ProductsDB, get_crypto_currency, payment
 from aiogram.dispatcher import FSMContext
 
-users = UsersDB("tg", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+users = UsersDB("tg", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: c.data.endswith("coin"))
