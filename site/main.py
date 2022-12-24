@@ -6,6 +6,9 @@ import webbrowser
 from secrets import choice
 from string import ascii_letters, digits
 import sys
+import logging
+
+logging.basicConfig(filename="log.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
 sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens
