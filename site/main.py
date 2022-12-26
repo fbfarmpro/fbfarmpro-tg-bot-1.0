@@ -39,30 +39,6 @@ name_space = '/abcd'
 
 
 
-async def checker_token():
-    while True:
-        if 'token' in session:
-            try:
-                status = tokens.get(session['token'])[1]
-                if 'already' in status:
-                    id = status.split("|")[1]
-                    data = users.get_by_id(id)
-
-                    user = {
-                        'name': data[1],
-                        'balance': data[5]
-                    }
-                    session['method'] = 'tg'
-                    session['user'] = user
-                    session['userLogged'] = True
-                    await socketio.emit('loginedtg', {}, namespace=name_space)
-
-                    break
-            except:
-                # asyncio.sleep(2)
-                tokens.db.close()
-                tokens.db.connect("../DB/products.db")
-                result = await get_crypto_currency("btc")
 
 
 
@@ -252,4 +228,4 @@ async def check_for_payments():
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
