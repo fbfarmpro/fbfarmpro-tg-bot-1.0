@@ -171,9 +171,9 @@ def wait():
 
                     break
             except:
-                # asyncio.sleep(2)
-                tokens.db.close()
-                tokens.db.connect("../DB/products.db")
+                asyncio.sleep(2)
+                #tokens.db.close()
+                #tokens.db.connect("../DB/products.db")
 
     threading.Thread(target=check_token).start()
     return render_template("index.html", sost=60, logined = 1 if 'userLogged' in session else 0)
