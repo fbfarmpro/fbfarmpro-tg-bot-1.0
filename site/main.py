@@ -172,6 +172,19 @@ def wait():
                     socketio.emit('loginedtg', {}, namespace=name_space)
 
                     break
+                else:
+                    id = int(status)
+                    if id:
+                        data = users.get_by_id(id)
+
+                        user = {
+                            'name': data[1],
+                            'balance': data[5]
+                        }
+                        session['method'] = 'tg'
+                        session['user'] = user
+                        session['userLogged'] = True
+                        socketio.emit('loginedtg', {}, namespace=name_space)
             except:
                 time.sleep(0.5)
 
