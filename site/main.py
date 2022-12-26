@@ -228,8 +228,8 @@ async def check_for_payments():
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
+
     socketio.run(app, host='0.0.0.0')
-=======
+
     socketio.run(app, host="0.0.0.0")
->>>>>>> a9a2a1686b6e63716e053c33fc329c3c62d1fa26
+
