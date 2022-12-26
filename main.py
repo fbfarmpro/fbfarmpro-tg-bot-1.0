@@ -84,8 +84,6 @@ async def check_for_payments():
                     users.remove_payment(payment_id, userID=userID)
                     continue
                 id = payment_data["id"]
-                if id not in payment_ids:
-                    continue
                 status = payment_data["state"]
                 """
                 string (PaymentState)
