@@ -28,12 +28,7 @@ $('.pay-amount-btn.minus').click(function(){
         document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").innerHTML;
     }
 });
-$('.pay-amount-btn.plus').click(function(){
-    var amountVal = $(this).closest('.pay-amount').find('.pay-amount-input input').val();
-    if (amountVal < 100) {
-        $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal = amountVal*1+1);
-    }
-});
+
 
 function modalOpen() {
     $('#confirmation-modal').fadeIn(200);
@@ -87,4 +82,13 @@ $('.change-btn').click(function() {
 $('.content-item-close').click(function() {
     $('.content-item').removeClass('active');
     $('.content-item.first').addClass('active');
+});
+
+$(document).ready(function () {
+    namespace = '/abcd';
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+    socket.on('loginedtg', function (res) {
+        window.location.href = "/profile"
+    });
+    socket.on('purchaseexpired')
 });

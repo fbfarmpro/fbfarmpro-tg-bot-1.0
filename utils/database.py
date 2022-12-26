@@ -98,7 +98,8 @@ class UsersDB:
                                                                                None, "RU", 0,
                                                                                None, 0))
         self.db.commit()
-
+    def get_by_id(self, id):
+        return self.cur.execute("SELECT * FROM users WHERE userid = ?", (id)).fetchone()
     def is_registered(self, *, userID=None, email=None, password=None):
         if self.method == "tg" or userID:
             assert userID is not None

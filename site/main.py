@@ -1,17 +1,19 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
-import threading
 import asyncio
-import time
-import webbrowser
 from secrets import choice
 from string import ascii_letters, digits
 import sys
 import logging
+from flask_socketio import SocketIO, emit
+import threading
+
+from flask import request, jsonify, copy_current_request_context
 
 logging.basicConfig(filename="log.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
 sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens
+
 
 tokens = Tokens("../DB/tokens.db")
 users = UsersDB("site", "../DB/users.db")
@@ -25,26 +27,49 @@ def create_random_token():
 
 app = Flask(__name__)
 app.secret_key = 'asdasdas?'
+app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
+
+from flask_socketio import SocketIO, emit
+
+
+socketio = SocketIO(app)
+
+
+name_space = '/abcd'
 
 
 
 async def checker_token():
     while True:
-        try:
-            if tokens.get(session['token'])[1] == "registered":
+        if 'token' in session:
+            try:
+                status = tokens.get(session['token'])[1]
+                if 'already' in status:
+                    id = status.split("|")[1]
+                    data = users.get_by_id(id)
 
+                    user = {
+                        'name': data[1],
+                        'balance': data[5]
+                    }
+                    session['method'] = 'tg'
+                    session['user'] = user
+                    session['userLogged'] = True
+                    await socketio.emit('loginedtg', {}, namespace=name_space)
+
+                    break
+            except:
+                # asyncio.sleep(2)
+                tokens.db.close()
+                tokens.db.connect("../DB/products.db")
                 result = await get_crypto_currency("btc")
 
-                break
-        except:
-            # asyncio.sleep(2)
-            tokens.db.close()
-            tokens.db.connect("../DB/products.db")
-            result = await get_crypto_currency("btc")
+
+
 @app.route("/")
 def index():
     if 'userLogged' in session:
-        return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0)
+        return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0)
     else:
         return redirect(url_for("profile"))
 
@@ -66,17 +91,17 @@ def rules():
 @app.route("/profile")
 def profile():
     if 'userLogged' in session:
-        payments = users.get_payments(email=session['email'])
+        if session['method'] == "site":
+            payments = users.get_payments(email=session['email'])
         return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0)
     else:
         return redirect(url_for("loginpage"))
 
-@app.route("/shop/category<id>")
-def category():
-    x = products.get_categories()
-    return render_template("index.html", sost=6, items= items, logined = 1 if 'userLogged' in session else 0)
-
-
+@app.route("/order<name>")
+def order(name):
+    count = products.get_count_of_products(name)
+    cost = products.get_category_price(name)
+    return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, cost=cost, max=count, name=name)
 
 @app.route("/shop")
 def shop():
@@ -84,9 +109,9 @@ def shop():
     items = []
     for item in x:
         items.append({
-            "category": item[0],
-            "desc": item[1],
-            "cost": item[2]
+            "category": item,
+            "desc": products.get_category_description(item),
+            "cost": products.get_category_price(item)
         })
 
     return render_template("index.html", sost=6, items = items, logined = 1 if 'userLogged' in session else 0)
@@ -108,6 +133,7 @@ def reg():
             users.register(email=email, password=passwd)
             session['userLogged'] = True
             session['email'] = email
+            session['method'] = "site"
             return redirect(url_for("profile"))
 
 
@@ -125,6 +151,7 @@ def auth():
             if email == reqEmail and passwd == reqPasswd:
                 session['userLogged'] = True
                 session['email'] = email
+                session['method'] = "site"
                 return redirect(url_for("profile"))
             else:
 
@@ -144,18 +171,43 @@ def logout():
     session.pop("userLogged", None)
     return redirect(url_for("index"))
 
-@app.route("/tglogin")
-def tg():
+@app.route('/waitingtg')
+def wait():
     tokens.add(session['token'])
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(checker_token())
-    return redirect('/profile')
+
+    @copy_current_request_context
+    def check_token():
+        while True:
+            try:
+                status = tokens.get(session['token'])[1]
+                if 'already' in status:
+                    id = status.split("|")[1]
+                    data = users.get_by_id(id)
+
+                    user = {
+                        'name': data[1],
+                        'balance': data[5]
+                    }
+                    session['method'] = 'tg'
+                    session['user'] = user
+                    session['userLogged'] = True
+                    socketio.emit('loginedtg', {}, namespace=name_space)
+
+                    break
+            except:
+                # asyncio.sleep(2)
+                tokens.db.close()
+                tokens.db.connect("../DB/products.db")
+
+    threading.Thread(target=check_token).start()
+    return render_template("index.html", sost=60, logined = 1 if 'userLogged' in session else 0)
 
 @app.route("/telegram")
 def tg_login():
     session['token'] = create_random_token()
+
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); </script>"
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/waitingtg')</script>"
 
 
 
@@ -163,12 +215,41 @@ def tg_login():
 async def pay():
     if request.method == "POST":
         currency = request.form['currency']
-        amount = 99 / await get_crypto_currency("btc")
+        amount = (int(request.form['cost'])*int(request.form['amount'])) / await get_crypto_currency(currency)
         x = await payment.create_payment(amount, "btc".upper())
-        #print(x)
-        z = await payment.get_payment('38e5bbf032364feda3a31b3aeef8af7e')
         return x
 
+async def check_for_payments():
+    while True:
+        payment_ids = users.get_payments(email=session['email'])
+        for payment_id in payment_ids:
+            payment_data = await payment.get_payment(payment_id)
+            payment_data = payment_data.get("result", None)
+            if not payment_data:
+                users.remove_payment(payment_id, email=session['email'])
+                continue
+            id = payment_data["id"]
+            if id not in payment_ids:
+                continue
+            status = payment_data["state"]
+            """
+                string (PaymentState)
+                Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
+                Payment State
+                """
+            if status == "COMPLETED":
+                amount = payment_data["amount"]
+                users.add_balance(amount, email=session['email'])
+                users.remove_payment(payment_id, email=session['email'])
+                await socketio.emit('purchaseexpired', {}, namespace=name_space)
+            elif status == "DECLINED" or status == "CANCELLED":
+                await socketio.emit('purchaseexpired', {}, namespace=name_space)
+
+                users.remove_payment(id, email=session['email'])
+
+        await asyncio.sleep(30)
+
+
+
 if __name__ == '__main__':
-    # app.run()
-    app.run(host="0.0.0.0", port=1001, debug=True)
+    socketio.run(app)
