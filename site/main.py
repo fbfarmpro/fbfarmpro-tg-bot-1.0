@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
 import asyncio
 from secrets import choice
@@ -171,7 +173,7 @@ def wait():
 
                     break
             except:
-                asyncio.sleep(2)
+                time.sleep(0.5)
 
     threading.Thread(target=check_token).start()
     return render_template("index.html", sost=60, logined = 1 if 'userLogged' in session else 0)
