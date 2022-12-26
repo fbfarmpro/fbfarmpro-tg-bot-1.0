@@ -88,7 +88,8 @@ $(document).ready(function () {
     namespace = '/abcd';
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
     socket.on('loginedtg', function (res) {
-        window.location.href = "/profile"
+        alert('123')
+        window.location.href = "/profile";
     });
-    socket.on('purchaseexpired')
+
 });
