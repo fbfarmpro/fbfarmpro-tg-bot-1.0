@@ -96,21 +96,21 @@ async def check_token():
 
                 id = status.split("|")[1]
                 users = UsersDB('tg', "../DB/users.db")
-                #data = users.get_by_id(id)
+                data = users.get_by_id(id)
 
-                #userID = data[1]
-                #purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
-                #purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
+                userID = data[1]
+                purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
+                purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
                 user = {
-                    'id': id
-                   # 'balance': data[5],
-                    #'payment_ids': data[6]
-                    #'purchase_history': purchases
+                    'id': id,
+                    'balance': data[5],
+                    'payment_ids': data[6],
+                    'purchase_history': purchases
                 }
                 session['method'] = 'tg'
                 session['user'] = user
                 session['userLogged'] = True
-                await get_crypto_currency("btc")
+                await flash("logined succefully!", "error")
                 break
         except:
             await get_crypto_currency("btc")
@@ -142,7 +142,14 @@ def rules():
 @app.route("/profile")
 def profile():
     if 'userLogged' in session:
-        if session['method'] == "site":
+        if session['method'] == "tg":
+            payments = users.get_payments(userID=session['user']['id'])
+            print(payments)
+            return render_template("index.html", sost=5, username=session['user']['id'],
+                                   balance=users.get_balance(userID=session['user']['id']),
+                                   logined=1 if 'userLogged' in session else 0)
+        else:
+
             payments = users.get_payments(email=session['email'])
         return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0)
     else:
