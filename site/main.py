@@ -256,7 +256,7 @@ def addd():
 async def buy():
     if request.method == 'POST':
         if session['method'] == "tg":
-            users = UsersDB("tg", "DB/users.db")
+            users = UsersDB("tg", "../DB/users.db")
             from handlers.main_menu import send_zip
             category_name = request.form['name']
             balance = users.get_balance(session['user']['id'])
