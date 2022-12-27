@@ -59,12 +59,12 @@ async def process_amount(message: types.Message, state: FSMContext):
     url = response["result"]["redirectUrl"]
     if lang == "RU":
         await bot.send_message(userID, f"Оплатите по ссылке:\n{url}\n"
-                                        f"❗️ Вы должны пополнить счет в течении 20 минут\n"
+                                        f"❗️ Вы должны пополнить счет в течении 60 минут\n"
                                         "⚠️Транзакция будет засчитана автоматически.")
         await bot.send_message(userID, "Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
     else:
         await bot.send_message(userID, f"Check details in the link below:\n{url}\n"
-                                        f"❗️ Your must fund your account within 20 minutes\n"
+                                        f"❗️ Your must fund your account within 60 minutes\n"
                                         "⚠️The transaction will be credited automatically.")
         await bot.send_message(userID, "Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     await state.finish()

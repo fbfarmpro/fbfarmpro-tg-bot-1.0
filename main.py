@@ -49,8 +49,13 @@ async def _(message: types.Message):
             await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
         users.register(userID=userID)
-        if greeting_msg["ru"]["text"]:
-            await message.answer(greeting_msg["ru"]["text"])
+        text = greeting_msg["ru"]["text"]
+        if text:
+            await message.answer(text)
+        try:
+            await message.answer_animation(InputFile(greeting_msg["ru"]["gif"]))
+        except:
+            await message.answer_document(InputFile(greeting_msg["ru"]["gif"]))
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
 
 
@@ -85,6 +90,7 @@ async def check_for_payments():
             email = user[2]
             if not userID:
                 continue
+<<<<<<< HEAD
             if userID:
                 userLang = user[4]
                 payment_ids = users.get_payments(userID=userID)
@@ -142,6 +148,37 @@ async def check_for_payments():
                     elif status == "DECLINED" or status == "CANCELLED":
                         await send_mail(email, f"You payment {id}, declined/cancelled")
                         users.remove_payment(id, email=email)
+=======
+            userLang = user[4]
+            payment_ids = users.get_payments(userID=userID)
+            for payment_id in payment_ids:
+                payment_data = await payment.get_payment(payment_id)
+                payment_data = payment_data.get("result", None)
+                if not payment_data:
+                    users.remove_payment(payment_id, userID=userID)
+                    continue
+                id = payment_data["id"]
+                status = payment_data["state"]
+                """
+                string (PaymentState)
+                Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
+                Payment State
+                """
+                if status == "COMPLETED":
+                    amount = payment_data["amount"]
+                    users.add_balance(amount, userID=userID)
+                    users.remove_payment(payment_id, userID=userID)
+                    if userLang == "RU":
+                        await bot.send_message(userID, f"Ваш счет успешно пополнено на {amount}$")
+                    else:
+                        await bot.send_message(userID, f"{amount}$ added to your balance")
+                elif status == "DECLINED" or status == "CANCELLED":
+                    if userLang == "RU":
+                        await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
+                    else:
+                        await bot.send_message(userID, f"You payment {id}, declined/cancelled")
+                    users.remove_payment(id, userID=userID)
+>>>>>>> 7adcae22986f30f0d9d4137b33fbe8cdb74f9a1b
 
         await asyncio.sleep(30)
 
