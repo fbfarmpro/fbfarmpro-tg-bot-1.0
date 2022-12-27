@@ -15,8 +15,8 @@ from handlers import *
 from loader import storage
 
 
-users = UsersDB("tg", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+users = UsersDB("tg", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: int(users.get_banned(userID=c.from_user.id)))
