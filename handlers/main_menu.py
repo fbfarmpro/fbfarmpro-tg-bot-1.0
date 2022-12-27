@@ -8,7 +8,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types import InputFile
 from aiogram.utils.exceptions import ChatNotFound
 
-from utils.database import UsersDB, ProductsDB
+from utils.database import UsersDB, ProductsDB, create_random_filename_zip
 import utils.keyboards as keyboards
 from config import ADMIN_ID, PURCHASE_GIF_FILENAME
 from handlers import *
