@@ -96,15 +96,15 @@ async def check_token():
 
                 id = status.split("|")[1]
                 users = UsersDB('tg', "../DB/users.db")
-                data = users.get_by_id(id)
+                #data = users.get_by_id(id)
 
-                userID = data[1]
+                #userID = data[1]
                 #purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
                 #purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
                 user = {
-                    'id': userID,
-                    'balance': data[5],
-                    'payment_ids': data[6]
+                    'id': id
+                   # 'balance': data[5],
+                    #'payment_ids': data[6]
                     #'purchase_history': purchases
                 }
                 session['method'] = 'tg'
