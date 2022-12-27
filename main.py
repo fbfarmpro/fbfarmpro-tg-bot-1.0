@@ -25,7 +25,7 @@ async def _(message: types.Message):
         else:
             await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
         # tokens.set_status(token, userID)
-        tokens.set_status(token, "done")
+        tokens.set_status(token, f"done|{userID}")
         return
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
