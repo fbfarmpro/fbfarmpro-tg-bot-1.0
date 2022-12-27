@@ -92,7 +92,7 @@ def check_token():
     while True:
         try:
             status = tokens.get(session['token'])[1]
-            if 'waiting' not in status:
+            if status.isdigit():
                 id = status
                 data = users.get_by_id(id)
 
