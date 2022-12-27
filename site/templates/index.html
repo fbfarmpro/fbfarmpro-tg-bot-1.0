@@ -433,28 +433,17 @@
 
                             <form action="/buy" method="post">
                                 <input type="text" name="currency" id="currency" style="display: none;">
-                                <input type="text" name="price" id="cost0" style="display: none;" value="{{ cost }}">
                                 <input type="text" name="amount" id="amount" style="display: none;" value="1">
                                 <div class="content-item active">
                                     <h2 class="pay-title">
-                                        Category: {{ name }}<br><br>
+                                        Add balance<br><br>
                                         <div class="pay-amount">
                                             Amount:
-                                            <div class="pay-amount-btn minus">
-                                                -
-                                            </div>
                                             <div class="pay-amount-input">
-                                                <input type="text" value="1" min="1" max="100" disabled>
-                                            </div>
-                                            <div class="pay-amount-btn plus">
-                                                +
+                                                <input type="text" value="1" maxlength="10" oninput="document.getElementById('amount').value = this.value;">$
                                             </div>
                                         </div>
                                         <br>
-
-                                            <div style="display: inline-flex">
-                                                Total cost: <p id="cost">&nbsp{{ cost }}</p>$
-                                            </div><br><br>
                                         Choose a payment method:
                                     </h2>
                                     <div class="pay-row">
@@ -498,7 +487,7 @@
                                             </div>
                                         </label>
                                         <label class="pay-block" for="pay4">
-                                            <input type="radio" id="pay4" name="pay" oninput="setcurrency('lite');">
+                                            <input type="radio" id="pay4" name="pay" oninput="setcurrency('ltc');">
                                             <div class="pay-block-row">
                                                 <div class="pay-block-check">
                                                 </div>
@@ -511,7 +500,7 @@
                                             </div>
                                         </label>
                                         <label class="pay-block" for="pay5">
-                                            <input type="radio" id="pay5" name="pay" oninput="setcurrency('teth');">
+                                            <input type="radio" id="pay5" name="pay" oninput="setcurrency('usdt');">
                                             <div class="pay-block-row">
                                                 <div class="pay-block-check">
                                                 </div>
@@ -524,7 +513,7 @@
                                             </div>
                                         </label>
                                         <label class="pay-block" for="pay6">
-                                            <input type="radio" id="pay6" name="pay" oninput="setcurrency('tron');">
+                                            <input type="radio" id="pay6" name="pay" oninput="setcurrency('trx');">
                                             <div class="pay-block-row">
                                                 <div class="pay-block-check">
                                                 </div>
@@ -537,6 +526,42 @@
                                             </div>
                                         </label>
                                     </div>
+                                    <div class="pay-btn" onclick="this.parentNode.parentNode.submit();">
+                                        <a href="#" class="h-btn">
+                                            TO PAY
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+
+
+                        {% elif sost == 8 %}
+                            <form action="/payment" method="post">
+                                <input type="text" name="currency" id="currency" style="display: none;">
+                                <input type="text" name="name" style="display: none;" value="{{ name }}">
+                                <input type="text" name="price" id="cost0" style="display: none;" value="{{ cost }}">
+                                <input type="text" name="amount" id="amount" style="display: none;" value="1">
+                                <div class="content-item active">
+                                    <h2 class="pay-title">
+                                        Category: {{ name }}<br><br>
+                                        <div class="pay-amount">
+                                            Amount:
+                                            <div class="pay-amount-btn minus">
+                                                -
+                                            </div>
+                                            <div class="pay-amount-input">
+                                                <input type="text" value="1" min="1" max="100" disabled>
+                                            </div>
+                                            <div class="pay-amount-btn plus">
+                                                +
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                            <div style="display: inline-flex">
+                                                Total cost: <p id="cost">&nbsp{{ cost }}</p>$
+                                            </div><br><br>
+                                    </h2>
                                     <div class="pay-btn" onclick="this.parentNode.parentNode.submit();">
                                         <a href="#" class="h-btn">
                                             TO PAY
