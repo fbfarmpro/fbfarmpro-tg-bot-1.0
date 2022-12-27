@@ -49,8 +49,13 @@ async def _(message: types.Message):
             await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
         users.register(userID=userID)
-        if greeting_msg["ru"]["text"]:
-            await message.answer(greeting_msg["ru"]["text"])
+        text = greeting_msg["ru"]["text"]
+        if text:
+            await message.answer(text)
+        try:
+            await message.answer_animation(InputFile(greeting_msg["ru"]["gif"]))
+        except:
+            await message.answer_document(InputFile(greeting_msg["ru"]["gif"]))
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
 
 
