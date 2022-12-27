@@ -70,6 +70,7 @@ async def _(callback_query: types.CallbackQuery):
         await bot.send_message(callback_query.from_user.id, "Developing...")
 
 
+
 @dp.callback_query_handler(lambda c: c.data == "back_category")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
@@ -192,6 +193,9 @@ async def _(message: types.Message, state: FSMContext):
     await state.update_data(data={"amount": amount})
     await state.set_state("purchase_accept")
 
+
+def send_zip(id, file):
+    bot.send_document(id, InputFile(file))
 
 @dp.message_handler(lambda msg: msg.text.lower() in ["да", "yes", "no", "нет"], state="purchase_accept")
 async def _(message: types.Message, state: FSMContext):

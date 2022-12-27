@@ -252,23 +252,46 @@ def addd():
 @app.route("/payment", methods= ['POST'])
 def buy():
     if request.method == 'POST':
-        category_name = request.form['name']
-        balance = users.get_balance(email=session['email'])
-        cost = int(float(request.form['price'])) * int(float(request.form['amount']))
-        if cost <= balance:
-            users.add_balance(-(cost), email=session['email'])
-            zip_filename = create_random_filename_zip()
-            zip_path = os.path.join("..", "DB", "bought", zip_filename)
-            zipObj = ZipFile(zip_path, "w")
-            for file in products.get_N_products(category_name, int(float(request.form['amount']))):
-                path = os.path.join("..", "DB", category_name, file[0])
-                zipObj.write(path, os.path.basename(path))
-                products.set_isBought(file[0], category_name)
-            zipObj.close()
-            send_file(zip_filename, session['email'])
-            flash("Product(s) was(were) sended to your email!", "error")
-            users.add_purchase(category_name, int(float(request.form['amount'])), int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename, email=session['email'])
-            return redirect(url_for('profile'))
+        if session['method'] == "tg":
+            users = UsersDB("tg", "../DB/users.db")
+            from handlers.main_menu import send_zip
+            category_name = request.form['name']
+            balance = users.get_balance(session['user']['id'])
+            cost = int(float(request.form['price'])) * int(float(request.form['amount']))
+            if cost <= balance:
+                users.add_balance(-(cost), session['user']['id'])
+                zip_filename = create_random_filename_zip()
+                zip_path = os.path.join("DB", "bought", zip_filename)
+                zipObj = ZipFile(zip_path, "w")
+                for file in products.get_N_products(category_name, int(float(request.form['amount']))):
+                    path = os.path.join("DB", category_name, file[0])
+                    zipObj.write(path, os.path.basename(path))
+                    products.set_isBought(file[0], category_name)
+                zipObj.close()
+                send_zip(session['user']['id'], zip_filename)
+                flash("Product(s) was(were) sended to your Telegram!", "error")
+                users.add_purchase(category_name, int(float(request.form['amount'])),
+                                   int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
+                                   session['user']['id'])
+                return redirect(url_for('profile'))
+        else:
+            category_name = request.form['name']
+            balance = users.get_balance(email=session['email'])
+            cost = int(float(request.form['price'])) * int(float(request.form['amount']))
+            if cost <= balance:
+                users.add_balance(-(cost), email=session['email'])
+                zip_filename = create_random_filename_zip()
+                zip_path = os.path.join("..", "DB", "bought", zip_filename)
+                zipObj = ZipFile(zip_path, "w")
+                for file in products.get_N_products(category_name, int(float(request.form['amount']))):
+                    path = os.path.join("..", "DB", category_name, file[0])
+                    zipObj.write(path, os.path.basename(path))
+                    products.set_isBought(file[0], category_name)
+                zipObj.close()
+                send_file(zip_filename, session['email'])
+                flash("Product(s) was(were) sended to your email!", "error")
+                users.add_purchase(category_name, int(float(request.form['amount'])), int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename, email=session['email'])
+                return redirect(url_for('profile'))
 @app.route("/buy", methods= ['POST'])
 async def pay():
     if request.method == "POST":
