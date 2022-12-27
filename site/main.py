@@ -199,12 +199,17 @@ def wait():
                     id = status.split("|")[1]
                     data = users.get_by_id(id)
 
+                    userID = data[1]
+                    purchases = filter(lambda t: int(t[0]) == int(userID), users.get_purchases()) or None
+                    # purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
                     user = {
-                        'name': data[1],
-                        'balance': data[5]
+                        'name': userID,
+                        'balance': data[5],
+                        'payment_ids': data[6],
+                        'purchase_history': purchases
                     }
                     session['method'] = 'tg'
-                    session['user'] = user
+                    session['userid'] = user
                     session['userLogged'] = True
                     socketio.emit('loginedtg', {}, namespace=name_space)
 
