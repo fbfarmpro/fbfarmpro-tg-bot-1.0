@@ -111,7 +111,6 @@ def check_token():
                 session['userLogged'] = True
 
                 break
-
         except:
             time.sleep(0.5)
 
@@ -216,7 +215,7 @@ def logout():
 
 @app.route("/tglogin")
 def tg():
-    session['token'] = create_random_token()
+
     tokens.add(session['token'])
     loop = asyncio.new_event_loop()
     loop.run_until_complete(check_token())
