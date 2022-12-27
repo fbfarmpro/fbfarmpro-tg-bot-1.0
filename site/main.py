@@ -93,7 +93,7 @@ def check_token():
         try:
             status = tokens.get(session['token'])[1]
             if status.isdigit():
-                print("done")
+                print(status)
                 id = status
                 data = users.get_by_id(id)
 
