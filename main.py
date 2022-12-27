@@ -90,7 +90,6 @@ async def check_for_payments():
             email = user[2]
             if not userID:
                 continue
-<<<<<<< HEAD
             if userID:
                 userLang = user[4]
                 payment_ids = users.get_payments(userID=userID)
@@ -148,7 +147,6 @@ async def check_for_payments():
                     elif status == "DECLINED" or status == "CANCELLED":
                         await send_mail(email, f"You payment {id}, declined/cancelled")
                         users.remove_payment(id, email=email)
-=======
             userLang = user[4]
             payment_ids = users.get_payments(userID=userID)
             for payment_id in payment_ids:
@@ -178,7 +176,6 @@ async def check_for_payments():
                     else:
                         await bot.send_message(userID, f"You payment {id}, declined/cancelled")
                     users.remove_payment(id, userID=userID)
->>>>>>> 7adcae22986f30f0d9d4137b33fbe8cdb74f9a1b
 
         await asyncio.sleep(30)
 
