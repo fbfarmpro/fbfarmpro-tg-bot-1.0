@@ -92,24 +92,23 @@ async def check_token():
     while True:
         try:
             status = tokens.get(session['token'])[1]
-            if status.isdigit():
-                print(status)
-                id = status
-                data = users.get_by_id(id)
+            if status=="done":
+                #id = status
+                #data = users.get_by_id(id)
 
-                userID = data[1]
-                purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
+                #userID = data[1]
+                #purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
                 # purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
-                user = {
-                    'id': userID,
-                    'balance': data[5],
-                    'payment_ids': data[6],
-                    'purchase_history': purchases
-                }
-                print(purchases)
-                session['method'] = 'tg'
-                session['user'] = user
-                session['userLogged'] = True
+                #user = {
+               #     'id': userID,
+               #     'balance': data[5],
+               #     'payment_ids': data[6],
+               #     'purchase_history': purchases
+               # }
+               # print(purchases)
+                #session['method'] = 'tg'
+               # session['user'] = user
+               # session['userLogged'] = True
                 await get_crypto_currency("btc")
                 break
         except:
