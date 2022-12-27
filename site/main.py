@@ -88,7 +88,7 @@ def send_file(file, receiver_email):
         server.sendmail(sender, receiver_email, text)
 
 
-def check_token():
+async def check_token():
     while True:
         try:
             status = tokens.get(session['token'])[1]
@@ -110,9 +110,10 @@ def check_token():
                 session['method'] = 'tg'
                 session['user'] = user
                 session['userLogged'] = True
-
+                await get_crypto_currency("btc")
                 break
         except:
+            await get_crypto_currency("btc")
             time.sleep(0.5)
 
 
