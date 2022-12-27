@@ -570,13 +570,13 @@
                                 </div>
                             </form>
                             <script>
+                                const price = {{ cost }};
                                 $('.pay-amount-btn.plus').click(function(){
                                     var amountVal = $(this).closest('.pay-amount').find('.pay-amount-input input').val();
                                     if (amountVal < {{ max }}) {
                                         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal = amountVal*1+1);
                                         document.getElementById("amount").value++;
-                                        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").value;
-
+                                        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + price;
                                     }
                                 });
                             </script>
