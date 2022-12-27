@@ -99,13 +99,13 @@ async def check_token():
                 data = users.get_by_id(id)
 
                 userID = data[1]
-                purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
-                purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
+                #purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
+                #purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
                 user = {
                     'id': id,
                     'balance': data[5],
-                    'payment_ids': data[6],
-                    'purchase_history': purchases
+                    'payment_ids': data[6]
+                    #'purchase_history': #purchases
                 }
                 session['method'] = 'tg'
                 session['user'] = user
@@ -145,7 +145,7 @@ def profile():
         if session['method'] == "tg":
             users = UsersDB('tg', "../DB/users.db")
 
-            print(session['user']['purchase_history'])
+            #print(session['user']['purchase_history'])
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=users.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0)
