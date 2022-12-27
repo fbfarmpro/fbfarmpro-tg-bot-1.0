@@ -158,7 +158,7 @@ class UsersDB:
         if self.method == "tg":
             self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
         else:
-            self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
+            self.cur.execute("UPDATE users SET balance = ? WHERE email = ?", (result if result > 0 else 0, email))
         self.db.commit()
 
     def get_count_of_users(self):
