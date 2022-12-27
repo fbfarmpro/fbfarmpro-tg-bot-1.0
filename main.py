@@ -19,12 +19,11 @@ async def _(message: types.Message):
     token = message.get_args()
     if token:
         if not users.is_registered(userID=userID):
-            tokens.set_status(token, userID)
             users.register_site_via_tg(userID)
             await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
         else:
-            tokens.set_status(token, f"already|{userID}")
             await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
+        tokens.set_status(token, userID)
         return
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
