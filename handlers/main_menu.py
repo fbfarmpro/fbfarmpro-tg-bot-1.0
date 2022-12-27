@@ -194,8 +194,8 @@ async def _(message: types.Message, state: FSMContext):
     await state.set_state("purchase_accept")
 
 
-def send_zip(id, file):
-    bot.send_document(id, InputFile(file))
+async def send_zip(id, file):
+    await bot.send_document(id, InputFile(file))
 
 @dp.message_handler(lambda msg: msg.text.lower() in ["да", "yes", "no", "нет"], state="purchase_accept")
 async def _(message: types.Message, state: FSMContext):

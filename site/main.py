@@ -251,7 +251,7 @@ def addd():
     return redirect(url_for("profile"))
 
 @app.route("/payment", methods= ['POST'])
-def buy():
+async def buy():
     if request.method == 'POST':
         if session['method'] == "tg":
             users = UsersDB("tg", "../DB/users.db")
@@ -269,7 +269,7 @@ def buy():
                     zipObj.write(path, os.path.basename(path))
                     products.set_isBought(file[0], category_name)
                 zipObj.close()
-                send_zip(session['user']['id'], zip_filename)
+                await send_zip(session['user']['id'], zip_filename)
                 flash("Product(s) was(were) sended to your Telegram!", "error")
                 users.add_purchase(category_name, int(float(request.form['amount'])),
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
@@ -291,6 +291,8 @@ def buy():
                 zipObj.close()
                 send_file(zip_filename, session['email'])
                 flash("Product(s) was(were) sended to your email!", "error")
+                await get_crypto_currency("btc")
+
                 users.add_purchase(category_name, int(float(request.form['amount'])), int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename, email=session['email'])
                 return redirect(url_for('profile'))
 @app.route("/buy", methods= ['POST'])
