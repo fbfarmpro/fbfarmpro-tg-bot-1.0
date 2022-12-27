@@ -575,7 +575,7 @@
                                     if (amountVal < {{ max }}) {
                                         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal = amountVal*1+1);
                                         document.getElementById("amount").value++;
-                                        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").innerHTML;
+                                        document.getElementById("cost").innerHTML = +document.getElementById("cost").value + +document.getElementById("cost0").value;
 
                                     }
                                 });
