@@ -103,7 +103,7 @@ async def _(callback_query: types.CallbackQuery):
             category_ru = category.split("|")[0]
             cat_text = "✅" + category_en + "✅" if products.get_count_of_products(full_category_name) else category_en
             kb.add(InlineKeyboardButton(text=cat_text, callback_data="category " + category_ru))
-    kb.add(InlineKeyboardButton(text="Back", callback_data="back_category"))
+        kb.add(InlineKeyboardButton(text="Back", callback_data="back_category"))
     if lang == "RU":
         await callback_query.message.edit_text("Выберите категорию", reply_markup=kb)
     else:
