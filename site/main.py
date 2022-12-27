@@ -34,8 +34,9 @@ def create_random_token():
 
 
 app = Flask(__name__)
-app.secret_key = 'asdasdas?'
-app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
+app.secret_key = 'hhhkhkhkkh'
+# app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
+app.config['SECRET_KEY'] = 'lksdjflaskjdhkjshg'
 
 from flask_socketio import SocketIO, emit
 
