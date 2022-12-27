@@ -144,8 +144,8 @@ def profile():
     if 'userLogged' in session:
         if session['method'] == "tg":
             users = UsersDB('tg', "../DB/users.db")
-            payments = users.get_payments(userID=session['user']['id'])
-            print(payments)
+
+            print(session['user']['purchase_history'])
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=users.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0)
