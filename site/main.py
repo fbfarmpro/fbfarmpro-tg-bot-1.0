@@ -16,13 +16,13 @@ import logging
 from flask_socketio import SocketIO, emit
 import threading
 from flask import jsonify, copy_current_request_context
-from secret import sender, password
+
 logging.basicConfig(filename="log.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
 sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
-
+from secret import sender, password
 tokens = Tokens("../DB/tokens.db")
 users = UsersDB("site", "../DB/users.db")
 products = ProductsDB("../DB/products.db")
