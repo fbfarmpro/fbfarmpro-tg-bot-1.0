@@ -92,37 +92,26 @@ def check_token():
     while True:
         try:
             status = tokens.get(session['token'])[1]
-            if 'already' in status:
-                id = status.split("|")[1]
+            if 'waiting' not in status:
+                id = status
                 data = users.get_by_id(id)
 
                 userID = data[1]
                 purchases = filter(lambda t: int(t[0]) == int(userID), users.get_purchases()) or None
                 # purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
                 user = {
-                    'name': userID,
+                    'id': userID,
                     'balance': data[5],
                     'payment_ids': data[6],
                     'purchase_history': purchases
                 }
+                print(purchases)
                 session['method'] = 'tg'
-                session['userid'] = user
+                session['user'] = user
                 session['userLogged'] = True
 
                 break
-            else:
-                id = int(status)
-                if id:
-                    data = users.get_by_id(id)
 
-                    user = {
-                        'name': data[1],
-                        'balance': data[5]
-                    }
-                    session['method'] = 'tg'
-                    session['user'] = user
-                    session['userLogged'] = True
-                    break
         except:
             time.sleep(0.5)
 
