@@ -26,8 +26,8 @@ from secret import sender, password
 
 
 tokens = Tokens("DB/tokens.db")
-users = UsersDB("site", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+users = UsersDB("site", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 def create_random_token():
     # choose from all lowercase letter
