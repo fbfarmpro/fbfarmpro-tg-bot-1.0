@@ -25,7 +25,8 @@ $('.pay-amount-btn.minus').click(function(){
     var amountVal = $(this).closest('.pay-amount').find('.pay-amount-input input').val();
     if (amountVal > 1) {
         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal - 1);
-        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").innerHTML;
+        document.getElementById("amount").value--;
+        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML - +document.getElementById("cost0").innerHTML;
     }
 });
 

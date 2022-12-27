@@ -6,8 +6,8 @@ from utils import keyboards
 from datetime import datetime
 import zipfile
 from utils.database import UsersDB, ProductsDB, Tokens
-
-
+import smtplib, ssl
+from secret import password, sender
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 tokens = Tokens("DB/tokens.db")
@@ -69,43 +69,79 @@ async def _(message: types.Message):
     await message.answer("What do you want to do", reply_markup=keyboards.ADMIN_MENU)
 
 
+
+async def send_mail(receiver, mail):
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender, password)
+        await server.sendmail(sender, receiver, mail)
+
 async def check_for_payments():
     while True:
         for user in users:
             userID = user[1]
+            email = user[2]
             if not userID:
                 continue
-            userLang = user[4]
-            payment_ids = users.get_payments(userID=userID)
-            for payment_id in payment_ids:
-                payment_data = await payment.get_payment(payment_id)
-                payment_data = payment_data.get("result", None)
-                if not payment_data:
-                    users.remove_payment(payment_id, userID=userID)
-                    continue
-                id = payment_data["id"]
-                if id not in payment_ids:
-                    continue
-                status = payment_data["state"]
-                """
-                string (PaymentState)
-                Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
-                Payment State
-                """
-                if status == "COMPLETED":
-                    amount = payment_data["amount"]
-                    users.add_balance(amount, userID=userID)
-                    users.remove_payment(payment_id, userID=userID)
-                    if userLang == "RU":
-                        await bot.send_message(userID, f"Ваш счет успешно пополнено на {amount}$")
-                    else:
-                        await bot.send_message(userID, f"{amount}$ added to your balance")
-                elif status == "DECLINED" or status == "CANCELLED":
-                    if userLang == "RU":
-                        await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
-                    else:
-                        await bot.send_message(userID, f"You payment {id}, declined/cancelled")
-                    users.remove_payment(id, userID=userID)
+            if userID:
+                userLang = user[4]
+                payment_ids = users.get_payments(userID=userID)
+                for payment_id in payment_ids:
+                    payment_data = await payment.get_payment(payment_id)
+                    payment_data = payment_data.get("result", None)
+                    if not payment_data:
+                        users.remove_payment(payment_id, userID=userID)
+                        continue
+                    id = payment_data["id"]
+                    if id not in payment_ids:
+                        continue
+                    status = payment_data["state"]
+                    """
+                    string (PaymentState)
+                    Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
+                    Payment State
+                    """
+                    if status == "COMPLETED":
+                        amount = payment_data["amount"]
+                        users.add_balance(amount, userID=userID)
+                        users.remove_payment(payment_id, userID=userID)
+                        if userLang == "RU":
+                            await bot.send_message(userID, f"Ваш счет успешно пополнено на {amount}$")
+                        else:
+                            await bot.send_message(userID, f"{amount}$ added to your balance")
+                    elif status == "DECLINED" or status == "CANCELLED":
+                        if userLang == "RU":
+                            await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
+                        else:
+                            await bot.send_message(userID, f"You payment {id}, declined/cancelled")
+                        users.remove_payment(id, userID=userID)
+            elif email:
+                payment_ids = users.get_payments(email=userID)
+                for payment_id in payment_ids:
+                    payment_data = await payment.get_payment(payment_id)
+                    payment_data = payment_data.get("result", None)
+                    if not payment_data:
+                        users.remove_payment(payment_id, email=email)
+                        continue
+                    id = payment_data["id"]
+                    if id not in payment_ids:
+                        continue
+                    status = payment_data["state"]
+                    """
+                    string (PaymentState)
+                    Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
+                    Payment State
+                    """
+                    if status == "COMPLETED":
+                        amount = payment_data["amount"]
+                        users.add_balance(amount, email=email)
+                        users.remove_payment(payment_id, email=email)
+                        await send_mail(email, f"{amount}$ added to your balance")
+                    elif status == "DECLINED" or status == "CANCELLED":
+                        await send_mail(email, f"You payment {id}, declined/cancelled")
+                        users.remove_payment(id, email=email)
 
         await asyncio.sleep(30)
 

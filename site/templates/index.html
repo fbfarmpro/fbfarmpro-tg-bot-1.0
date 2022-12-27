@@ -433,7 +433,8 @@
 
                             <form action="/buy" method="post">
                                 <input type="text" name="currency" id="currency" style="display: none;">
-                                <input type="text" name="cost" id="cost0" style="display: none;" value="{{ cost }}">
+                                <input type="text" name="price" id="cost0" style="display: none;" value="{{ cost }}">
+                                <input type="text" name="amount" id="amount" style="display: none;" value="1">
                                 <div class="content-item active">
                                     <h2 class="pay-title">
                                         Category: {{ name }}<br><br>
@@ -443,7 +444,7 @@
                                                 -
                                             </div>
                                             <div class="pay-amount-input">
-                                                <input type="text" value="1" name="amount" min="1" max="100" disabled>
+                                                <input type="text" value="1" min="1" max="100" disabled>
                                             </div>
                                             <div class="pay-amount-btn plus">
                                                 +
@@ -548,6 +549,9 @@
                                     var amountVal = $(this).closest('.pay-amount').find('.pay-amount-input input').val();
                                     if (amountVal < {{ max }}) {
                                         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal = amountVal*1+1);
+                                        document.getElementById("amount").value++;
+                                        document.getElementById("cost").innerHTML = +document.getElementById("cost").innerHTML + +document.getElementById("cost0").innerHTML;
+
                                     }
                                 });
                             </script>

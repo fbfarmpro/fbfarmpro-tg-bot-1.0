@@ -196,15 +196,16 @@ def tg_login():
     session['token'] = create_random_token()
 
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/waitingtg')</script>"
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/waitingtg'); window.close();</script>"
 
 
 
 @app.route("/buy", methods= ['POST'])
 async def pay():
     if request.method == "POST":
+        print(request.form)
         currency = request.form['currency']
-        amount = (int(request.form['cost'])*int(request.form['amount'])) / await get_crypto_currency(currency)
+        amount = (int(float(request.form['price']))*int(float(request.form['amount']))) / await get_crypto_currency(currency)
         x = await payment.create_payment(amount, "btc".upper())
         return x
 
