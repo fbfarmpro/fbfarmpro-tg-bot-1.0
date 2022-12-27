@@ -11,7 +11,7 @@ from secret import password, sender
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 tokens = Tokens("DB/tokens.db")
-
+users0 = UsersDB("site", "DB/users.db")
 
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
@@ -123,12 +123,12 @@ async def check_for_payments():
                             await bot.send_message(userID, f"You payment {id}, declined/cancelled")
                         users.remove_payment(id, userID=userID)
             elif email:
-                payment_ids = users.get_payments(email=userID)
+                payment_ids = users0.get_payments(email=email)
                 for payment_id in payment_ids:
                     payment_data = await payment.get_payment(payment_id)
                     payment_data = payment_data.get("result", None)
                     if not payment_data:
-                        users.remove_payment(payment_id, email=email)
+                        users0.remove_payment(payment_id, email=email)
                         continue
                     id = payment_data["id"]
                     if id not in payment_ids:
@@ -141,11 +141,12 @@ async def check_for_payments():
                     """
                     if status == "COMPLETED":
                         amount = payment_data["amount"]
-                        users.add_balance(amount, email=email)
-                        users.remove_payment(payment_id, email=email)
+                        users0.add_balance(amount, email=email)
+                        users0.remove_payment(payment_id, email=email)
                         await send_mail(email, f"{amount}$ added to your balance")
                     elif status == "DECLINED" or status == "CANCELLED":
                         await send_mail(email, f"You payment {id}, declined/cancelled")
+<<<<<<< HEAD
                         users.remove_payment(id, email=email)
             userLang = user[4]
             payment_ids = users.get_payments(userID=userID)
@@ -176,6 +177,10 @@ async def check_for_payments():
                     else:
                         await bot.send_message(userID, f"You payment {id}, declined/cancelled")
                     users.remove_payment(id, userID=userID)
+=======
+                        users0.remove_payment(id, email=email)
+
+>>>>>>> f1edd179d86175e7adc6955e33d0b1922c1651ca
 
         await asyncio.sleep(30)
 
