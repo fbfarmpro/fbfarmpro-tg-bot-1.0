@@ -95,7 +95,7 @@ async def check_token():
             if "done" in status:
 
                 id = status.split("|")[1]
-
+                users = UsersDB('tg', "../DB/users.db")
                 data = users.get_by_id(id)
 
                 userID = data[1]
