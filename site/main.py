@@ -88,6 +88,45 @@ def send_file(file, receiver_email):
         server.sendmail(sender, receiver_email, text)
 
 
+def check_token():
+    while True:
+        try:
+            status = tokens.get(session['token'])[1]
+            if 'already' in status:
+                id = status.split("|")[1]
+                data = users.get_by_id(id)
+
+                userID = data[1]
+                purchases = filter(lambda t: int(t[0]) == int(userID), users.get_purchases()) or None
+                # purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
+                user = {
+                    'name': userID,
+                    'balance': data[5],
+                    'payment_ids': data[6],
+                    'purchase_history': purchases
+                }
+                session['method'] = 'tg'
+                session['userid'] = user
+                session['userLogged'] = True
+
+                break
+            else:
+                id = int(status)
+                if id:
+                    data = users.get_by_id(id)
+
+                    user = {
+                        'name': data[1],
+                        'balance': data[5]
+                    }
+                    session['method'] = 'tg'
+                    session['user'] = user
+                    session['userLogged'] = True
+                    break
+        except:
+            time.sleep(0.5)
+
+
 @app.route("/")
 def index():
     if 'userLogged' in session:
@@ -186,66 +225,25 @@ def logout():
     session.pop("userLogged", None)
     return redirect(url_for("index"))
 
-@app.route('/waitingtg')
-def wait():
+@app.route("/tglogin")
+def tg():
+    session['token'] = create_random_token()
     tokens.add(session['token'])
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(check_token())
+    return redirect('/profile')
 
-    @copy_current_request_context
-    def check_token():
-        while True:
-            try:
-                status = tokens.get(session['token'])[1]
-                if 'already' in status:
-                    id = status.split("|")[1]
-                    data = users.get_by_id(id)
-
-                    userID = data[1]
-                    purchases = filter(lambda t: int(t[0]) == int(userID), users.get_purchases()) or None
-                    # purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
-                    user = {
-                        'name': userID,
-                        'balance': data[5],
-                        'payment_ids': data[6],
-                        'purchase_history': purchases
-                    }
-                    session['method'] = 'tg'
-                    session['userid'] = user
-                    session['userLogged'] = True
-                    socketio.emit('loginedtg', {}, namespace=name_space)
-
-                    break
-                else:
-                    id = int(status)
-                    if id:
-                        data = users.get_by_id(id)
-
-                        user = {
-                            'name': data[1],
-                            'balance': data[5]
-                        }
-                        session['method'] = 'tg'
-                        session['user'] = user
-                        session['userLogged'] = True
-                        socketio.emit('loginedtg', {}, namespace=name_space)
-            except:
-                time.sleep(0.5)
-
-    threading.Thread(target=check_token).start()
-    return render_template("index.html", sost=9, logined = 1 if 'userLogged' in session else 0)
-
+@app.route("/telegram")
+def tg_login():
+    session['token'] = create_random_token()
+    # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 @app.route("/pay<name>")
 def shopp(name):
     count = products.get_count_of_products(name)
     cost = products.get_category_price(name)
     return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count, name=name)
 
-
-@app.route("/telegram")
-def tg_login():
-    session['token'] = create_random_token()
-
-    # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/waitingtg'); window.close();</script>"
 
 
 @app.route("/addmee")
