@@ -182,16 +182,14 @@ def order():
 
 @app.route("/shop")
 def shop():
-    x = products.get_categories()
-    items = []
-    for item in x:
-        items.append({
-            "category": item.split("|")[-1],
-            "desc": products.get_category_description(item).split("|")[-1],
-            "cost": products.get_category_price(item)
-        })
-
-    return render_template("index.html", sost=6, items = items, logined = 1 if 'userLogged' in session else 0)
+	if 'userLogged' in session:
+		x = products.get_categories()
+		items = []
+		for item in x:
+			items.append({"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
+		return render_template("index.html", sost=6, items = items, logined = 1 if 'userLogged' in session else 0)
+	else:
+		return redirect(url_for("loginpage"))
 
 @app.route("/create", methods = ['POST'])
 def reg():
