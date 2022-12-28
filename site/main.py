@@ -27,9 +27,9 @@ from loader import dp, bot
 from flask_socketio import SocketIO, emit
 from aiogram.types import InputFile
 
-tokens = Tokens("../DB/tokens.db")
-users = UsersDB("site", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+tokens = Tokens("DB/tokens.db")
+users = UsersDB("site", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 def create_random_token():
     # choose from all lowercase letter
