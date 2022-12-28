@@ -198,7 +198,6 @@ def reg():
     if request.method == "POST":
         email = request.form['r-email']
         passwd = request.form['r-password']
-        username = request.form['r-username']
 
 
         if users.is_registered(email=email):
