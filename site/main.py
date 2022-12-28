@@ -53,7 +53,7 @@ socketio = SocketIO(app)
 name_space = '/abcd'
 
 async def send_zip(id, file):
-    await bot.send_document(id, InputFile(f"../{file}"))
+    await bot.send_document(id, InputFile(file))
 
 def send_file(file, receiver_email):
     subject = "Your order"
@@ -298,7 +298,7 @@ async def buy():
                     zipObj.write(path, os.path.basename(path))
                     products.set_isBought(file[0], category_name)
                 zipObj.close()
-                send_file(zip_filename, session['email'])
+                send_file(zip_path, session['email'])
                 flash("Product(s) was(were) sended to your email!", "error")
                 await get_crypto_currency("btc")
 
