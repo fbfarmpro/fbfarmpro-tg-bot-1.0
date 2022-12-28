@@ -313,7 +313,7 @@
                                                 <div class="profile-list">
                                                         {% for order in history %}
                                                             <p class="profile-list-item">
-                                                                {{ order }}
+                                                                {{ order|safe }}
                                                             </p>
                                                         {% endfor %}
                                                 </div>
