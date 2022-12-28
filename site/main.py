@@ -185,8 +185,8 @@ def shop():
     items = []
     for item in x:
         items.append({
-            "category": item,
-            "desc": products.get_category_description(item),
+            "category": item.split("|")[-1],
+            "desc": products.get_category_description(item).split("|")[-1],
             "cost": products.get_category_price(item)
         })
 
@@ -254,6 +254,10 @@ def tg_login():
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 @app.route("/pay<name>")
 def shopp(name):
+    for category in products.get_categories():
+        if name in category:
+            name = category
+            break
     count = products.get_count_of_products(name)
     cost = products.get_category_price(name)
     return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count, name=name)
