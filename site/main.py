@@ -7,7 +7,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, send_file
 import asyncio
 from secrets import choice
 from string import ascii_letters, digits
@@ -126,6 +126,12 @@ async def check_token():
             await get_crypto_currency("btc")
             time.sleep(0.5)
 
+
+@app.route('/download<file>')
+def downloadFile(file):
+
+    path = os.path.join("DB", "bought", file)
+    return send_file(path, as_attachment=True)
 
 @app.route("/")
 def index():
