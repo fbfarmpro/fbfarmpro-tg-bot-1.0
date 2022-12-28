@@ -7,9 +7,8 @@ from string import ascii_letters, digits
 
 import aiohttp
 from aiogram import types
-from passlib.hash import pbkdf2_sha256 as sha256
+import hashlib
 
-# from handlers import *
 from secret import APIKEY
 import config
 
@@ -89,7 +88,7 @@ class UsersDB:
         else:
             assert password is not None and email is not None
             self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", None, email,
-                                                                                   sha256.hash(password), "EN", 0,
+                                                                                   hashlib.sha256(password).hexdigest(), "EN", 0,
                                                                                    None, 0))
         self.db.commit()
 
@@ -100,7 +99,7 @@ class UsersDB:
         self.db.commit()
 
     def get_by_id(self, id):
-        return self.cur.execute("SELECT * FROM users WHERE userid = ?", (id,)).fetchone()
+        return self.cur.execute("SELECT * FROM users WHERE userID = ?", (id,)).fetchone()
 
     def is_registered(self, *, userID=None, email=None):
         if self.method == "tg" or userID:
