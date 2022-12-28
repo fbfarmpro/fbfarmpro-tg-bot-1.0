@@ -278,7 +278,7 @@ async def buy():
                     zipObj.write(path, os.path.basename(path))
                     products.set_isBought(file[0], category_name)
                 zipObj.close()
-                await send_zip(session['user']['id'], zip_filename)
+                await send_zip(session['user']['id'], zip_path)
                 flash("Product(s) was(were) sended to your Telegram!", "error")
                 usersTG.add_purchase(category_name, int(float(request.form['amount'])),
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
