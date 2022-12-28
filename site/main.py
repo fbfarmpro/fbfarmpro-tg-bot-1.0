@@ -268,10 +268,10 @@ async def buy():
 
             print(session['user']['id'])
             category_name = request.form['name']
-            balance = usersTG.get_balance(session['user']['id'])
+            balance = usersTG.get_balance(userID=session['user']['id'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
             if cost <= balance:
-                usersTG.add_balance(-(cost), session['user']['id'])
+                usersTG.add_balance(-(cost), userID = session['user']['id'])
                 zip_filename = create_random_filename_zip()
                 zip_path = os.path.join("DB", "bought", zip_filename)
                 zipObj = ZipFile(zip_path, "w")
@@ -284,7 +284,7 @@ async def buy():
                 flash("Product(s) was(were) sended to your Telegram!", "error")
                 usersTG.add_purchase(category_name, int(float(request.form['amount'])),
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
-                                   session['user']['id'])
+                                   userID=session['user']['id'])
                 return redirect(url_for('profile'))
         else:
             category_name = request.form['name']
