@@ -32,6 +32,7 @@ from aiogram.types import InputFile
 
 tokens = Tokens("DB/tokens.db")
 users = UsersDB("site", "DB/users.db")
+usersTG = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 bot = Bot(token=TOKEN)
 
@@ -264,13 +265,13 @@ def addd():
 async def buy():
     if request.method == 'POST':
         if session['method'] == "tg":
-            users = UsersDB("tg", "../DB/users.db")
+
 
             category_name = request.form['name']
-            balance = users.get_balance(session['user']['id'])
+            balance = usersTG.get_balance(session['user']['id'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
             if cost <= balance:
-                users.add_balance(-(cost), session['user']['id'])
+                usersTG.add_balance(-(cost), session['user']['id'])
                 zip_filename = create_random_filename_zip()
                 zip_path = os.path.join("DB", "bought", zip_filename)
                 zipObj = ZipFile(zip_path, "w")
@@ -281,7 +282,7 @@ async def buy():
                 zipObj.close()
                 await send_zip(session['user']['id'], zip_filename)
                 flash("Product(s) was(were) sended to your Telegram!", "error")
-                users.add_purchase(category_name, int(float(request.form['amount'])),
+                usersTG.add_purchase(category_name, int(float(request.form['amount'])),
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
                                    session['user']['id'])
                 return redirect(url_for('profile'))
