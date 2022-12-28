@@ -98,8 +98,10 @@ class UsersDB:
                                                                                None, "RU", 0,
                                                                                None, 0))
         self.db.commit()
+
     def get_by_id(self, id):
         return self.cur.execute("SELECT * FROM users WHERE userid = ?", (id,)).fetchone()
+
     def is_registered(self, *, userID=None, email=None, password=None):
         if self.method == "tg" or userID:
             assert userID is not None
@@ -127,6 +129,14 @@ class UsersDB:
             assert email is not None
             data = self.cur.execute("SELECT isBanned FROM users WHERE email = ?", (email,)).fetchone()
         return int(data[0]) if data else 0
+
+    def get_purchase_history(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            return [i for i in filter(lambda t: str(t[0]) == str(userID), users.get_purchases())]
+        else:
+            assert email is not None
+            return [i for i in filter(lambda t: str(t[1]) == str(email), users.get_purchases())]
 
     def change_language(self, *, userID=None, email=None):
         lang = self.get_language(userID=userID, email=email)
