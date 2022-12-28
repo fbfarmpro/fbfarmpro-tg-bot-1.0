@@ -131,7 +131,7 @@ async def check_token():
 def downloadFile(file):
 
     path = os.path.join("DB", "bought", file)
-    return send_file(path, as_attachment=True)
+    return send_file(path)
 
 @app.route("/")
 def index():
