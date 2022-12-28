@@ -139,6 +139,11 @@ class UsersDB:
             assert email is not None
             return [i for i in filter(lambda t: str(t[1]) == str(email), self.get_purchases())]
 
+    def change_password(self, email, password):
+        # hashlib.sha256(password.encode()).hexdigest(), "EN", 0,
+        self.cur.execute("UPDATE users SET password = ? where email = ?", (hashlib.sha256(password.encode()).hexdigest(), email))
+        self.db.commit()
+
     def change_language(self, *, userID=None, email=None):
         lang = self.get_language(userID=userID, email=email) or "RU"
         if self.method == "tg":
