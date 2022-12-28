@@ -616,10 +616,11 @@ p {
 .profile-list {
     margin-top: 28px;
     overflow-y: scroll;
-    max-height: 630px;
+    max-height: 500px;
 }
-.nav-tabs {
-   border-bottom:none;
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
 }
 .profile-list-item {
     font-size: 16px;
