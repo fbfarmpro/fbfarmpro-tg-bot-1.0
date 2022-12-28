@@ -93,13 +93,11 @@ class UsersDB:
                                                                                    None, 0))
         self.db.commit()
 
-    """
     def register_site_via_tg(self, userID):
         self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", userID, None,
                                                                                None, "RU", 0,
                                                                                None, 0))
         self.db.commit()
-    """
 
     def get_by_id(self, id):
         return self.cur.execute("SELECT * FROM users WHERE userid = ?", (id,)).fetchone()
