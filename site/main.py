@@ -218,9 +218,8 @@ def auth():
         email = request.form['a-email']
         passwd = request.form['a-password']
         if users.is_registered(email=email):
-            reqEmail = users.is_registered(email=email, password=passwd)
-            reqPasswd = users.is_registered(email=email, password=passwd)
-            print(reqPasswd)
+            reqEmail = users.is_registered(email=email, password=passwd)[0]
+            reqPasswd = users.is_registered(email=email, password=passwd)[1]
 
             if email == reqEmail and passwd == reqPasswd:
                 session['userLogged'] = True
