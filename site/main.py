@@ -105,14 +105,16 @@ async def check_token():
             if "done" in status:
 
                 id = status.split("|")[1]
-                users = UsersDB('tg', "../DB/users.db")
                 data = users.get_by_id(id)
 
                 userID = data[1]
+                purchases = usersTG.get_purchase_history(userID=userID)
+                purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
                 user = {
                     'id': id,
                     'balance': data[5],
-                    'payment_ids': data[6]
+                    'payment_ids': data[6],
+                    'purchase_history': purchase_history
                 }
                 session['method'] = 'tg'
                 session['user'] = user
