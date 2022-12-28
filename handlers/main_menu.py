@@ -311,15 +311,14 @@ async def _(callback_query: types.CallbackQuery):
     if purchases:
         if lang == "RU":
             result = f"\n\n".join(f"Дата: {t[2]}\nКатегория: {t[3].split('|')[0]}\nКоличество: {t[4]}\nЦена: {t[5]}" for t in purchases)
-            await callback_query.message.answer(result or "Ваша история покупок пуста")
         else:
             result = f"\n\n".join(f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
-            await callback_query.message.answer(result or "Your purchase history is empty")
+        await callback_query.message.answer(result)
     else:
         if lang == "RU":
-            await callback_query.message.answer(result or "Ваша история покупок пуста")
+            await callback_query.message.answer("Ваша история покупок пуста")
         else:
-            await callback_query.message.answer(result or "Your purchase history is empty")
+            await callback_query.message.answer("Your purchase history is empty")
 
 
 
