@@ -156,7 +156,7 @@ def profile():
 
             print(session['user']['purchase_history'])
             return render_template("index.html", sost=5, username=session['user']['id'],
-                                   balance=users.get_balance(userID=session['user']['id']),
+                                   balance=usersTG.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0)
         else:
 
