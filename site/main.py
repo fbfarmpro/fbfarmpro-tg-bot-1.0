@@ -99,6 +99,7 @@ def send_file(file, receiver_email):
 async def check_token():
     while True:
         try:
+
             status = tokens.get(session['token'])[1]
             if "done" in status:
 
@@ -107,8 +108,8 @@ async def check_token():
                 data = users.get_by_id(id)
 
                 userID = data[1]
-                purchases = filter(lambda t: str(t[0]) == str(userID), users.get_purchases()) or None
-                purchase_history = f"\n\n".join( f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases)
+                purchases = users.get_purchase_history(userID=userID)
+                purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
                 user = {
                     'id': id,
                     'balance': data[5],
@@ -152,14 +153,16 @@ def rules():
 def profile():
     if 'userLogged' in session:
         if session['method'] == "tg":
-
+            purchases = usersTG.get_purchase_history(userID=session['user']['id'])
+            purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
-                                   logined=1 if 'userLogged' in session else 0, history = session['user']['purchase_history'])
+                                   logined=1 if 'userLogged' in session else 0, history = purchase_history)
         else:
-
+            purchases = users.get_purchase_history(email=session['email'])
+            purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
             payments = users.get_payments(email=session['email'])
-        return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0)
+        return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0, history = purchase_history)
     else:
         return redirect(url_for("loginpage"))
 
