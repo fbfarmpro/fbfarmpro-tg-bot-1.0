@@ -131,7 +131,11 @@ async def check_token():
 def downloadFile(file):
 
     path = os.path.join("..", "DB", "bought", file)
-    return send_file(path, as_attachment=True)
+    try:
+        return send_file(path, as_attachment=True)
+    except FileNotFoundError:
+        flash("Срок скачивания файла истек!")
+        return redirect(url_for("profile"))
 
 @app.route("/")
 def index():
