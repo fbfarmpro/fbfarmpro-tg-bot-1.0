@@ -616,10 +616,11 @@ p {
 .profile-list {
     margin-top: 28px;
     overflow-y: scroll;
-
-    border-bottom: none;
+    max-height: 630px;
 }
-
+.nav-tabs {
+   border-bottom:none;
+}
 .profile-list-item {
     font-size: 16px;
 }
