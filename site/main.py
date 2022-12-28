@@ -133,7 +133,7 @@ def downloadFile(file):
     path = os.path.join("..", "DB", "bought", file)
     try:
         return send_file(path, as_attachment=True)
-    except FileNotFoundError:
+    except:
         flash("Срок скачивания файла истек!")
         return redirect(url_for("profile"))
 
