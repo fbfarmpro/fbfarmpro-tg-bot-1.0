@@ -270,7 +270,7 @@ async def buy():
             if cost <= balance:
                 usersTG.add_balance(-(cost), userID = session['user']['id'])
                 zip_filename = create_random_filename_zip()
-                zip_path = os.path.join("DB", "bought", zip_filename)
+                zip_path = os.path.join("..",  "DB", "bought", zip_filename)
                 zipObj = ZipFile(zip_path, "w")
                 for file in products.get_N_products(category_name, int(float(request.form['amount']))):
                     path = os.path.join("DB", category_name, file[0])
