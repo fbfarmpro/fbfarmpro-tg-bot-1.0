@@ -297,6 +297,9 @@ async def buy():
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
                                    userID=session['user']['id'])
                 return redirect(url_for('profile'))
+            else:
+                flash("Please replenish the balance!", "error")
+                return redirect(url_for('profile'))
         else:
             category_name = request.form['name']
             balance = users.get_balance(email=session['email'])
@@ -317,6 +320,12 @@ async def buy():
 
                 users.add_purchase(category_name, int(float(request.form['amount'])), int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename, email=session['email'])
                 return redirect(url_for('profile'))
+            else:
+                flash("Please replenish the balance!", "error")
+                return redirect(url_for('profile'))
+
+    else:
+        return redirect(url_for('profile'))
 @app.route("/buy", methods= ['POST'])
 async def pay():
     if request.method == "POST":
