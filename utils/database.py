@@ -115,7 +115,6 @@ class UsersDB:
             # if db was deleted and languages were lost, default lang would be EN
             lang = self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()
             if not lang:
-                self.change_language(userID=userID)
                 return "EN"
             else:
                 return lang[0]
