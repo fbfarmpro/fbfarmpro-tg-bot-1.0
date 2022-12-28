@@ -133,10 +133,10 @@ class UsersDB:
     def get_purchase_history(self, *, userID=None, email=None):
         if self.method == "tg":
             assert userID is not None
-            return [i for i in filter(lambda t: str(t[0]) == str(userID), users.get_purchases())]
+            return [i for i in filter(lambda t: str(t[0]) == str(userID), self.get_purchases())]
         else:
             assert email is not None
-            return [i for i in filter(lambda t: str(t[1]) == str(email), users.get_purchases())]
+            return [i for i in filter(lambda t: str(t[1]) == str(email), self.get_purchases())]
 
     def change_language(self, *, userID=None, email=None):
         lang = self.get_language(userID=userID, email=email)
