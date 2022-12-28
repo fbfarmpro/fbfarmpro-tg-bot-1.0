@@ -53,7 +53,7 @@ socketio = SocketIO(app)
 name_space = '/abcd'
 
 async def send_zip(id, file):
-    await bot.send_document(id, InputFile(file))
+    await bot.send_document(id, InputFile(f"../{file}"))
 
 def send_file(file, receiver_email):
     subject = "Your order"
