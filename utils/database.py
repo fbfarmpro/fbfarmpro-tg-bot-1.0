@@ -113,10 +113,12 @@ class UsersDB:
         if self.method == "tg":
             assert userID is not None
             # if db was deleted and languages were lost, default lang would be EN
-            lang = self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+            lang = self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()
             if not lang:
                 self.change_language(userID=userID)
                 return "EN"
+            else:
+                return lang[0]
         else:
             assert email is not None
             return self.cur.execute("SELECT language FROM users WHERE email = ?", (email,)).fetchone()[0]
