@@ -219,6 +219,7 @@ def auth():
         passwd = request.form['a-password']
         if users.is_registered(email=email):
             print(users.is_registered(email=email))
+            print(users.is_registered(email=email, password=passwd))
             reqEmail = users.is_registered(email=email, password=passwd)[0]
             reqPasswd = users.is_registered(email=email, password=passwd)[1]
 
