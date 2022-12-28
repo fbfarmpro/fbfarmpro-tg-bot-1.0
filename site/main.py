@@ -17,7 +17,7 @@ from flask_socketio import SocketIO, emit
 import threading
 from flask import jsonify, copy_current_request_context
 
-logging.basicConfig(filename="log.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
+logging.basicConfig(filename="logsite.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
 sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
@@ -266,7 +266,7 @@ async def buy():
     if request.method == 'POST':
         if session['method'] == "tg":
 
-
+            print(session['user']['id'])
             category_name = request.form['name']
             balance = usersTG.get_balance(session['user']['id'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
