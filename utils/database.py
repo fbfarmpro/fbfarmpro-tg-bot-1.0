@@ -112,7 +112,11 @@ class UsersDB:
     def get_language(self, *, userID=None, email=None):
         if self.method == "tg":
             assert userID is not None
-            return self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+            # if db was deleted and languages were lost, default lang would be EN
+            lang = self.cur.execute("SELECT language FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+            if not lang:
+                self.change_language(userID=userID)
+                return "EN"
         else:
             assert email is not None
             return self.cur.execute("SELECT language FROM users WHERE email = ?", (email,)).fetchone()[0]
@@ -135,7 +139,7 @@ class UsersDB:
             return [i for i in filter(lambda t: str(t[1]) == str(email), self.get_purchases())]
 
     def change_language(self, *, userID=None, email=None):
-        lang = self.get_language(userID=userID, email=email)
+        lang = self.get_language(userID=userID, email=email) or "RU"
         if self.method == "tg":
             self.cur.execute("UPDATE users SET language = ? WHERE userID = ?", ("RU" if lang == "EN" else "EN", userID))
         else:
