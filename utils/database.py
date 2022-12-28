@@ -88,7 +88,7 @@ class UsersDB:
         else:
             assert password is not None and email is not None
             self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", None, email,
-                                                                                   hashlib.sha256(password).hexdigest(), "EN", 0,
+                                                                                   hashlib.sha256(password.encode()).hexdigest(), "EN", 0,
                                                                                    None, 0))
         self.db.commit()
 
