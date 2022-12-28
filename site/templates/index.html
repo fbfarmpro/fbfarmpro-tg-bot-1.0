@@ -311,11 +311,10 @@
                                                     Order history:
                                                 </p>
                                                 <div class="profile-list">
-                                                    {% for order in history %}
                                                         <p class="profile-list-item">
-                                                            {{ order.text }}
+                                                            {{ history }}
                                                         </p>
-                                                    {% endfor %}
+
                                                 </div>
                                                     {% if history|length > 5 %}
                                                         <div class="profile-link-block">

@@ -153,11 +153,9 @@ def profile():
     if 'userLogged' in session:
         if session['method'] == "tg":
 
-
-            print(session['user']['purchase_history'])
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
-                                   logined=1 if 'userLogged' in session else 0)
+                                   logined=1 if 'userLogged' in session else 0, history = session['user']['purchase_history'])
         else:
 
             payments = users.get_payments(email=session['email'])
@@ -255,7 +253,10 @@ def shopp(name):
 
 @app.route("/addmee")
 def addd():
-    users.add_balance(email=session['email'], amount=1000)
+    if session['method'] == 'site':
+        users.add_balance(email=session['email'], amount=100)
+    else:
+        users.add_balance(userID=session['user']['id'], amount=100)
     return redirect(url_for("profile"))
 
 @app.route("/payment", methods= ['POST'])
