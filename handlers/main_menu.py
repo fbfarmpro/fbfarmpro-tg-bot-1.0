@@ -15,8 +15,8 @@ from handlers import *
 from loader import storage
 
 
-users = UsersDB("tg", "../DB/users.db")
-products = ProductsDB("../DB/products.db")
+users = UsersDB("tg", "DB/users.db")
+products = ProductsDB("DB/products.db")
 
 
 @dp.callback_query_handler(lambda c: int(users.get_banned(userID=c.from_user.id)))
@@ -194,8 +194,6 @@ async def _(message: types.Message, state: FSMContext):
     await state.set_state("purchase_accept")
 
 
-async def send_zip(id, file):
-    await bot.send_document(id, InputFile(file))
 
 @dp.message_handler(lambda msg: msg.text.lower() in ["да", "yes", "no", "нет"], state="purchase_accept")
 async def _(message: types.Message, state: FSMContext):

@@ -23,7 +23,9 @@ sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
 from secret import sender, password
-from handlers.main_menu import send_zip
+from loader import dp, bot
+from flask_socketio import SocketIO, emit
+from aiogram.types import InputFile
 
 tokens = Tokens("../DB/tokens.db")
 users = UsersDB("site", "../DB/users.db")
@@ -40,14 +42,14 @@ app.secret_key = 'hhhkhkhkkh'
 # app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
 app.config['SECRET_KEY'] = 'lksdjflaskjdhkjshg'
 
-from flask_socketio import SocketIO, emit
-
 
 socketio = SocketIO(app)
 
 
 name_space = '/abcd'
 
+async def send_zip(id, file):
+    await bot.send_document(id, InputFile(file))
 
 def send_file(file, receiver_email):
     subject = "Your order"
