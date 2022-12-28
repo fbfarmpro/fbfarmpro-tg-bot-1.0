@@ -23,14 +23,20 @@ sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
 from secret import sender, password
-from loader import dp, bot
+from aiogram import Bot
+from aiogram.dispatcher import Dispatcher
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
+from secret import TOKEN
 from flask_socketio import SocketIO, emit
 from aiogram.types import InputFile
 
 tokens = Tokens("DB/tokens.db")
 users = UsersDB("site", "DB/users.db")
 products = ProductsDB("DB/products.db")
+bot = Bot(token=TOKEN)
 
+storage = RedisStorage2('localhost', 6379, db=5, pool_size=10, prefix='fbfarmBot')
+dp = Dispatcher(bot, storage=storage)
 def create_random_token():
     # choose from all lowercase letter
     letters = ascii_letters + digits
