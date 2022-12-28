@@ -614,6 +614,8 @@ p {
 
 .profile-list {
     margin-top: 28px;
+    overflow-y: scroll;
+    max-height: 630px;
 }
 
 .profile-list-item {
