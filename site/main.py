@@ -29,15 +29,12 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from secret import TOKEN
 from flask_socketio import SocketIO, emit
 from aiogram.types import InputFile
-
+from loader import bot
 tokens = Tokens("DB/tokens.db")
 users = UsersDB("site", "DB/users.db")
 usersTG = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
-bot = Bot(token=TOKEN)
 
-storage = RedisStorage2('localhost', 6379, db=5, pool_size=10, prefix='fbfarmBot')
-dp = Dispatcher(bot, storage=storage)
 def create_random_token():
     # choose from all lowercase letter
     letters = ascii_letters + digits
