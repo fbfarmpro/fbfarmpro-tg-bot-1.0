@@ -139,10 +139,8 @@ def downloadFile(file):
 
 @app.route("/")
 def index():
-    if 'userLogged' in session:
-        return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0)
-    else:
-        return redirect(url_for("profile"))
+    return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0)
+    
 
 @app.route("/login")
 def loginpage():
@@ -153,7 +151,10 @@ def loginpage():
 
 @app.route("/register")
 def sign_up():
-    return render_template("index.html", sost=4, logined = 1 if 'userLogged' in session else 0)
+	if 'userLogged' in session:
+        return redirect(url_for("profile"))
+    else:
+    	return render_template("index.html", sost=4, logined = 1 if 'userLogged' in session else 0)
 
 @app.route("/rules")
 def rules():
