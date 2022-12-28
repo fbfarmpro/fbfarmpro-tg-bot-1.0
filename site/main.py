@@ -165,7 +165,7 @@ def profile():
     if 'userLogged' in session:
         if session['method'] == "tg":
             purchases = usersTG.get_purchase_history(userID=session['user']['id'])
-            purchase_history = [Markup(f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}>Download</a>'") for t in purchases]
+            purchase_history = [Markup(f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}'>Download</a>") for t in purchases]
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0, history = purchase_history)
