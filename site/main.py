@@ -134,7 +134,7 @@ def downloadFile(file):
     try:
         return send_file(path, as_attachment=True)
     except:
-        flash("Срок скачивания файла истек!")
+        flash("File download link expired!", "error")
         return redirect(url_for("profile"))
 
 @app.route("/")
@@ -164,13 +164,13 @@ def profile():
     if 'userLogged' in session:
         if session['method'] == "tg":
             purchases = usersTG.get_purchase_history(userID=session['user']['id'])
-            purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
+            purchase_history = [f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}>Download</a>'" for t in purchases]
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0, history = purchase_history)
         else:
             purchases = users.get_purchase_history(email=session['email'])
-            purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for t in purchases]
+            purchase_history = [f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}>Download</a>'" for t in purchases]
             payments = users.get_payments(email=session['email'])
         return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0, history = purchase_history)
     else:
