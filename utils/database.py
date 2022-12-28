@@ -102,13 +102,10 @@ class UsersDB:
     def get_by_id(self, id):
         return self.cur.execute("SELECT * FROM users WHERE userid = ?", (id,)).fetchone()
 
-    def is_registered(self, *, userID=None, email=None, password=None):
+    def is_registered(self, *, userID=None, email=None):
         if self.method == "tg" or userID:
             assert userID is not None
             return self.cur.execute("SELECT * FROM users WHERE userID = ?", (userID,)).fetchone()
-        elif password:
-            assert email is not None and password is not None
-            return self.cur.execute("SELECT * FROM users WHERE email = ? and password = ?", (email, sha256.hash(password))).fetchone()
         else:
             assert email is not None
             return self.cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
