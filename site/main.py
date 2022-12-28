@@ -23,11 +23,11 @@ sys.path.append("/root/fbfarmpro-tg-bot-1.0")
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
 from secret import sender, password
+from handlers.main_menu import send_zip
 
-
-tokens = Tokens("DB/tokens.db")
-users = UsersDB("site", "DB/users.db")
-products = ProductsDB("DB/products.db")
+tokens = Tokens("../DB/tokens.db")
+users = UsersDB("site", "../DB/users.db")
+products = ProductsDB("../DB/products.db")
 
 def create_random_token():
     # choose from all lowercase letter
@@ -257,7 +257,7 @@ async def buy():
     if request.method == 'POST':
         if session['method'] == "tg":
             users = UsersDB("tg", "../DB/users.db")
-            from handlers.main_menu import send_zip
+
             category_name = request.form['name']
             balance = users.get_balance(session['user']['id'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
