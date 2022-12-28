@@ -3,7 +3,7 @@ import time
 from zipfile import ZipFile
 import email, smtplib, ssl
 from markupsafe import Markup
-
+from passlib.hash import pbkdf2_sha256 as sha256
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -218,12 +218,10 @@ def auth():
         email = request.form['a-email']
         passwd = request.form['a-password']
         if users.is_registered(email=email):
-            print(users.is_registered(email=email))
-            print(users.is_registered(email=email, password=passwd))
-            reqEmail = users.is_registered(email=email, password=passwd)[0]
-            reqPasswd = users.is_registered(email=email, password=passwd)[1]
+            reqEmail = users.is_registered(email=email)[2]
+            reqPasswd = users.is_registered(email=email)[3]
 
-            if email == reqEmail and passwd == reqPasswd:
+            if email == reqEmail and sha256.hash(passwd) == reqPasswd:
                 session['userLogged'] = True
                 session['email'] = email
                 session['method'] = "site"
