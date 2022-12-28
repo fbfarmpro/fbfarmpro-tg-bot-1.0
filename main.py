@@ -8,6 +8,8 @@ import zipfile
 from utils.database import UsersDB, ProductsDB, Tokens
 import smtplib, ssl
 from secret import password, sender
+
+
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 tokens = Tokens("DB/tokens.db")
@@ -18,15 +20,14 @@ async def _(message: types.Message):
     userID = message.from_user.id
     token = message.get_args()
     if token:
-        await message.answer(token)
         if not users.is_registered(userID=userID):
-            users.register_site_via_tg(userID)
+            # users.register_site_via_tg(userID)
+            users.register(userID=userID)
             await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
         else:
             await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
-        # tokens.set_status(token, userID)
         tokens.set_status(token, f"done|{userID}")
-        return
+
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
     if users.is_registered(userID=userID):
