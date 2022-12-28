@@ -591,6 +591,7 @@ p {
     border-radius: 4px;
     padding: 30px 30px 40px 30px;
     width: 48%;
+    max-height: 630px;
 }
 
 .profile-title {
@@ -615,7 +616,8 @@ p {
 .profile-list {
     margin-top: 28px;
     overflow-y: scroll;
-    max-height: 630px;
+
+    border-bottom: none;
 }
 
 .profile-list-item {
