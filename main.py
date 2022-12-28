@@ -21,8 +21,8 @@ async def _(message: types.Message):
     token = message.get_args()
     if token:
         if not users.is_registered(userID=userID):
-            users.register_site_via_tg(userID)
-            # users.register(userID=userID)
+            # users.register_site_via_tg(userID)
+            users.register(userID=userID)
             await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
         else:
             await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
