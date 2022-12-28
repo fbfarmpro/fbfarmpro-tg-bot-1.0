@@ -260,7 +260,7 @@ def shopp(name):
             break
     count = products.get_count_of_products(name)
     cost = products.get_category_price(name)
-    return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count, name=name)
+    return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count, name=name.split("|")[-1])
 
 
 
