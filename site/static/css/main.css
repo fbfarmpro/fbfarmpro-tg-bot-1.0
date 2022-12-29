@@ -1177,3 +1177,37 @@ p {
 .fiveth .content-btn + .content-btn{
     margin-top: 20px;
 }
+.slider-direction div{
+    display: flex !important;
+}
+
+.slick-track {
+  display: flex;
+}
+.slick-track .slick-slide {
+  display: flex;
+  height: auto;
+
+}
+.slider-block{
+    padding-bottom: 90px;
+    width: 100%;
+}
+.slider-item.slick-center .slider-block{
+    padding-top: 30px;
+
+    margin-top: -60px;
+    position: relative;
+    bottom: -30px;
+}
+
+.slider-item.slick-center .slider-block .slider-block-btn{
+    bottom: 50px;
+}
+.slider-block-btn{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+    margin-top: 0;
+}
