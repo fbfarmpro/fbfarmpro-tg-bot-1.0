@@ -225,7 +225,7 @@ def changepage(token):
 @app.route("/sendpasswd", methods=['POST'])
 def sendpass():
     email= request.form['email']
-    if user.is_registered(email=email):
+    if users.is_registered(email=email):
         token = create_random_token()
         tokens.add_email(token=token, email=email)
         send_mail(email, f"Your link for change: {request.base_url}/change{token}")
