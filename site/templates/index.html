@@ -440,7 +440,7 @@ If you have linked business manager to your account and for some reason Facebook
                         {% elif sost == 7 %}
 
                             <form action="/buy" method="post">
-                                <input type="text" name="currency" id="currency" style="display: none;">
+                                <input type="text" name="currency" id="currency" value="btc" style="display: none;">
                                 <input type="text" name="amount" id="amount" style="display: none;" value="1">
                                 <div class="content-item active">
                                     <h2 class="pay-title">
@@ -456,7 +456,7 @@ If you have linked business manager to your account and for some reason Facebook
                                     </h2>
                                     <div class="pay-row">
                                         <label class="pay-block" for="pay1">
-                                            <input type="radio" id="pay1" name="pay" oninput="setcurrency('btc');">
+                                            <input checked type="radio" id="pay1" name="pay" oninput="setcurrency('btc');">
                                             <div class="pay-block-row">
                                                 <div class="pay-block-check">
                                                 </div>
