@@ -96,6 +96,13 @@ def sendfile(file, receiver_email):
         server.login(sender, password)
         server.sendmail(sender, receiver_email, text)
 
+def send_mail(receiver, mail):
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender, password)
+        server.sendmail(sender, receiver, mail)
 
 async def check_token():
     while True:
@@ -140,7 +147,7 @@ def downloadFile(file):
 @app.route("/")
 def index():
     return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0)
-    
+
 
 @app.route("/login")
 def loginpage():
@@ -151,10 +158,10 @@ def loginpage():
 
 @app.route("/register")
 def sign_up():
-	if 'userLogged' in session:
+    if 'userLogged' in session:
         return redirect(url_for("profile"))
     else:
-    	return render_template("index.html", sost=4, logined = 1 if 'userLogged' in session else 0)
+        return render_template("index.html", sost=4, logined = 1 if 'userLogged' in session else 0)
 
 @app.route("/rules")
 def rules():
@@ -182,14 +189,57 @@ def order():
 
 @app.route("/shop")
 def shop():
-	if 'userLogged' in session:
-		x = products.get_categories()
-		items = []
-		for item in x:
-			items.append({"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
-		return render_template("index.html", sost=6, items = items, logined = 1 if 'userLogged' in session else 0)
-	else:
-		return redirect(url_for("loginpage"))
+    if 'userLogged' in session:
+        x = products.get_categories()
+        items = []
+        for item in x:
+            items.append({"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
+        return render_template("index.html", sost=6, items = items, logined = 1 if 'userLogged' in session else 0)
+    else:
+        return redirect(url_for("loginpage"))
+
+@app.route("/newpasswd", methods = ['POST'])
+def new():
+    passw0 = request.form['password']
+    passw1 = request.form['password0']
+    email = tokens.get_email(token=session['resettoken'])[1]
+    if passw0 == passw1:
+        users.change_password(email=email, password=passw0)
+        flash("Password changed successfully!", "error")
+        return redirect(url_for("loginpage"))
+    else:
+        flash("Passwords do not match", "error")
+        return redirect(request.url)
+
+@app.route("/change<token>")
+def changepage(token):
+    if tokens.get_email(token=token):
+        session['resettoken'] = token
+        return render_template("index.html", sost = 11, logined = 1 if 'userLogged' in session else 0)
+    else:
+        flash("Invalid url!", "error")
+        return redirect(url_for("loginpage"))
+
+
+
+@app.route("/sendpasswd", methods=['POST'])
+def sendpass():
+    email= request.form['email']
+    if user.is_registered(email=email):
+        token = create_random_token()
+        tokens.add_email(token=token, email=email)
+        send_mail(email, f"Your link for change: {request.base_url}/change{token}")
+        flash("Link sended to your email!", "error")
+        return redirect(url_for("loginpage"))
+    else:
+        flash("User is not exists!", "error")
+        return redirect(url_for("loginpage"))
+
+
+
+@app.route("/forgot")
+def forgot():
+    return render_template("index.html", sost = 10, logined = 1 if 'userLogged' in session else 0)
 
 @app.route("/create", methods = ['POST'])
 def reg():
@@ -208,6 +258,7 @@ def reg():
             session['userLogged'] = True
             session['email'] = email
             session['method'] = "site"
+            send_mail(email, "Thanks for registration!")
             return redirect(url_for("profile"))
 
 
@@ -294,8 +345,8 @@ async def buy():
                 await send_zip(session['user']['id'], zip_path)
                 flash("Product(s) was(were) sended to your Telegram!", "error")
                 usersTG.add_purchase(category_name, int(float(request.form['amount'])),
-                                   int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
-                                   userID=session['user']['id'])
+                                     int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
+                                     userID=session['user']['id'])
                 return redirect(url_for('profile'))
             else:
                 flash("Please replenish the balance!", "error")
