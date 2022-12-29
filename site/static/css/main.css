@@ -1164,3 +1164,12 @@ p {
         margin-bottom: 30px
     }
 }
+
+.forgot{
+	text-align: center;
+}
+
+.forgot-block{
+	max-width: 340px;
+	margin: 0 auto;
+}
