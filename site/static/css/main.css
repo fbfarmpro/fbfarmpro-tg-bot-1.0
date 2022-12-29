@@ -1173,3 +1173,7 @@ p {
 	max-width: 340px;
 	margin: 0 auto;
 }
+
+.fiveth .content-btn + .content-btn{
+    margin-top: 20px;
+}
