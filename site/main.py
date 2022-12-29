@@ -228,8 +228,8 @@ def sendpass():
 	if users.is_registered(email=email):
 		token = create_random_token()
 		tokens.add_email(token=token, email=email)
-		msg = MIMEText(f'Your link for change: <a href="{request.url_root}/change{token}">Change</a>','html')
-		msg['Subject'] = 'subject'
+		msg = MIMEText(f'Your link for change: <a href="{request.url_root}change{token}">Change</a>','html')
+		msg['Subject'] = 'Reset password'
 		msg['From'] = 'fb-farm.pro'
 		msg['To'] = email 
 		
