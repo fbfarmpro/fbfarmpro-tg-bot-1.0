@@ -342,6 +342,11 @@ async def buy():
 
 			print(session['user']['id'])
 			category_name = request.form['name']
+			for category in products.get_categories():
+				if category_name in category:
+					category_name = category
+					break
+			printf(f"{category_name=}")
 			balance = usersTG.get_balance(userID=session['user']['id'])
 			cost = int(float(request.form['price'])) * int(float(request.form['amount']))
 			if cost <= balance:
