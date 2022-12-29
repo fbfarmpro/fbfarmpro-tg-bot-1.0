@@ -400,7 +400,8 @@ async def pay():
 		currency = request.form['currency']
 		amount = int(float(request.form['amount']))
 		if currency in MIN_MONEY_PER_BUY and amount >= MIN_MONEY_PER_BUY[currency]:
-			amount = int(float(request.form['amount'])) / (await get_crypto_currency(currency) if currency != "usdt" else 1)
+			price = await get_crypto_currency(currency) if currency != "usdt" else 1
+			amount = int(float(request.form['amount'])) / price
 
 			x = await payment.create_payment(amount, currency.upper())
 			return f"<script>window.open('{x['result']['redirectUrl']}', '_blank'); window.open('/profile'); window.close();</script>"
