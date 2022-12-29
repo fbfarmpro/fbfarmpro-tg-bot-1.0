@@ -296,11 +296,13 @@ def logout():
 
 @app.route("/tglogin")
 def tg():
-
-	tokens.add(session['token'])
-	loop = asyncio.new_event_loop()
-	loop.run_until_complete(check_token())
-	return redirect('/profile')
+	try:
+		tokens.add(session['token'])
+		loop = asyncio.new_event_loop()
+		loop.run_until_complete(check_token())
+		return redirect('/profile')
+	except:
+		return redirect(url_for("tg"))
 
 @app.route("/telegram")
 def tg_login():
