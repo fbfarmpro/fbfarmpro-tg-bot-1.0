@@ -336,7 +336,7 @@ If you have linked business manager to your account and for some reason Facebook
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    # <div class="col-12">
                                         <div class="content-btn">
                                             <a href="/balance" class="h-btn">
                                                 Replenish
@@ -594,7 +594,7 @@ If you have linked business manager to your account and for some reason Facebook
         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal - 1);
         amount--;
         document.getElementById("cost").innerHTML = amount*price;
-        document.getElementById("amount").innerHTML = amount;
+        document.getElementById("amount").value = amount;
     }
 
 });
@@ -605,7 +605,7 @@ $('.pay-amount-btn.plus').click(function(){
         $(this).closest('.pay-amount').find('.pay-amount-input input').val(amountVal = amountVal*1+1);
         amount++;
         document.getElementById("cost").innerHTML = amount*price;
-        document.getElementById("amount").innerHTML = amount;
+        document.getElementById("amount").value = amount;
 
     }
 
