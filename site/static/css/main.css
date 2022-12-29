@@ -1211,3 +1211,26 @@ p {
     bottom: 20px;
     margin-top: 0;
 }
+
+@media screen and (max-width: 480px){
+    .f-one{
+        flex-wrap: nowrap;
+    }
+    .header-soc-item-icon img{
+        width: 20px;
+        height: 20px;
+    }
+    .header-soc-item-icon{
+        margin-right: 5px
+    }
+    .header-soc-item{
+        margin: 0 !important;
+        justify-content: flex-start !important;
+        width: auto;
+    }
+}
+@media screen and (max-width: 400px){
+    .header-soc-item-title{
+        font-size: 12px;
+    }
+}
