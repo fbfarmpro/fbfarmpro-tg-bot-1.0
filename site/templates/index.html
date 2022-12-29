@@ -239,7 +239,7 @@
                                                     </div>
                                                 </a>
                                             </form>
-                                            <a class="reg-link grey" href="/forgot">
+                                            <a class="reg-link grey">
                                                 Forgot your password?
                                             </a>
                                         </div>
@@ -607,7 +607,7 @@ $('.pay-amount-btn.plus').click(function(){
                                         Forgot password
                                     </h2>
                                     <div class="forgot-block">
-                                        <form action="/sendpasswd">
+                                        <form action="/sendpasswd" method="post">
                                             <div class="reg-input">
                                                 <input type="email" placeholder="E-mail" name="email" required>
                                             </div>
@@ -629,7 +629,7 @@ $('.pay-amount-btn.plus').click(function(){
                                         Forgot password
                                     </h2>
                                     <div class="forgot-block">
-                                        <form action="/newpasswd">
+                                        <form action="/newpasswd" method="post">
                                             <div class="reg-input">
                                                 <input type="password" placeholder="New password" name="password" required>
                                             </div>
