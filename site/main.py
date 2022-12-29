@@ -68,7 +68,7 @@ def sendfile(file, receiver_email):
 	# Add body to email
 	message.attach(MIMEText(body, "plain"))
 
-	filename = f"../DB/bought/{file}"  # In same directory as script
+	filename = f"DB/bought/{file}"  # In same directory as script
 
 	# Open PDF file in binary mode
 	with open(filename, "rb") as attachment:
@@ -137,7 +137,7 @@ async def check_token():
 @app.route('/download<file>')
 def downloadFile(file):
 
-	path = os.path.join("DB", "bought", file)
+	path = os.path.join("..", "DB", "bought", file)
 	try:
 		return send_file(path, as_attachment=True)
 	except:
@@ -378,7 +378,7 @@ async def buy():
 					zipObj.write(path, os.path.basename(path))
 					products.set_isBought(file[0], category_name)
 				zipObj.close()
-				sendfile(zip_path, session['email'])
+				sendfile(zip_filename, session['email'])
 				flash("Product(s) was(were) sended to your email!", "error")
 				await get_crypto_currency("btc")
 
