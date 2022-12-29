@@ -137,7 +137,7 @@ async def check_token():
 @app.route('/download<file>')
 def downloadFile(file):
 
-	path = os.path.join("..", "DB", "bought", file)
+	path = os.path.join("DB", "bought", file)
 	try:
 		return send_file(path, as_attachment=True)
 	except:
@@ -371,10 +371,10 @@ async def buy():
 			if cost <= balance:
 				users.add_balance(-(cost), email=session['email'])
 				zip_filename = create_random_filename_zip()
-				zip_path = os.path.join("..", "DB", "bought", zip_filename)
+				zip_path = os.path.join("DB", "bought", zip_filename)
 				zipObj = ZipFile(zip_path, "w")
 				for file in products.get_N_products(category_name, int(float(request.form['amount']))):
-					path = os.path.join("..", "DB", category_name, file[0])
+					path = os.path.join("DB", category_name, file[0])
 					zipObj.write(path, os.path.basename(path))
 					products.set_isBought(file[0], category_name)
 				zipObj.close()
