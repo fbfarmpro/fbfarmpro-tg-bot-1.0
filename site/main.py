@@ -178,8 +178,8 @@ def profile():
 								   logined=1 if 'userLogged' in session else 0, history = purchase_history)
 		else:
 			purchases = users.get_purchase_history(email=session['email'])
-			purchase_history = [Markup(f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}>Download</a>'") for t in purchases]
-		return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0, history = purchase_history)
+			purchase_history = [Markup(f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}'>Download</a>") for t in purchases]
+			return render_template("index.html", sost=5, username=session['email'].split('@')[0], balance=users.get_balance(email=session['email']), logined = 1 if 'userLogged' in session else 0, history = purchase_history)
 	else:
 		return redirect(url_for("loginpage"))
 
