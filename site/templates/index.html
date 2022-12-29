@@ -598,6 +598,53 @@ $('.pay-amount-btn.plus').click(function(){
 });
                                 </script>
                             {% endif %}
+                         {% elif sost == 10 %}
+                         <div class="content-item active">
+                        <div class="row">  
+                            <div class="col-12">
+                                <div class="forgot">
+                                    <h2 class="title">
+                                        Forgot password
+                                    </h2>
+                                    <div class="forgot-block">
+                                        <form action="/sendpasswd">
+                                            <div class="reg-input">
+                                                <input type="email" placeholder="E-mail" name="email" required>
+                                            </div>
+                                            <div class="reg-sub">
+                                                <input type="submit" value="Send" class="h-btn">
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif sost == 11 %}
+                    <div class="content-item">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="forgot">
+                                    <h2 class="title">
+                                        Forgot password
+                                    </h2>
+                                    <div class="forgot-block">
+                                        <form action="/newpasswd">
+                                            <div class="reg-input">
+                                                <input type="password" placeholder="New password" name="password" required>
+                                            </div>
+                                             <div class="reg-input">
+                                                <input type="password" placeholder="Repeat new password" name="password0" required>
+                                            </div>
+                                            <div class="reg-sub">
+                                                <input type="submit" value="Send" class="h-btn">
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                         {% endif %}
                     {% endblock content %}
                 </div>

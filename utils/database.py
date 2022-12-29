@@ -213,6 +213,8 @@ class Tokens:
         self.cur = self.db.cursor()
         self.cur.execute("""CREATE TABLE IF NOT EXISTS tokens (token TEXT NOT NULL,
                                                                status TEXT NOT NULL)""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS resetEmail (token TEXT NOT NULL,
+                                                               email TEXT NOT NULL)""")
         self.db.commit()
 
     def get(self, token):
@@ -228,6 +230,17 @@ class Tokens:
 
     def remove(self, token):
         self.cur.execute("DELETE FROM tokens WHERE token = ?", (token,))
+        self.db.commit()
+
+    def get_email(self, token):
+        return self.cur.execute("SELECT * FROM resetEmail WHERE token = ?", (token,)).fetchone()
+
+    def add_email(self, token, email):
+        self.cur.execute("INSERT INTO resetEmail VALUES (?, ?)", (token, email,))
+        self.db.commit()
+
+    def remove_email(self, token):
+        self.cur.execute("DELETE FROM resetEmail WHERE token = ?", (token,))
         self.db.commit()
 
 
