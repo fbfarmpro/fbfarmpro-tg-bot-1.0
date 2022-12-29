@@ -228,8 +228,12 @@ def sendpass():
 	if users.is_registered(email=email):
 		token = create_random_token()
 		tokens.add_email(token=token, email=email)
-		link = f"Your link for change: {request.base_url}/change{token}"
-		send_mail(email, link)
+		msg = MIMEText(f'Your link for change: <a href="{request.base_url}/change{token}">abc</a>','html')
+		msg['Subject'] = 'subject'
+		msg['From'] = 'fb-farm.pro'
+		msg['To'] = email 
+		
+		send_mail(email, msg.as_string())
 		flash("Link sended to your email!", "error")
 		return redirect(url_for("loginpage"))
 	else:
