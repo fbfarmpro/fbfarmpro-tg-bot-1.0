@@ -91,8 +91,6 @@ async def check_for_payments():
         for user in users:
             userID = user[1]
             email = user[2]
-            if not userID:
-                continue
             if userID:
                 userLang = user[4]
                 payment_ids = users.get_payments(userID=userID)
@@ -150,38 +148,6 @@ async def check_for_payments():
                     elif status == "DECLINED" or status == "CANCELLED":
                         await send_mail(email, f"You payment {id}, declined/cancelled")
                         users.remove_payment(id, email=email)
-            userLang = user[4]
-            payment_ids = users.get_payments(userID=userID)
-            for payment_id in payment_ids:
-                payment_data = await payment.get_payment(payment_id)
-                payment_data = payment_data.get("result", None)
-                if not payment_data:
-                    users.remove_payment(payment_id, userID=userID)
-                    continue
-                id = payment_data["id"]
-                status = payment_data["state"]
-                """
-                string (PaymentState)
-                Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
-                Payment State
-                """
-                if status == "COMPLETED":
-                    amount = payment_data["amount"]
-                    users.add_balance(amount, userID=userID)
-                    users.remove_payment(payment_id, userID=userID)
-                    if userLang == "RU":
-                        await bot.send_message(userID, f"Ваш счет успешно пополнено на {amount}$")
-                    else:
-                        await bot.send_message(userID, f"{amount}$ added to your balance")
-                elif status == "DECLINED" or status == "CANCELLED":
-                    if userLang == "RU":
-                        await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
-                    else:
-                        await bot.send_message(userID, f"You payment {id}, declined/cancelled")
-                        users.remove_payment(id, userID=userID)
-                        users0.remove_payment(id, email=email)
-
-
         await asyncio.sleep(30)
 
 
