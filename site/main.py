@@ -345,7 +345,7 @@ async def buy():
 				break
 		if session['method'] == "tg":
 			print(session['user']['id'])
-			printf(f"{category_name=}")
+			print(f"{category_name=}")
 			balance = usersTG.get_balance(userID=session['user']['id'])
 			cost = int(float(request.form['price'])) * int(float(request.form['amount']))
 			if cost <= balance:
