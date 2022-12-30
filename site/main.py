@@ -19,7 +19,7 @@ import threading
 from flask import jsonify, copy_current_request_context
 
 logging.basicConfig(filename="logsite.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
-sys.path.append("/root/fbfarmpro-tg-bot-1.0")
+sys.path.append("/home/fbfarmpro/public_html")
 
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
