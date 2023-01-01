@@ -654,7 +654,9 @@ p {
     height: 44px;
 }
 
-
+.fiveth .reg-btn{
+   margin-top: 20px;
+}
 
 .slider-container {
     position: relative;
