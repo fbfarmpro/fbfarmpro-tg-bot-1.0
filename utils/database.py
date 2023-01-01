@@ -109,6 +109,9 @@ class UsersDB:
             assert email is not None
             return self.cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
+    def link_tg(self, userID, email):
+        self.cur.execute("UPDATE users SET userID = ?, language = ? WHERE email = ?", (userID, "RU", email))
+        self.db.commit()
     def get_language(self, *, userID=None, email=None):
         if self.method == "tg":
             assert userID is not None

@@ -20,14 +20,22 @@ async def _(message: types.Message):
     userID = message.from_user.id
     token = message.get_args()
     if token:
-        if not users.is_registered(userID=userID):
-            users.register_site_via_tg(userID)
-            # users.register(userID=userID)
-            await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
-        else:
-            await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
-        tokens.set_status(token, f"done|{userID}")
-        return
+        status = tokens.get(token)[1]
+        if 'link' in status:
+            email = status.split("|")[1]
+            users.link_tg(userID, email)
+            tokens.set_status(token, f"linked|{userID}|{email}")
+            await message.answer("Вы успешно привязали свой telegram!")
+            return
+        elif 'waiting' in status:
+            if not users.is_registered(userID=userID):
+                users.register_site_via_tg(userID)
+                # users.register(userID=userID)
+                await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
+            else:
+                await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
+            tokens.set_status(token, f"done|{userID}")
+            return
 
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())

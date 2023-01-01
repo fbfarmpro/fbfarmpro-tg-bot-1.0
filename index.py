@@ -133,6 +133,25 @@ async def check_token():
                 flash("logined succefully!", "error")
                 await get_crypto_currency("btc")
                 break
+            elif "linked" in status:
+                id = status.split("|")[1]
+                email = status.split("|")[2]
+                data = users.get_by_id(id)
+
+
+
+                user = {
+                    'id': id,
+                    'email': email,
+                    'balance': data[5],
+                    'payment_ids': data[6]
+                }
+                session['method'] = 'all'
+                session['user'] = user
+                session['userLogged'] = True
+                flash("Linked succefully!", "error")
+                await get_crypto_currency("btc")
+                break
         except:
             await get_crypto_currency("btc")
             time.sleep(0.5)
@@ -313,10 +332,15 @@ def logout():
     return redirect(url_for("index"))
 
 
+@app.route("/link")
+def link_tg():
+    session['token'] = create_random_token()
+    tokens.add(session['token'])
+    tokens.set_status(session['token'], f"link|{session['email']}")
+    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 @app.route("/tglogin")
 def tg():
     try:
-        tokens.add(session['token'])
         loop = asyncio.new_event_loop()
         loop.run_until_complete(check_token())
         return redirect('/profile')
@@ -327,6 +351,7 @@ def tg():
 @app.route("/telegram")
 def tg_login():
     session['token'] = create_random_token()
+    tokens.add(session['token'])
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 
