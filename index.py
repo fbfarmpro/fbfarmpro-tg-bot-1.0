@@ -14,7 +14,7 @@ from secrets import choice
 from string import ascii_letters, digits
 import sys
 import logging
-from flask_socketio import SocketIO, emit
+
 import threading
 from flask import jsonify, copy_current_request_context
 
@@ -47,11 +47,9 @@ def create_random_token():
 app = Flask(__name__)
 app.secret_key = 'hhhkhkhkkh'
 # app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
-app.config['SECRET_KEY'] = 'lksdjflaskjdhkjshg'
 
-socketio = SocketIO(app)
 
-name_space = '/abcd'
+
 
 
 async def send_zip(id, file):
