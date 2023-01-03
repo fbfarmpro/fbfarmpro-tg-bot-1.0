@@ -334,7 +334,7 @@ def link_tg():
     session['token'] = create_random_token()
     tokens.add(session['token'])
     tokens.set_status(session['token'], f"link|{session['email']}")
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
+    return redirect(f"https://t.me/fbfarmprobot?start={session['token']}")
 
 
 
