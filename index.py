@@ -1,4 +1,5 @@
 import os
+import random
 import time
 import logging
 import smtplib
@@ -220,16 +221,14 @@ def order():
 
 @app.route("/shop")
 def shop():
-    if 'userLogged' in session:
-        x = products.get_categories()
-        items = []
-        for item in x:
-            items.append(
-                {"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1],
-                 "cost": products.get_category_price(item)})
-        return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0)
-    else:
-        return redirect(url_for("loginpage"))
+
+    x = products.get_categories()
+    items = []
+    for item in x:
+        items.append(
+            {"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
+    return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0)
+
 
 
 @app.route("/newpasswd", methods=['POST'])
@@ -273,6 +272,21 @@ def sendpass():
     else:
         flash("User is not exists!", "error")
         return redirect(url_for("loginpage"))
+@app.route("/sendcode", methods=['POST'])
+def code():
+    if request.method == "POST":
+        email = request.form['r-email']
+        passwd = request.form['r-password']
+        session['mEmail'] = email
+        session['mPasswd'] = passwd
+        code = random.randint(10000, 99999)
+        send_mail(email, f"Your code for verification: {code}")
+        session['mCode'] = code
+        flash("Code was sended to your email!", "error")
+        return redirect(url_for('verify'))
+@app.route("/verify")
+def verify():
+    return render_template('index.html', sost = 12, logined=1 if 'userLogged' in session else 0)
 
 
 @app.route("/forgot")
@@ -283,8 +297,8 @@ def forgot():
 @app.route("/create", methods=['POST'])
 def reg():
     if request.method == "POST":
-        email = request.form['r-email']
-        passwd = request.form['r-password']
+        email = session['mEmail']
+        passwd = session['mPasswd']
 
         if users.is_registered(email=email):
             flash("User is already exists!", "error")
@@ -306,18 +320,38 @@ def auth():
         email = request.form['a-email']
         passwd = request.form['a-password']
         if users.is_registered(email=email):
-            reqEmail = users.is_registered(email=email)[2]
-            reqPasswd = users.is_registered(email=email)[3]
+            user = users.is_registered(email=email)
+            reqEmail = user[2]
+            reqPasswd = user[3]
+            id = user[1]
+            if id:
+                if email == reqEmail and hashlib.sha256(passwd.encode()).hexdigest() == reqPasswd:
+                    data = users.get_by_id(id)
 
-            if email == reqEmail and hashlib.sha256(passwd.encode()).hexdigest() == reqPasswd:
-                session['userLogged'] = True
-                session['email'] = email
-                session['method'] = "site"
-                return redirect(url_for("profile"))
+                    user = {
+                        'id': id,
+                        'email': email,
+                        'balance': data[5],
+                        'payment_ids': data[6]
+                    }
+                    session['method'] = 'all'
+                    session['user'] = user
+                    session['userLogged'] = True
+                    return redirect(url_for("profile"))
+                else:
+                    flash("Invalid password!", "error")
+                    return redirect(url_for("loginpage"))
             else:
 
-                flash("Invalid password!", "error")
-                return redirect(url_for("loginpage"))
+                if email == reqEmail and hashlib.sha256(passwd.encode()).hexdigest() == reqPasswd:
+                    session['userLogged'] = True
+                    session['email'] = email
+                    session['method'] = "site"
+                    return redirect(url_for("profile"))
+                else:
+
+                    flash("Invalid password!", "error")
+                    return redirect(url_for("loginpage"))
         else:
             flash("User is not exists!", "error")
             return redirect(url_for("loginpage"))
@@ -353,15 +387,17 @@ def tg_login():
 
 @app.route("/pay<name>")
 def shopp(name):
-    for category in products.get_categories():
-        if name in category:
-            name = category
-            break
-    count = products.get_count_of_products(name)
-    cost = products.get_category_price(name)
-    return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
-                           name=name.split("|")[-1])
-
+    if 'userLogged' in session:
+        for category in products.get_categories():
+            if name in category:
+                name = category
+                break
+        count = products.get_count_of_products(name)
+        cost = products.get_category_price(name)
+        return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
+                               name=name.split("|")[-1])
+    else:
+        redirect(url_for('loginpage'))
 
 @app.route("/balance")
 def balance():

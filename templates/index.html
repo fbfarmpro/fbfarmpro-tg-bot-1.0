@@ -670,6 +670,28 @@ $('.pay-amount-btn.plus').click(function(){
                             </div>
                         </div>
                     </div>
+                            {% elif sost == 12 %}
+                    <div class="content-item active">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="forgot">
+                                    <h2 class="title">
+                                        Verify Email
+                                    </h2>
+                                    <div class="forgot-block">
+                                        <form action="/create" method="post">
+                                            <div class="reg-input">
+                                                <input type="text" placeholder="Code" name="code" required>
+                                            </div>
+                                            <div class="reg-sub">
+                                                <input type="submit" value="Send" class="h-btn">
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                         {% endif %}
                     {% endblock content %}
                 </div>
@@ -1112,23 +1134,34 @@ $('.pay-amount-btn.plus').click(function(){
                     </div>
                     <div class="header-inner">
                         <div class="header-link">
-                            <a href="/login" class="header-link-item change-btn h-close" data-change=".third">
-                                <div class="header-link-item-icon">
-                                    <img width="14" height="20" src="{{url_for('static', filename='img/lock-icon.png')}}" alt="">
-                                </div>
-                                <div class="header-link-item-title">
-                                    Authorization
-                                </div>
-                            </a>
-                            <a href="/register" class="header-link-item change-btn h-close" data-change=".fourth">
-                                <div class="header-link-item-icon">
-                                    <img width="19" height="19" src="{{url_for('static', filename='img/profile-icon.png')}}" alt="">
-                                </div>
-                                <div class="header-link-item-title">
-                                    Registration
-                                </div>
-                            </a>
-                        </div>
+                                {% if logined == 0 %}
+                                    <a href="/login" class="header-link-item change-btn" data-change=".third">
+                                        <div class="header-link-item-icon">
+                                            <img width="14" height="20" src="{{url_for('static', filename='img/lock-icon.png')}}" alt="">
+                                        </div>
+                                        <div class="header-link-item-title">
+                                            Authorization
+                                        </div>
+                                    </a>
+                                    <a href="/register" class="header-link-item change-btn" data-change=".fourth">
+                                        <div class="header-link-item-icon">
+                                            <img width="19" height="19" src="{{url_for('static', filename='img/profile-icon.png')}}" alt="">
+                                        </div>
+                                        <div class="header-link-item-title">
+                                            Registration
+                                        </div>
+                                    </a>
+                                {% else %}
+                                    <a href="/profile" class="header-link-item change-btn" data-change=".third">
+                                        <div class="header-link-item-icon">
+                                            <img width="19" height="19" src="{{url_for('static', filename='img/profile-icon.png')}}" alt="">
+                                        </div>
+                                        <div class="header-link-item-title">
+                                            Profile
+                                        </div>
+                                    </a>
+                                {% endif %}
+                            </div>
                         <a href="/rules" class="header-btn change-btn h-close" data-change=".second">
                             Replacement rules
                         </a>
@@ -1140,10 +1173,7 @@ $('.pay-amount-btn.plus').click(function(){
 
     <script type="text/javascript" src="{{url_for('static', filename='dist/slick/slick.min.js')}}"></script>
     <script src="{{url_for('static', filename='dist/rangeSlider/rSlider.min.js')}}"></script>
-    <script src="{{url_for('static', filename='dist/wow/wow.min.js')}}"></script>
-    <script>
-    new WOW().init();
-    </script>
+
     <script src="{{url_for('static', filename='js/script.js')}}"></script>
 </body>
 
