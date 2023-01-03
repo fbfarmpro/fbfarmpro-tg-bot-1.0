@@ -27,15 +27,15 @@ async def _(message: types.Message):
             email = status.split("|")[1]
             users.link_tg(userID, email)
             tokens.set_status(token, f"linked|{userID}|{email}")
-            await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
+            await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
             return
         elif 'waiting' in status:
             if not users.is_registered(userID=userID):
                 users.register_site_via_tg(userID)
                 # users.register(userID=userID)
-                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
+                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
             else:
-                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
+                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
             tokens.set_status(token, f"done|{userID}")
             return
 

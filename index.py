@@ -11,8 +11,10 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 from flask import Flask, session, redirect, url_for, request, render_template, flash, send_file
 # from flask import escape
+
 from secrets import choice
 from string import ascii_letters, digits
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
@@ -146,6 +148,48 @@ async def check_token():
             # await get_crypto_currency("btc")
             time.sleep(0.5)
 
+
+@app.route("/tgauth<token>")
+def telegauth(token):
+    if token:
+        status = tokens.get(token)[1]
+        if 'done' in status:
+            user_id = status.split("|")[1]
+            data = users.get_by_id(user_id)
+
+            userID = data[1]
+            purchases = usersTG.get_purchase_history(userID=userID)
+            purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for
+                                t in purchases]
+            user = {
+                'id': user_id,
+                'balance': data[5],
+                'payment_ids': data[6],
+                'purchase_history': purchase_history
+            }
+            session['method'] = 'tg'
+            session['user'] = user
+            session['userLogged'] = True
+            flash("Logged successfully!", "error")
+            return redirect(url_for('profile'))
+        elif "linked" in status:
+            user_id = status.split("|")[1]
+            email = status.split("|")[2]
+            data = users.get_by_id(user_id)
+
+            user = {
+                'id': user_id,
+                'email': email,
+                'balance': data[5],
+                'payment_ids': data[6]
+            }
+            session['method'] = 'all'
+            session['user'] = user
+            session['userLogged'] = True
+            flash("Linked successfully!", "error")
+            return redirect(url_for('profile'))
+    else:
+        redirect(url_for('profile'))
 
 @app.route('/download<file>')
 def download_file(file):
@@ -332,6 +376,7 @@ def link_tg():
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 
 
+
 @app.route("/tglogin")
 def tg():
     try:
@@ -354,12 +399,7 @@ def tg_login():
 
 
 
-@app.route("/tgauth<token>")
-def telegauth(token):
-    if token:
-        pass
-    else:
-        abort(403)
+
 @app.route("/pay<name>")
 def shopp(name):
     for category in products.get_categories():
