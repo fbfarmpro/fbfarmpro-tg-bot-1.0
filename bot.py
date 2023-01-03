@@ -33,9 +33,9 @@ async def _(message: types.Message):
             if not users.is_registered(userID=userID):
                 users.register_site_via_tg(userID)
                 # users.register(userID=userID)
-                await message.answer("Вы успешно зарегестрировались на сайте с помощью telegram")
+                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
             else:
-                await message.answer("Вы успешно авторизировались на сайте с помощью telegram")
+                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
             tokens.set_status(token, f"done|{userID}")
             return
 
