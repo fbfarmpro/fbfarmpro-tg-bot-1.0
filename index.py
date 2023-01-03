@@ -11,13 +11,8 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-<<<<<<< HEAD
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, send_file, abort
-import asyncio
-=======
 from flask import Flask, session, redirect, url_for, request, render_template, flash, send_file
 # from flask import escape
->>>>>>> 971ee9fbd1d0779a3f5fc00871a095874057cad3
 from secrets import choice
 from string import ascii_letters, digits
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
@@ -335,8 +330,6 @@ def link_tg():
     tokens.add(session['token'])
     tokens.set_status(session['token'], f"link|{session['email']}")
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
-<<<<<<< HEAD
-=======
 
 
 @app.route("/tglogin")
