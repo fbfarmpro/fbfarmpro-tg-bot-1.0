@@ -1,36 +1,30 @@
 import os
 import time
-from zipfile import ZipFile
-import email, smtplib, ssl
-from markupsafe import Markup
+import logging
+import smtplib
+import ssl
 import hashlib
+import asyncio
+from zipfile import ZipFile
+from markupsafe import Markup
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, send_file
-import asyncio
+from flask import Flask, session, redirect, url_for, request, render_template, flash, send_file
+# from flask import escape
 from secrets import choice
 from string import ascii_letters, digits
-import sys
-import logging
-
-import threading
-from flask import jsonify, copy_current_request_context
-
-logging.basicConfig(filename="logsite.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
-sys.path.append("/home/fbfarmpro/public_html")
-
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
 from secret import sender, password
-from aiogram import Bot
-from aiogram.dispatcher import Dispatcher
-from aiogram.contrib.fsm_storage.redis import RedisStorage2
-from secret import TOKEN
-from flask_socketio import SocketIO, emit
 from aiogram.types import InputFile
 from loader import bot
+
+# from flask import jsonify, copy_current_request_context
+
+logging.basicConfig(filename="logsite.txt", level=logging.DEBUG, format="%(asctime)s %(message)s")
+
 
 tokens = Tokens("DB/tokens.db")
 users = UsersDB("site", "DB/users.db")
@@ -46,17 +40,16 @@ def create_random_token():
 
 app = Flask(__name__)
 app.secret_key = 'hhhkhkhkkh'
+
+
 # app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
 
 
+async def send_zip(document_id, file):
+    await bot.send_document(document_id, InputFile(file))
 
 
-
-async def send_zip(id, file):
-    await bot.send_document(id, InputFile(file))
-
-
-def sendfile(file, receiver_email):
+def send_email_attachment(file, receiver_email):
     subject = "Your order"
     body = "Here is your purchase"
     message = MIMEMultipart()
@@ -112,15 +105,15 @@ async def check_token():
 
             status = tokens.get(session['token'])[1]
             if "done" in status:
-                id = status.split("|")[1]
-                data = users.get_by_id(id)
+                user_id = status.split("|")[1]
+                data = users.get_by_id(user_id)
 
                 userID = data[1]
                 purchases = usersTG.get_purchase_history(userID=userID)
                 purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for
                                     t in purchases]
                 user = {
-                    'id': id,
+                    'id': user_id,
                     'balance': data[5],
                     'payment_ids': data[6],
                     'purchase_history': purchase_history
@@ -128,18 +121,16 @@ async def check_token():
                 session['method'] = 'tg'
                 session['user'] = user
                 session['userLogged'] = True
-                flash("logined succefully!", "error")
-                await get_crypto_currency("btc")
+                flash("Logged successfully!", "error")
+                # await get_crypto_currency("btc")
                 break
             elif "linked" in status:
-                id = status.split("|")[1]
+                user_id = status.split("|")[1]
                 email = status.split("|")[2]
-                data = users.get_by_id(id)
-
-
+                data = users.get_by_id(user_id)
 
                 user = {
-                    'id': id,
+                    'id': user_id,
                     'email': email,
                     'balance': data[5],
                     'payment_ids': data[6]
@@ -147,20 +138,22 @@ async def check_token():
                 session['method'] = 'all'
                 session['user'] = user
                 session['userLogged'] = True
-                flash("Linked succefully!", "error")
-                await get_crypto_currency("btc")
+                flash("Linked successfully!", "error")
+                # await get_crypto_currency("btc")
                 break
-        except:
-            await get_crypto_currency("btc")
+        except Exception as e:
+            print(e)
+            # await get_crypto_currency("btc")
             time.sleep(0.5)
 
 
 @app.route('/download<file>')
-def downloadFile(file):
+def download_file(file):
     path = os.path.join("..", "DB", "bought", file)
     try:
         return send_file(path, as_attachment=True)
-    except:
+    except Exception as e:
+        print(e)
         flash("File download link expired!", "error")
         return redirect(url_for("profile"))
 
@@ -198,7 +191,7 @@ def profile():
             purchases = usersTG.get_purchase_history(userID=session['user']['id'])
             purchase_history = [Markup(
                 f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}'>Download</a>")
-                                for t in purchases]
+                for t in purchases]
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
                                    logined=1 if 'userLogged' in session else 0, history=purchase_history)
@@ -206,7 +199,7 @@ def profile():
             purchases = users.get_purchase_history(email=session['email'])
             purchase_history = [Markup(
                 f"Date: {t[2]}<br>Category: {t[3].split('|')[-1]}<br>Amount: {t[4]}<br>Price: {t[5]}<br>File: <a href='/download{t[6]}'>Download</a>")
-                                for t in purchases]
+                for t in purchases]
             return render_template("index.html", sost=5, username=session['email'].split('@')[0],
                                    balance=users.get_balance(email=session['email']),
                                    logined=1 if 'userLogged' in session else 0, history=purchase_history)
@@ -336,13 +329,16 @@ def link_tg():
     tokens.add(session['token'])
     tokens.set_status(session['token'], f"link|{session['email']}")
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
+
+
 @app.route("/tglogin")
 def tg():
     try:
         loop = asyncio.new_event_loop()
         loop.run_until_complete(check_token())
         return redirect('/profile')
-    except:
+    except Exception as e:
+        print(e)
         return redirect(url_for("tg"))
 
 
@@ -350,7 +346,6 @@ def tg():
 def tg_login():
     session['token'] = create_random_token()
     tokens.add(session['token'])
-    # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 
 
@@ -392,12 +387,10 @@ async def buy():
                 category_name = category
                 break
         if session['method'] == "tg":
-            print(session['user']['id'])
-            print(f"{category_name=}")
             balance = usersTG.get_balance(userID=session['user']['id'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
             if cost <= balance:
-                usersTG.add_balance(-(cost), userID=session['user']['id'])
+                usersTG.add_balance(-cost, userID=session['user']['id'])
                 zip_filename = create_random_filename_zip()
                 zip_path = os.path.join("DB", "bought", zip_filename)
                 print(zip_path)
@@ -422,7 +415,7 @@ async def buy():
             balance = users.get_balance(email=session['email'])
             cost = int(float(request.form['price'])) * int(float(request.form['amount']))
             if cost <= balance:
-                users.add_balance(-(cost), email=session['email'])
+                users.add_balance(-cost, email=session['email'])
                 zip_filename = create_random_filename_zip()
                 zip_path = os.path.join("DB", "bought", zip_filename)
                 zipObj = ZipFile(zip_path, "w")
@@ -431,9 +424,9 @@ async def buy():
                     zipObj.write(path, os.path.basename(path))
                     products.set_isBought(file[0], category_name)
                 zipObj.close()
-                sendfile(zip_filename, session['email'])
+                send_email_attachment(zip_filename, session['email'])
                 flash("Product(s) was(were) sended to your email!", "error")
-                await get_crypto_currency("btc")
+                # await get_crypto_currency("btc")
 
                 users.add_purchase(category_name, int(float(request.form['amount'])),
                                    int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
@@ -462,39 +455,7 @@ async def pay():
             return redirect(url_for("order"))
 
 
-async def check_for_payments():
-    while True:
-        payment_ids = users.get_payments(email=session['email'])
-        for payment_id in payment_ids:
-            payment_data = await payment.get_payment(payment_id)
-            payment_data = payment_data.get("result", None)
-            if not payment_data:
-                users.remove_payment(payment_id, email=session['email'])
-                continue
-            id = payment_data["id"]
-            if id not in payment_ids:
-                continue
-            status = payment_data["state"]
-            """
-				string (PaymentState)
-				Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
-				Payment State
-				"""
-            if status == "COMPLETED":
-                amount = payment_data["amount"]
-                users.add_balance(amount, email=session['email'])
-                users.remove_payment(payment_id, email=session['email'])
-                await socketio.emit('purchaseexpired', {}, namespace=name_space)
-            elif status == "DECLINED" or status == "CANCELLED":
-                await socketio.emit('purchaseexpired', {}, namespace=name_space)
-
-                users.remove_payment(id, email=session['email'])
-
-        await asyncio.sleep(30)
-
-
 if __name__ == '__main__':
     # from waitress import serve
     # socketio.run(app, host='0.0.0.0', port=5000)
-    app.run(host = "0.0.0.0", port=5000)
-
+    app.run(host="0.0.0.0", port=5000)

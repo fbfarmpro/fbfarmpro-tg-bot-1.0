@@ -3,6 +3,7 @@ from handlers import *
 from aiogram import types
 from utils.database import UsersDB, ProductsDB, get_crypto_currency, payment
 from aiogram.dispatcher import FSMContext
+import utils.keyboards as keyboards
 
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")

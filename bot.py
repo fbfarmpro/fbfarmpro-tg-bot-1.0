@@ -6,7 +6,8 @@ from utils import keyboards
 from datetime import datetime
 import zipfile
 from utils.database import UsersDB, ProductsDB, Tokens
-import smtplib, ssl
+import smtplib
+import ssl
 from secret import password, sender
 
 
@@ -14,6 +15,7 @@ users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 tokens = Tokens("DB/tokens.db")
 users0 = UsersDB("site", "DB/users.db")
+
 
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
@@ -46,7 +48,8 @@ async def _(message: types.Message):
                 await message.answer(text)
             try:
                 await message.answer_animation(InputFile(greeting_msg["ru"]["gif"]))
-            except:
+            except Exception as e:
+                print(e)
                 await message.answer_document(InputFile(greeting_msg["ru"]["gif"]))
             await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
         else:
@@ -55,7 +58,8 @@ async def _(message: types.Message):
                 await message.answer(text)
             try:
                 await message.answer_animation(InputFile(greeting_msg["en"]["gif"]))
-            except:
+            except Exception as e:
+                print(e)
                 await message.answer_document(InputFile(greeting_msg["en"]["gif"]))
             await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
     else:
@@ -65,7 +69,8 @@ async def _(message: types.Message):
             await message.answer(text)
         try:
             await message.answer_animation(InputFile(greeting_msg["ru"]["gif"]))
-        except:
+        except Exception as e:
+            print(e)
             await message.answer_document(InputFile(greeting_msg["ru"]["gif"]))
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
 
@@ -85,14 +90,14 @@ async def _(message: types.Message):
     await message.answer("What do you want to do", reply_markup=keyboards.ADMIN_MENU)
 
 
-
-async def send_mail(receiver, mail):
+def send_mail(receiver, mail):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(sender, password)
-        await server.sendmail(sender, receiver, mail)
+        server.sendmail(sender, receiver, mail)
+
 
 async def check_for_payments():
     while True:
@@ -107,9 +112,6 @@ async def check_for_payments():
                     payment_data = payment_data.get("result", None)
                     if not payment_data:
                         users.remove_payment(payment_id, userID=userID)
-                        continue
-                    id = payment_data["id"]
-                    if id not in payment_ids:
                         continue
                     status = payment_data["state"]
                     """
@@ -127,10 +129,10 @@ async def check_for_payments():
                             await bot.send_message(userID, f"{amount}$ added to your balance")
                     elif status == "DECLINED" or status == "CANCELLED":
                         if userLang == "RU":
-                            await bot.send_message(userID, f"Ваш платеж {id} просрочен/отменен")
+                            await bot.send_message(userID, f"Ваш платеж {payment_id} просрочен/отменен")
                         else:
-                            await bot.send_message(userID, f"You payment {id}, declined/cancelled")
-                        users.remove_payment(id, userID=userID)
+                            await bot.send_message(userID, f"You payment {payment_id}, declined/cancelled")
+                        users.remove_payment(payment_id, userID=userID)
             elif email:
                 payment_ids = users0.get_payments(email=email)
                 for payment_id in payment_ids:
@@ -139,23 +141,15 @@ async def check_for_payments():
                     if not payment_data:
                         users0.remove_payment(payment_id, email=email)
                         continue
-                    id = payment_data["id"]
-                    if id not in payment_ids:
-                        continue
                     status = payment_data["state"]
-                    """
-                    string (PaymentState)
-                    Enum: "CHECKOUT" "PENDING" "CANCELLED" "DECLINED" "COMPLETED"
-                    Payment State
-                    """
                     if status == "COMPLETED":
                         amount = payment_data["amount"]
                         users0.add_balance(amount, email=email)
                         users0.remove_payment(payment_id, email=email)
-                        await send_mail(email, f"{amount}$ added to your balance")
+                        send_mail(email, f"{amount}$ added to your balance")
                     elif status == "DECLINED" or status == "CANCELLED":
-                        await send_mail(email, f"You payment {id}, declined/cancelled")
-                        users.remove_payment(id, email=email)
+                        send_mail(email, f"You payment {payment_id}, declined/cancelled")
+                        users.remove_payment(payment_id, email=email)
         await asyncio.sleep(30)
 
 
