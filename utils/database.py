@@ -108,7 +108,9 @@ class UsersDB:
         else:
             assert email is not None
             return self.cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
-
+    def remove_user(self, userID):
+        self.cur.execute("DELETE FROM users where userID = ?", (userID,))
+        self.db.commit()
     def link_tg(self, userID, email):
         self.cur.execute("UPDATE users SET userID = ?, language = ? WHERE email = ?", (userID, "RU", email))
         self.db.commit()

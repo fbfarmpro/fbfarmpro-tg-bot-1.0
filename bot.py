@@ -25,7 +25,7 @@ async def _(message: types.Message):
             email = status.split("|")[1]
             users.link_tg(userID, email)
             tokens.set_status(token, f"linked|{userID}|{email}")
-            await message.answer("Вы успешно привязали свой telegram!")
+            await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/authtg{token}'>Завершить</a>", parse_mode="HTML")
             return
         elif 'waiting' in status:
             if not users.is_registered(userID=userID):

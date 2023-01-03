@@ -8,7 +8,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, send_file
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, send_file, abort
 import asyncio
 from secrets import choice
 from string import ascii_letters, digits
@@ -193,6 +193,7 @@ def rules():
     return render_template("index.html", sost=2, logined=1 if 'userLogged' in session else 0)
 
 
+
 @app.route("/profile")
 def profile():
     if 'userLogged' in session:
@@ -338,24 +339,20 @@ def link_tg():
     tokens.add(session['token'])
     tokens.set_status(session['token'], f"link|{session['email']}")
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
-@app.route("/tglogin")
-def tg():
-    try:
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(check_token())
-        return redirect('/profile')
-    except:
-        return redirect(url_for("tg"))
-
 
 @app.route("/telegram")
 def tg_login():
     session['token'] = create_random_token()
     tokens.add(session['token'])
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
-    return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
+    return redirect(f"https://t.me/fbfarmprobot?start={session['token']}")
 
+@app.route("/tgauth<token>")
+def telegauth(token):
+    if token:
 
+    else:
+        abort(403)
 @app.route("/pay<name>")
 def shopp(name):
     for category in products.get_categories():
