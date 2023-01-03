@@ -101,52 +101,6 @@ def send_mail(receiver, mail):
         server.sendmail(sender, receiver, mail)
 
 
-async def check_token():
-    while True:
-        try:
-
-            status = tokens.get(session['token'])[1]
-            if "done" in status:
-                user_id = status.split("|")[1]
-                data = users.get_by_id(user_id)
-
-                userID = data[1]
-                purchases = usersTG.get_purchase_history(userID=userID)
-                purchase_history = [f"Date: {t[2]}\nCategory: {t[3].split('|')[-1]}\nAmount: {t[4]}\nPrice: {t[5]}" for
-                                    t in purchases]
-                user = {
-                    'id': user_id,
-                    'balance': data[5],
-                    'payment_ids': data[6],
-                    'purchase_history': purchase_history
-                }
-                session['method'] = 'tg'
-                session['user'] = user
-                session['userLogged'] = True
-                flash("Logged successfully!", "error")
-                # await get_crypto_currency("btc")
-                break
-            elif "linked" in status:
-                user_id = status.split("|")[1]
-                email = status.split("|")[2]
-                data = users.get_by_id(user_id)
-
-                user = {
-                    'id': user_id,
-                    'email': email,
-                    'balance': data[5],
-                    'payment_ids': data[6]
-                }
-                session['method'] = 'all'
-                session['user'] = user
-                session['userLogged'] = True
-                flash("Linked successfully!", "error")
-                # await get_crypto_currency("btc")
-                break
-        except Exception as e:
-            print(e)
-            # await get_crypto_currency("btc")
-            time.sleep(0.5)
 
 
 @app.route("/tgauth<token>")
@@ -375,16 +329,6 @@ def link_tg():
     return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.open('/tglogin'); window.close();</script>"
 
 
-
-@app.route("/tglogin")
-def tg():
-    try:
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(check_token())
-        return redirect('/profile')
-    except Exception as e:
-        print(e)
-        return redirect(url_for("tg"))
 
 
 @app.route("/telegram")
