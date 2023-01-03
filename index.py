@@ -193,11 +193,10 @@ def telegauth(token):
 
 @app.route('/download<file>')
 def download_file(file):
-    path = os.path.join("..", "DB", "bought", file)
+    path = os.path.join("DB", "bought", file)
     try:
         return send_file(path, as_attachment=True)
-    except Exception as e:
-        print(e)
+    except FileNotFoundError:
         flash("File download link expired!", "error")
         return redirect(url_for("profile"))
 
