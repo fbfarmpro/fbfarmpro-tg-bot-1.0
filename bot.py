@@ -25,6 +25,10 @@ async def _(message: types.Message):
         status = tokens.get(token)[1]
         if 'link' in status:
             email = status.split("|")[1]
+            users0.add_balance(users.get_balance(userID=userID), email=email)
+            for x in users.get_payments(userID=userID):
+                users0.add_payment(x, email=email)
+            users.remove_user(userID=userID)
             users.link_tg(userID, email)
             tokens.set_status(token, f"linked|{userID}|{email}")
             await message.answer(f"Для завершения перейдите по ссылке <b><a href='https://fbfarm.pro/tgauth{token}'>Завершить</a></b>", parse_mode="HTML")
