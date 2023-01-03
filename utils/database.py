@@ -98,8 +98,8 @@ class UsersDB:
                                                                                None, 0))
         self.db.commit()
 
-    def get_by_id(self, id):
-        return self.cur.execute("SELECT * FROM users WHERE userID = ?", (id,)).fetchone()
+    def get_by_id(self, userID):
+        return self.cur.execute("SELECT * FROM users WHERE userID = ?", (userID,)).fetchone()
 
     def is_registered(self, *, userID=None, email=None):
         if self.method == "tg" or userID:
@@ -114,6 +114,7 @@ class UsersDB:
     def link_tg(self, userID, email):
         self.cur.execute("UPDATE users SET userID = ?, language = ? WHERE email = ?", (userID, "RU", email))
         self.db.commit()
+
     def get_language(self, *, userID=None, email=None):
         if self.method == "tg":
             assert userID is not None

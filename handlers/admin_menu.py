@@ -44,14 +44,16 @@ async def _(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "greeting_msg_edit_ru")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer(f"send text for russian greeting message (send {config.GREETING_NO_TEXT} to disable)")
+    await callback_query.message.answer(f"send text for russian greeting message "
+                                        f"(send {config.GREETING_NO_TEXT} to disable)")
     await storage.set_state(user=callback_query.from_user.id, state="edit_msg_ru")
 
 
 @dp.callback_query_handler(lambda c: c.data == "greeting_msg_edit_en")
 async def _(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    await callback_query.message.answer(f"send text for english greeting message (send {config.GREETING_NO_TEXT} to disable)")
+    await callback_query.message.answer(f"send text for english greeting message "
+                                        f"(send {config.GREETING_NO_TEXT} to disable)")
     await storage.set_state(user=callback_query.from_user.id, state="edit_msg_en")
 
 
@@ -477,7 +479,8 @@ async def _(callback_query: types.CallbackQuery):
     """
     for user in users:
         try:
-            await bot.send_message(user[0], "Проводим тестирование кто забанил бота. Если вы получили это сообщение, то вы молодец")
+            await bot.send_message(user[0], "Проводим тестирование кто забанил бота."
+                                            "Если вы получили это сообщение, то вы молодец")
         except (BotBlocked, ChatNotFound) as _:
             users_who_ban_bot += 1
 

@@ -85,12 +85,3 @@ $('.content-item-close').click(function() {
     $('.content-item.first').addClass('active');
 });
 
-$(document).ready(function () {
-    namespace = '/abcd';
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-    socket.on('loginedtg', function (res) {
-        alert('123')
-        window.location.href = "/profile";
-    });
-
-});
