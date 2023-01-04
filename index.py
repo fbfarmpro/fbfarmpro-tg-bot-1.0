@@ -397,7 +397,7 @@ def shopp(name):
         return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
                                name=name.split("|")[-1])
     else:
-        redirect(url_for('loginpage'))
+        return redirect(url_for('loginpage'))
 
 @app.route("/balance")
 def balance():
