@@ -13,7 +13,8 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     position: relative;
-    background-size: 100% 100%;
+    background-size: cover;
+    background-position: center;
     color: #fff;
     min-height: 100vh;
     padding-bottom: 75px;
@@ -122,14 +123,23 @@ p {
     width: 170px;
     height: 49px;
 }
+.header-ad {
+    margin-left: auto;
+    margin-right: 5px;
+}
 
+.header-ad img {
+    width: 88px;
+    height: 30px;
+}
 
 .header-inner {
     display: flex;
     align-items: center;
-    margin-left: auto;
     flex-wrap: wrap;
 }
+
+
 
 .header-link {
     margin-left: auto;
@@ -188,6 +198,7 @@ p {
     cursor: pointer;
     display: none;
 }
+
 
 .footer {
     padding: 50px 0 40px 0;
@@ -910,6 +921,27 @@ p {
 }
 
 
+.content-ad{
+    display: none;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+}
+.content-ad img{
+    max-width: 100%;
+    height: 60px;
+}
+
+.ad-block{
+    text-align: center;
+    margin-bottom: 40px;
+}
+.ad-block img{
+    max-width: 90%;
+}
+
 
 @media screen and (max-width: 1200px) {
     .content .container {
@@ -963,8 +995,23 @@ p {
 
 }
 
+@media screen and (max-width: 992px) {
+    .header-ad {
+        display: none;
+    }
+
+    .header-inner {
+        margin-left: auto;
+    }
+}
 
 @media screen and (max-width: 768px) {
+    .ad-block{
+        display: none;
+    }
+    .content-ad{
+        display: block;
+    }
     .modal-three .h-modal-content {
         padding: 40px;
     }
