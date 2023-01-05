@@ -59,17 +59,10 @@
                             </a>
                         </div>
                         <div class="header-soc">
-                            <a href="https://telegram.me/fbfarmprobot" target="_blank" class="header-soc-item">
-                                <div class="header-soc-item-icon">
-                                    <img width="30" height="30" src="{{url_for('static', filename='img/tg-icon.png')}}" alt="">
-                                </div>
-                                <div class="header-soc-item-title">
-                                    Shop
-                                </div>
-                            </a>
                             <a href="https://telegram.me/fbfarmpro" target="_blank" class="header-soc-item">
                                 <div class="header-soc-item-icon">
                                     <img width="30" height="30" src="{{url_for('static', filename='img/tg-icon.png')}}" alt="">
+                                    
                                 </div>
                                 <div class="header-soc-item-title">
                                     Support
@@ -83,6 +76,11 @@
                                     fbfarmpro@gmail.com
                                 </div>
                             </a>
+                        </div>
+                        <div class="header-cont-a">
+                            <img src="{{url_for('static', filename='img/Descktop_top_obj.gif')}}" alt="">
+
+
                         </div>
                         <div class="header-inner">
                             <div class="header-link">
@@ -391,7 +389,7 @@ If you have linked business manager to your account and for some reason Facebook
                                                                 </p>
                                                             </div>
                                                             <div class="slider-block-btn">
-                                                                <div onclick="window.location.href = '/pay{{ item.category }}';" class="h-btn modal-btn">
+                                                                <div class="h-btn modal-btn" data-modal="#question">
                                                                     Buy Now
                                                                 </div>
                                                             </div>
@@ -696,6 +694,10 @@ $('.pay-amount-btn.plus').click(function(){
                     {% endblock content %}
                 </div>
             </div>
+            <div class="content-cont-a">
+                <img src="{{url_for('static', filename='img/Mobile_bottom_obj.gif')}}" alt="">
+
+            </div>
         </div>
     </section>
     <footer class="footer">
@@ -739,6 +741,10 @@ $('.pay-amount-btn.plus').click(function(){
             </div>
         </div>
     </footer>
+    <div class="block-cont-a">
+        <img src="{{url_for('static', filename='img/Descktop_bottom_obj.gif')}}" alt="">
+
+    </div>
     <div class="page-item">
         <div id="VzVxRsOZSiXDlsKkdmd4RXNzcMOAbmDDuE4=" class="mytuner-widget" data-target="461419" data-requires_initialization="true" data-autoplay="true" data-hidehistory="false" style="width: 100%; max-width: 100%; overflow: hidden; max-height: 500px;">
             <style type="text/css">
@@ -1043,58 +1049,26 @@ $('.pay-amount-btn.plus').click(function(){
             </div>
         </div>
     </div>
-    <div class="h-modal modal-one" id="rules">
+    <div class="h-modal question-modal" id="question">
         <div class="h-modal-content">
             <div class="h-modal-close h-close">
                 <img width="17" height="17" src="{{url_for('static', filename='img/close-icon.png')}}" alt="">
             </div>
             <div class="h-modal-block">
                 <h2 class="h-modal-title">
-                    Replacement rules
+                    Would you like to register?
                 </h2>
-                <div class="h-modal-text-block">
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
-                    <p class="h-modal-text-block-item">
-                        Lorem ipsum dolor, sit amet consectetur, adipisicing elit. Animi, reprehenderit!
-                    </p>
+                <div class="question-row">
+                    <div class="question-row-item">
+                        <a href="/register" class="h-btn">
+                            Yes
+                        </a>
+                    </div>
+                    <div class="question-row-item h-close">
+                        <a class="h-btn">
+                            No
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

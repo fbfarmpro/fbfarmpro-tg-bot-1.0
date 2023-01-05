@@ -381,10 +381,6 @@ def tg_login():
     # return f"<script>window.open('https://t.me/fbfarmprobot?start={session['token']}', '_blank'); window.location.href = '/tglogin'</script>"
     return redirect(f"https://t.me/fbfarmprobot?start={session['token']}")
 
-
-
-
-
 @app.route("/pay<name>")
 def shopp(name):
     if 'userLogged' in session:
@@ -397,6 +393,7 @@ def shopp(name):
         return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
                                name=name.split("|")[-1])
     else:
+
         return redirect(url_for('loginpage'))
 
 @app.route("/balance")
