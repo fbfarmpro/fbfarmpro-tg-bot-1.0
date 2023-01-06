@@ -1,6 +1,9 @@
 import asyncio
 import os
+import filecmp
+import random
 
+import config
 from handlers import *
 from utils import keyboards
 from datetime import datetime
@@ -9,6 +12,7 @@ from utils.database import UsersDB, ProductsDB, Tokens
 import smtplib
 import ssl
 from secret import password, sender
+from json import loads
 
 
 users = UsersDB("tg", "DB/users.db")
@@ -93,10 +97,14 @@ async def _(message: types.Message):
 async def _(message: types.Message):
     userID = message.from_user.id
     userLang = users.get_language(userID=userID)
+    with open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "r") as file:
+        texts = loads(file.read())
     if userLang == "RU":
         await message.answer("Главное меню", reply_markup=keyboards.MAIN_MENU_RU)
+        await message.answer(texts["ru"])
     else:
         await message.answer("Main menu", reply_markup=keyboards.MAIN_MENU_EN)
+        await message.answer(texts["en"])
 
 
 @dp.message_handler(lambda msg: msg.from_user.id in config.ADMIN_ID, commands=["admin"])
@@ -186,7 +194,51 @@ async def check_for_bought_products():
                 os.remove(zip_path)
 
         # every 5 minutes
-        await asyncio.sleep(5*60)
+        await asyncio.sleep(300)
+
+
+async def change_advertisement():
+    while True:
+        themes = get_themes()
+        # there are any themes and not only default
+        if len(themes) != 1:
+            ok = False
+            # search for next theme
+            while not ok:
+                next_theme = random.choice(themes)
+                # if it is not the same theme as previous
+                # dircmp().diff_files returns list of files that didn't match
+                # So if this list is empty folders have the same content, and we don't need this theme to be next
+                if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
+                    ok = True  # ok, i found new theme
+                    # now copy files from that theme to 'current' folder
+                    for filename in config.AD_FILES:
+                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
+                                    os.path.join(config.AD_FOLDER, "current", filename))
+            await asyncio.sleep(random.randint(10, 60))  # sleep 'till next change
+        else:
+            # if there are only default theme and current theme is not default -> change theme
+            if len(filecmp.dircmp(config.AD_DEFAULT_FOLDER, config.AD_CURRENT_FOLDER).diff_files) != 0:
+                for filename in config.AD_FILES:
+                    shutil.copy(os.path.join(config.AD_FOLDER, "default", filename),
+                                os.path.join(config.AD_FOLDER, "current", filename))
+            else:
+                await asyncio.sleep(60)  # wait for updates
+
+
+async def check_advertisement():
+    while True:
+        themes = get_themes()
+        for theme in themes:
+            with open(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME)) as file:
+                data = loads(file.read())
+                if data["time"]:
+                    difference = (datetime.fromisoformat(data["time"]) - datetime.now()).days
+                    if difference < 0:
+                        shutil.rmtree(os.path.join(config.AD_FOLDER, theme))
+
+        # every 10 minutes
+        await asyncio.sleep(20)
 
 
 if __name__ == "__main__":
@@ -194,4 +246,6 @@ if __name__ == "__main__":
     loop.create_task(dp.start_polling())
     loop.create_task(check_for_payments())
     loop.create_task(check_for_bought_products())
+    loop.create_task(change_advertisement())
+    loop.create_task(check_advertisement())
     loop.run_forever()

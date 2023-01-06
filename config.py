@@ -1,12 +1,27 @@
 import logging
+from os import path
 
 
-ADMIN_ID = [1787686208,730161327,5639593336, 948640825]
+ADMIN_ID = [1787686208, 730161327, 5639593336, 948640825]
 
 GREETING_MSG_FILENAME = "greeting_msg.json"
 GREETING_MSG_GIF_RU_FILENAME = "greeting_msg_gif_ru.gif"
 GREETING_MSG_GIF_EN_FILENAME = "greeting_msg_gif_en.gif"
 PURCHASE_GIF_FILENAME = "purchase_gif.gif"
+AD_FOLDER = path.join("static", "ad")
+AD_CURRENT_FOLDER = path.join(AD_FOLDER, "current")
+AD_DEFAULT_FOLDER = path.join(AD_FOLDER, "default")
+# width x height
+AD_MOBILE_FILENAME = "obj-340x70.gif"
+AD_DESKTOP_TOP_FILENAME = "obj-88x30.gif"
+AD_DESKTOP_BOTTOM_FILENAME = "obj-468x60.gif"
+AD_TEXT_FILENAME = "config.json"
+SITE_BACKGROUND_FILENAME = "site_background-1920x980.png"
+AD_FILES = [AD_MOBILE_FILENAME,
+            AD_DESKTOP_BOTTOM_FILENAME,
+            AD_DESKTOP_TOP_FILENAME,
+            SITE_BACKGROUND_FILENAME,
+            AD_TEXT_FILENAME]
 GREETING_NO_TEXT = "text is off"
 FINAL_ZIP_NAME_LEN = 20
 MAX_MONEY_PER_BUY = 1488
