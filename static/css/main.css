@@ -123,12 +123,12 @@ p {
     width: 170px;
     height: 49px;
 }
-.header-ad {
+.header-cont-a{
     margin-left: auto;
     margin-right: 5px;
 }
 
-.header-ad img {
+.header-cont-a img {
     width: 88px;
     height: 30px;
 }
@@ -921,26 +921,43 @@ p {
 }
 
 
-.content-ad{
+.content-cont-a{
     display: none;
     text-align: center;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     bottom: 20px;
+    width: 100%;
+
+
 }
-.content-ad img{
+.content-cont-a img{
     max-width: 100%;
     height: 60px;
 }
 
-.ad-block{
+.block-cont-a{
     text-align: center;
     margin-bottom: 40px;
 }
-.ad-block img{
+.block-cont-a img{
     max-width: 90%;
 }
+
+
+#question{
+
+}
+.question-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.question-row-item{
+    width: 48%;
+}
+
 
 
 @media screen and (max-width: 1200px) {
@@ -996,7 +1013,7 @@ p {
 }
 
 @media screen and (max-width: 992px) {
-    .header-ad {
+    .header-cont-a {
         display: none;
     }
 
@@ -1006,11 +1023,14 @@ p {
 }
 
 @media screen and (max-width: 768px) {
-    .ad-block{
+    .block-cont-a{
         display: none;
     }
-    .content-ad{
+    .content-cont-a{
         display: block;
+    }
+    .content .container{
+        padding-bottom: 100px !important;
     }
     .modal-three .h-modal-content {
         padding: 40px;
