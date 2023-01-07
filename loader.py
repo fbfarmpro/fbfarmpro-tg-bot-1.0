@@ -4,7 +4,6 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from secret import TOKEN
 
-print(TOKEN)
 bot = Bot(token=TOKEN)
 
 storage = RedisStorage2('localhost', 6379, db=5, pool_size=10, prefix='fbfarmBot')

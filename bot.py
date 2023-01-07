@@ -238,7 +238,7 @@ async def check_advertisement():
                         shutil.rmtree(os.path.join(config.AD_FOLDER, theme))
 
         # every 10 minutes
-        await asyncio.sleep(20)
+        await asyncio.sleep(600)
 
 
 if __name__ == "__main__":

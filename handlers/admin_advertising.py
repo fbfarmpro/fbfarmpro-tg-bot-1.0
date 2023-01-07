@@ -214,7 +214,7 @@ async def _(message: types.Message, state: FSMContext):
     content["ru"] = ru
     content["en"] = en
     with open(path, "w") as file:
-        file.write(dumps(content))
+        file.write(dumps(content, ensure_ascii=False))
     await message.answer("Success")
     await state.reset_state(with_data=False)
 
@@ -240,7 +240,7 @@ async def _(message: types.Message, state: FSMContext):
     current_text["time"] = (datetime.datetime.now() + datetime.timedelta(days=days)).isoformat()
 
     with open(os.path.join(config.AD_FOLDER, data["theme"], config.AD_TEXT_FILENAME), "w") as file:
-        file.write(dumps(current_text))
+        file.write(dumps(current_text, ensure_ascii=False))
 
     await message.answer("Success")
     await state.reset_state(with_data=False)
