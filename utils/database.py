@@ -206,7 +206,7 @@ class UsersDB:
         self.db.commit()
 
     def get_regular_customers(self):
-        return iter(self.cur.execute("SELECT * FROM users WHERE balance > 0"))
+        return iter(self.cur.execute("SELECT * FROM users WHERE balance > 0").fetchall())
 
     def __iter__(self):
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
@@ -220,8 +220,10 @@ class Tokens:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS tokens (token TEXT NOT NULL,
                                                                status TEXT NOT NULL)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS resetEmail (token TEXT NOT NULL,
-                                                               email TEXT NOT NULL)""")
-        self.db.commit()
+                                                                   email TEXT NOT NULL)""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS guestpayments (id TEXT NOT NULL,
+                                                                      email TEXT NOT NULL,
+                                                                      zipname TEXT NOT NULL)""")
 
     def get(self, token):
         return self.cur.execute("SELECT * FROM tokens WHERE token = ?", (token,)).fetchone()
@@ -249,6 +251,17 @@ class Tokens:
         self.cur.execute("DELETE FROM resetEmail WHERE token = ?", (token,))
         self.db.commit()
 
+    def get_all_payments(self):
+        return iter(self.cur.execute("SELECT * FROM guestpayments").fetchall())
+    
+    def add_payment(self, payment_id, email, zipname):
+        self.cur.execute("INSERT INTO guestpayments VALUES (?, ?, ?)", (payment_id, email, zipname))
+        self.db.commit()
+        
+    def remove_payment(self, payment_id):
+        self.cur.execute("DELETE FROM guestpayments WHERE id = ?", (payment_id,))
+        self.db.commit()
+
 
 class ProductsDB:
     def __init__(self, path):
@@ -261,6 +274,14 @@ class ProductsDB:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL,
                                                                  category TEXT NOT NULL,
                                                                  boughtAt TEXT)""")
+
+        # TODO
+        # type can be 'sum' of 'percent'
+        # value is the value of coupon, o.e.  type = percent value = 20 means -20% from price of product
+        # type = sum value = 5 means -5$ from price of product
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS coupons (name TEXT NOT NULL,
+                                                                type TEXT NOT NULL,
+                                                                value TEXT)""")
         self.db.commit()
 
     def create_category(self, name, desc, price):

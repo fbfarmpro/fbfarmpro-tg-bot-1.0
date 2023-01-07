@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
 # buttons
 
@@ -72,7 +72,22 @@ CATEGORY_ADD_BTN = InlineKeyboardButton("Add category", callback_data="category_
 PRODUCT_ADD_BTN = InlineKeyboardButton("Add product", callback_data="product_add")
 PRODUCT_REPLACE_BTN = InlineKeyboardButton("Change product category", callback_data="product_replace")
 
+AD_SETTINGS_BTN = InlineKeyboardButton("Advertising", callback_data="advertising_menu")
+
+AD_ADD_PACK = InlineKeyboardButton("Add pack", callback_data="advertising_add_pack")
+AD_DEL_PACK = InlineKeyboardButton("Delete pack", callback_data="advertising_del_pack")
+AD_UPD_PACK = InlineKeyboardButton("Update pack", callback_data="advertising_upd_pack")
+
+AD_MOBILE_CHANGE_PIC_BTN = InlineKeyboardButton("Change mobile ad", callback_data="ad_mobile")
+AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN = InlineKeyboardButton("Change desktop bottom ad", callback_data="ad_bottom")
+AD_DESKTOP_TOP_CHANGE_PIC_BTN = InlineKeyboardButton("Change desktop top ad", callback_data="ad_top")
+AD_TEXT_BTN = InlineKeyboardButton("Change text in bot", callback_data="ad_text")
+BACKGROUND_CHANGE_PIC_BTN = InlineKeyboardButton("Change site background", callback_data="ad_bg")
+AD_DEADLINE = InlineKeyboardButton("Change ad duration", callback_data="ad_time")
+
 BACK_BTN = InlineKeyboardButton("Back", callback_data="back")
+CANCEL_ADMIN_REPLY_TEXT = "Cancel"
+CANCEL_ADMIN_REPLY = ReplyKeyboardMarkup(resize_keyboard=True).add(CANCEL_ADMIN_REPLY_TEXT)
 
 # keyboards
 
@@ -97,7 +112,7 @@ ADMIN_MENU = InlineKeyboardMarkup(row_width=1)
 ADMIN_MENU.add(GREETING_MSG_BTN, PURCHASE_GIF_CHANGE, MAILING_BTN)
 ADMIN_MENU.add(CHANGE_USER_DATA_BTN, STATISTIC_BTN)
 ADMIN_MENU.add(CATEGORY_ADD_BTN, PRODUCT_ADD_BTN)
-ADMIN_MENU.add(PRODUCT_REPLACE_BTN)
+ADMIN_MENU.add(PRODUCT_REPLACE_BTN, AD_SETTINGS_BTN)
 
 GREETING_MSG_MENU = InlineKeyboardMarkup(row_width=1)
 GREETING_MSG_MENU.add(GREETING_MSG_EDIT_RU_BTN, GREETING_MSG_EDIT_EN_BTN)
@@ -118,3 +133,11 @@ MAILING_CHANGE_BUTTONS_MENU.add(MAILING_CHANGE_BUTTONS_BACK_BTN)
 
 CHANGE_USER_DATA_MENU = InlineKeyboardMarkup(row_width=2)
 CHANGE_USER_DATA_MENU.add(CHANGE_USER_DATA_BAN_BTN, CHANGE_USER_DATA_BALANCE_BTN)
+
+ADVERTISING_MENU = InlineKeyboardMarkup(row_width=1)
+ADVERTISING_MENU.add(AD_ADD_PACK, AD_DEL_PACK, AD_UPD_PACK)
+
+ADVERTISING_CHANGE_MENU = InlineKeyboardMarkup(row_width=1)
+ADVERTISING_CHANGE_MENU.add(AD_MOBILE_CHANGE_PIC_BTN, AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN)
+ADVERTISING_CHANGE_MENU.add(AD_DESKTOP_TOP_CHANGE_PIC_BTN, BACKGROUND_CHANGE_PIC_BTN)
+ADVERTISING_CHANGE_MENU.add(AD_TEXT_BTN, AD_DEADLINE, BACK_BTN)
