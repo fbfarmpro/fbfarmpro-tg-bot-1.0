@@ -85,6 +85,14 @@ AD_TEXT_BTN = InlineKeyboardButton("Change text in bot", callback_data="ad_text"
 BACKGROUND_CHANGE_PIC_BTN = InlineKeyboardButton("Change site background", callback_data="ad_bg")
 AD_DEADLINE = InlineKeyboardButton("Change ad duration", callback_data="ad_time")
 
+COUPON_BTN = InlineKeyboardButton("Coupons", callback_data="coupon_menu")
+
+COUPON_CREATE_BTN = InlineKeyboardButton("Create coupon", callback_data="coupon_create")
+COUPON_EDIT_DATE_BTN = InlineKeyboardButton("Edit coupon date", callback_data="coupon_date")
+COUPON_DELETE_BTN = InlineKeyboardButton("Delete coupon", callback_data="coupon_delete")
+COUPON_GET_ALL_BTN = InlineKeyboardButton("Get all coupons", callback_data="coupon_all")
+COUPON_GIVE_BTN = InlineKeyboardButton("Send coupon", callback_data="coupon_send")
+
 BACK_BTN = InlineKeyboardButton("Back", callback_data="back")
 CANCEL_ADMIN_REPLY_TEXT = "Cancel"
 CANCEL_ADMIN_REPLY = ReplyKeyboardMarkup(resize_keyboard=True).add(CANCEL_ADMIN_REPLY_TEXT)
@@ -113,6 +121,7 @@ ADMIN_MENU.add(GREETING_MSG_BTN, PURCHASE_GIF_CHANGE, MAILING_BTN)
 ADMIN_MENU.add(CHANGE_USER_DATA_BTN, STATISTIC_BTN)
 ADMIN_MENU.add(CATEGORY_ADD_BTN, PRODUCT_ADD_BTN)
 ADMIN_MENU.add(PRODUCT_REPLACE_BTN, AD_SETTINGS_BTN)
+ADMIN_MENU.add(COUPON_BTN)
 
 GREETING_MSG_MENU = InlineKeyboardMarkup(row_width=1)
 GREETING_MSG_MENU.add(GREETING_MSG_EDIT_RU_BTN, GREETING_MSG_EDIT_EN_BTN)
@@ -141,3 +150,9 @@ ADVERTISING_CHANGE_MENU = InlineKeyboardMarkup(row_width=1)
 ADVERTISING_CHANGE_MENU.add(AD_MOBILE_CHANGE_PIC_BTN, AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN)
 ADVERTISING_CHANGE_MENU.add(AD_DESKTOP_TOP_CHANGE_PIC_BTN, BACKGROUND_CHANGE_PIC_BTN)
 ADVERTISING_CHANGE_MENU.add(AD_TEXT_BTN, AD_DEADLINE, BACK_BTN)
+
+COUPON_EDIT_MENU = InlineKeyboardMarkup(row_width=1)
+COUPON_EDIT_MENU.add(COUPON_CREATE_BTN, COUPON_DELETE_BTN, COUPON_GET_ALL_BTN)
+
+COUPON_CHANGE_MENU = InlineKeyboardMarkup(row_width=1)
+COUPON_CHANGE_MENU.add(COUPON_EDIT_DATE_BTN, COUPON_DELETE_BTN)

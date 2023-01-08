@@ -146,8 +146,10 @@ async def _(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         return
     data = await state.get_data()
+
     res = f"{message.animation.width}x{message.animation.height}"
     need_res = config.AD_DESKTOP_TOP_FILENAME.split("-")[-1].split(".")[0]
+
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
         await state.set_state("advertising_photo_top")
@@ -166,7 +168,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         return
     data = await state.get_data()
-    await message.animation.download(destination=os.path.join(
+    await message.animation.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
     await message.answer("Success")
     await state.reset_state(with_data=False)
@@ -194,8 +196,8 @@ async def _(message: types.Message, state: FSMContext):
         await state.set_state("advertising_photo_bg")
         return
     data = await state.get_data()
-    await message.document.download(destination=os.path.join(
-        config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
+    await message.document.download(destination_file=os.path.join(
+        config.AD_FOLDER, data["theme"], config.SITE_BACKGROUND_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 

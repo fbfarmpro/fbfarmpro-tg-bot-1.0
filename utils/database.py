@@ -288,7 +288,6 @@ class ProductsDB:
                                                                  category TEXT NOT NULL,
                                                                  boughtAt TEXT)""")
 
-
         self.cur.execute("""CREATE TABLE IF NOT EXISTS coupons (coupon TEXT,
                                                                 type TEXT,
                                                                 value INT, 
@@ -296,14 +295,22 @@ class ProductsDB:
         self.db.commit()
 
     def add_coupon(self, name, type, expires, value):
-        self.cur.execute("INSERT INTO coupons VALUES (?, ?, ?, ?, ?)", (name, type, value, expires))
+        self.cur.execute("INSERT INTO coupons VALUES (?, ?, ?, ?)", (name, type, value, expires))
         self.db.commit()
 
     def get_coupon(self, name):
-        return self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()[0]
+        coupon = self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()
+        return coupon[0] if coupon else None
+
+    def get_all_coupons(self):
+        return self.cur.execute("SELECT * FROM coupons").fetchall()
 
     def remove_coupon(self, name):
         self.cur.execute("DELETE FROM coupons WHERE coupon = ?", (name,))
+        self.db.commit()
+
+    def change_coupon_expires(self, name, expires):
+        self.cur.execute("UPDATE coupons SET expires = ? WHERE coupon = ?", (expires, name))
         self.db.commit()
 
     def create_category(self, name, desc, price):
