@@ -177,9 +177,9 @@ async def _(message: types.Message, state: FSMContext):
         await message.answer("What do you want to do", reply_markup=keyboards.ADVERTISING_MENU)
         await state.reset_state(with_data=False)
         return
-    res = f"{message.animation.width}x{message.animation.height}"
+    res = f"{message.photo[0].width}x{message.photo[0].height}"
     need_res = config.SITE_BACKGROUND_FILENAME.split("-")[-1].split(".")[0]
-    res = f"{message.animation.width}x{message.animation.height}"
+    res = f"{message.photo[0].width}x{message.photo[0].height}"
     need_res = config.AD_MOBILE_FILENAME.split("-")[-1].split(".")[0]
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
@@ -188,7 +188,7 @@ async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await message.photo[0].download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
-    await message.answer(f"photo bg {data['theme']} {message.photo[0].width}x{message.photo[0].height}")
+    await message.answer("Success")
     await state.reset_state(with_data=False)
 
 
