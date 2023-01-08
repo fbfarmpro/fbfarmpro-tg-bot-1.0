@@ -8,7 +8,7 @@ GREETING_MSG_FILENAME = "greeting_msg.json"
 GREETING_MSG_GIF_RU_FILENAME = "greeting_msg_gif_ru.gif"
 GREETING_MSG_GIF_EN_FILENAME = "greeting_msg_gif_en.gif"
 PURCHASE_GIF_FILENAME = "purchase_gif.gif"
-AD_FOLDER = path.join("static", "ad")
+AD_FOLDER = path.join("static", "obj")
 AD_CURRENT_FOLDER = path.join(AD_FOLDER, "current")
 AD_DEFAULT_FOLDER = path.join(AD_FOLDER, "default")
 # width x height

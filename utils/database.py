@@ -288,7 +288,6 @@ class ProductsDB:
                                                                  category TEXT NOT NULL,
                                                                  boughtAt TEXT)""")
 
-
         self.cur.execute("""CREATE TABLE coupons (coupon TEXT,
                                                   type TEXT,
                                                   value INT, 
@@ -298,14 +297,13 @@ class ProductsDB:
     def add_coupon(self, name, type, expires, value):
         self.cur.execute("INSERT INTO coupons VALUES (?, ?, ?, ?, ?)", (name, type, value, expires))
         self.db.commit()
+
     def get_coupon(self, name):
         return self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()[0]
 
     def remove_coupon(self, name):
         self.cur.execute("DELETE FROM coupons WHERE coupon = ?", (name,))
         self.db.commit()
-
-
 
     def create_category(self, name, desc, price):
         os.mkdir(os.path.join("DB", name))
