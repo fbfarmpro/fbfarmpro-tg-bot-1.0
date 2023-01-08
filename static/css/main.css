@@ -126,8 +126,12 @@ p {
 <<<<<<< HEAD
 .header-cont-a{
 =======
+<<<<<<< HEAD
+.header-cont-a{
+=======
 .header-ad {
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     margin-left: auto;
     margin-right: 5px;
 }
@@ -135,8 +139,12 @@ p {
 <<<<<<< HEAD
 .header-cont-a img {
 =======
+<<<<<<< HEAD
+.header-cont-a img {
+=======
 .header-ad img {
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     width: 88px;
     height: 30px;
 }
@@ -932,8 +940,12 @@ p {
 <<<<<<< HEAD
 .content-cont-a{
 =======
+<<<<<<< HEAD
+.content-cont-a{
+=======
 .content-ad{
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     display: none;
     text-align: center;
     position: absolute;
@@ -947,13 +959,24 @@ p {
 }
 .content-cont-a img{
 =======
+<<<<<<< HEAD
+    width: 100%;
+
+
+}
+.content-cont-a img{
+=======
 }
 .content-ad img{
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     max-width: 100%;
     height: 60px;
 }
 
+<<<<<<< HEAD
+.block-cont-a{
+=======
 <<<<<<< HEAD
 .block-cont-a{
     text-align: center;
@@ -979,14 +1002,29 @@ p {
 
 =======
 .ad-block{
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     text-align: center;
     margin-bottom: 40px;
 }
-.ad-block img{
+.block-cont-a img{
     max-width: 90%;
 }
 
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+
+#question{
+
+}
+.question-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.question-row-item{
+    width: 48%;
+}
+
+
 
 @media screen and (max-width: 1200px) {
     .content .container {
@@ -1044,8 +1082,12 @@ p {
 <<<<<<< HEAD
     .header-cont-a {
 =======
+<<<<<<< HEAD
+    .header-cont-a {
+=======
     .header-ad {
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
         display: none;
     }
 
@@ -1055,6 +1097,9 @@ p {
 }
 
 @media screen and (max-width: 768px) {
+<<<<<<< HEAD
+    .block-cont-a{
+=======
 <<<<<<< HEAD
     .block-cont-a{
         display: none;
@@ -1067,12 +1112,19 @@ p {
     }
 =======
     .ad-block{
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
         display: none;
     }
-    .content-ad{
+    .content-cont-a{
         display: block;
     }
+<<<<<<< HEAD
+    .content .container{
+        padding-bottom: 100px !important;
+    }
+=======
 >>>>>>> abe373f34a538d46583127da1d272a08cd560dcb
+>>>>>>> 1beb75e1762e838ead5c079ae2b76b4bbf4a8ae3
     .modal-three .h-modal-content {
         padding: 40px;
     }

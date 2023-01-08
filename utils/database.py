@@ -206,7 +206,7 @@ class UsersDB:
         self.db.commit()
 
     def get_regular_customers(self):
-        return iter(self.cur.execute("SELECT * FROM users WHERE balance > 0"))
+        return iter(self.cur.execute("SELECT * FROM users WHERE balance > 0").fetchall())
 
     def __iter__(self):
         """[0] element is userID, [1] element is language, [2] is balance, [3] is payment_ids"""
@@ -220,7 +220,7 @@ class Tokens:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS tokens (token TEXT NOT NULL,
                                                                status TEXT NOT NULL)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS resetEmail (token TEXT NOT NULL,
-                                                                       email TEXT NOT NULL)""")
+                                                       email TEXT NOT NULL)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS guestpayments (id TEXT NOT NULL,
                                                                        email TEXT NOT NULL,
                                                                        zipname TEXT NOT NULL)""")
@@ -264,6 +264,17 @@ class Tokens:
         self.cur.execute("DELETE FROM resetEmail WHERE token = ?", (token,))
         self.db.commit()
 
+    def get_all_payments(self):
+        return iter(self.cur.execute("SELECT * FROM guestpayments").fetchall())
+    
+    def add_payment(self, payment_id, email, zipname):
+        self.cur.execute("INSERT INTO guestpayments VALUES (?, ?, ?)", (payment_id, email, zipname))
+        self.db.commit()
+        
+    def remove_payment(self, payment_id):
+        self.cur.execute("DELETE FROM guestpayments WHERE id = ?", (payment_id,))
+        self.db.commit()
+
 
 class ProductsDB:
     def __init__(self, path):
@@ -276,7 +287,25 @@ class ProductsDB:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS products (name TEXT NOT NULL,
                                                                  category TEXT NOT NULL,
                                                                  boughtAt TEXT)""")
+
+
+        self.cur.execute("""CREATE TABLE coupons (coupon TEXT,
+                                                  type TEXT,
+                                                  value INT, 
+                                                  expires DATETIME)""")
         self.db.commit()
+
+    def add_coupon(self, name, type, expires, value):
+        self.cur.execute("INSERT INTO coupons VALUES (?, ?, ?, ?, ?)", (name, type, value, expires))
+        self.db.commit()
+    def get_coupon(self, name):
+        return self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()[0]
+
+    def remove_coupon(self, name):
+        self.cur.execute("DELETE FROM coupons WHERE coupon = ?", (name,))
+        self.db.commit()
+
+
 
     def create_category(self, name, desc, price):
         os.mkdir(os.path.join("DB", name))
