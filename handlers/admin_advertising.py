@@ -10,6 +10,7 @@ from loader import storage
 import os
 import shutil
 import datetime
+from PIL import Image
 
 
 users = UsersDB("tg", "DB/users.db")
@@ -53,6 +54,7 @@ async def _(call: types.CallbackQuery):
         return
     await storage.update_data(user=call.from_user.id, data={"theme": call.message.text})
 
+    await call.message.answer("Send photo without compression")
     if action == "bg":
         await call.message.answer("Send photo with 1920x980 resolution", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
         await storage.set_state(user=call.from_user.id, state="advertising_photo_bg")
@@ -170,25 +172,31 @@ async def _(message: types.Message, state: FSMContext):
     await state.reset_state(with_data=False)
 
 
-@dp.message_handler(state="advertising_photo_bg", content_types=["photo", "text"])
+@dp.message_handler(state="advertising_photo_bg", content_types=["document", "text"])
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
         await message.answer("ok", reply_markup=types.ReplyKeyboardRemove())
         await message.answer("What do you want to do", reply_markup=keyboards.ADVERTISING_MENU)
         await state.reset_state(with_data=False)
         return
-    res = f"{message.animation.width}x{message.animation.height}"
+
+    # I need to download this file to get resolution
+    await message.document.download(destination_file="tmp.png")
+    with Image.open("tmp.png") as file:
+        width, height = file.size
+
+    res = f"{width}x{height}"
     need_res = config.SITE_BACKGROUND_FILENAME.split("-")[-1].split(".")[0]
-    res = f"{message.animation.width}x{message.animation.height}"
-    need_res = config.AD_MOBILE_FILENAME.split("-")[-1].split(".")[0]
+    os.remove("tmp.png")
+
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
-        await state.set_state("advertising_photo_mobile")
+        await state.set_state("advertising_photo_bg")
         return
     data = await state.get_data()
-    await message.photo[0].download(destination=os.path.join(
+    await message.document.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
-    await message.answer(f"photo bg {data['theme']} {message.photo[0].width}x{message.photo[0].height}")
+    await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 
 
