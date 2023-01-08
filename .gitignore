@@ -10,4 +10,5 @@ DB
 greeting_msg*
 purchase_gif.gif
 venv
+obj
 nohup.out
