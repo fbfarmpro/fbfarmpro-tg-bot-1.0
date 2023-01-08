@@ -229,7 +229,7 @@ def shop():
     for item in x:
         items.append(
             {"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
-    return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME, guest=1 if 'isguest' in session else 0)
 
 
 
@@ -404,7 +404,10 @@ def balance():
         return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
     else:
         return redirect(url_for("loginpage"))
-
+@app.route("/setguest")
+def setguest():
+    session['isguest'] = True
+    return redirect(url_for('shop'))
 
 @app.route("/addmee")
 def addd():
