@@ -288,10 +288,10 @@ class ProductsDB:
                                                                  category TEXT NOT NULL,
                                                                  boughtAt TEXT)""")
 
-        self.cur.execute("""CREATE TABLE coupons (coupon TEXT,
-                                                  type TEXT,
-                                                  value INT, 
-                                                  expires DATETIME)""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS coupons (coupon TEXT,
+                                                                type TEXT,
+                                                                value INT, 
+                                                                expires DATETIME)""")
         self.db.commit()
 
     def add_coupon(self, name, type, expires, value):
