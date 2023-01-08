@@ -181,7 +181,7 @@ async def _(message: types.Message, state: FSMContext):
     need_res = config.SITE_BACKGROUND_FILENAME.split("-")[-1].split(".")[0]
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
-        await state.set_state("advertising_photo_mobile")
+        await state.set_state("advertising_photo_bg")
         return
     data = await state.get_data()
     await message.photo[0].download(destination=os.path.join(
