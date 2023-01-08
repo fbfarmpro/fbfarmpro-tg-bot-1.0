@@ -394,7 +394,7 @@ If you have linked business manager to your account and for some reason Facebook
                                                                 </p>
                                                             </div>
                                                             <div class="slider-block-btn">
-                                                                <div class="h-btn modal-btn"  {% if guest == 9 %} data-modal="#question" {% endif %}>
+                                                                <div class="h-btn modal-btn"  {% if guest == 9 %} data-modal="#question" {% else %} onclick="window.location.href = '/pay{{ item.category }}'" {% endif %}>
                                                                     Buy Now
                                                                 </div>
                                                             </div>

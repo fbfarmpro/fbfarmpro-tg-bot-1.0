@@ -385,18 +385,16 @@ def tg_login():
 
 @app.route("/pay<name>")
 def shopp(name):
-    if 'userLogged' in session:
-        for category in products.get_categories():
-            if name in category:
-                name = category
-                break
-        count = products.get_count_of_products(name)
-        cost = products.get_category_price(name)
-        return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
-                               name=name.split("|")[-1], mobile = config.AD_MOBILE_FILENAME, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
-    else:
 
-        return redirect(url_for('loginpage'))
+    for category in products.get_categories():
+        if name in category:
+            name = category
+            break
+    count = products.get_count_of_products(name)
+    cost = products.get_category_price(name)
+    return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
+                               name=name.split("|")[-1], mobile = config.AD_MOBILE_FILENAME, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+
 
 @app.route("/balance")
 def balance():
