@@ -1,32 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@fxckfallen 
-fbfarmpro
-/
-fbfarmpro-tg-bot-1.0
-Public
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-fbfarmpro-tg-bot-1.0/templates/index.html
-
-root added ad (beta) to site
-Latest commit ec4ef68 yesterday
- History
- 0 contributors
-1154 lines (1094 sloc)  63.9 KB
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,6 +13,11 @@ Latest commit ec4ef68 yesterday
     <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
     <script src="{{url_for('static', filename='js/jquery-3.6.0.min.js')}}"></script>
     <title>fbfarm.pro - Make sure our product is the best!</title>
+    <style>
+        body{
+            background-image: url({{url_for('static', filename='obj/current/' + bg)}});
+        }
+    </style>
 </head>
 
 <body>
@@ -107,7 +83,7 @@ Latest commit ec4ef68 yesterday
                             </a>
                         </div>
                         <div class="header-cont-a">
-                            <img src="{{url_for('static', filename='img/Descktop_top_obj.gif')}}" alt="">
+                            <img src="{{url_for('static', filename='obj/current/' + pc_top)}} " alt="">
 
 
                         </div>
@@ -724,7 +700,7 @@ $('.pay-amount-btn.plus').click(function(){
                 </div>
             </div>
             <div class="content-cont-a">
-                <img src="{{url_for('static', filename='img/Mobile_bottom_obj.gif')}}" alt="">
+                <img src="{{url_for('static', filename='obj/current/' + mobile)}} " alt="">
 
             </div>
         </div>
@@ -771,7 +747,7 @@ $('.pay-amount-btn.plus').click(function(){
         </div>
     </footer>
     <div class="block-cont-a">
-        <img src="{{url_for('static', filename='img/Descktop_bottom_obj.gif')}}" alt="">
+        <img src="{{url_for('static', filename='obj/current/' + pc_bottom)}} " alt="">
 
     </div>
     <div class="page-item">
@@ -1089,12 +1065,12 @@ $('.pay-amount-btn.plus').click(function(){
                 </h2>
                 <div class="question-row">
                     <div class="question-row-item">
-                        <a href="#" class="h-btn">
+                        <a href="/login" class="h-btn">
                             Yes
                         </a>
                     </div>
                     <div class="question-row-item">
-                        <a href="#" class="h-btn">
+                        <a href="/setguest" class="h-btn">
                             No
                         </a>
                     </div>
