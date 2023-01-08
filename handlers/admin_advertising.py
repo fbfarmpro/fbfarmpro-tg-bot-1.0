@@ -179,8 +179,6 @@ async def _(message: types.Message, state: FSMContext):
         return
     res = f"{message.photo[0].width}x{message.photo[0].height}"
     need_res = config.SITE_BACKGROUND_FILENAME.split("-")[-1].split(".")[0]
-    res = f"{message.photo[0].width}x{message.photo[0].height}"
-    need_res = config.AD_MOBILE_FILENAME.split("-")[-1].split(".")[0]
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
         await state.set_state("advertising_photo_mobile")
