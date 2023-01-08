@@ -498,8 +498,8 @@ async def buy():
             zipObj.write(path, os.path.basename(path))
             products.set_isBought(file[0], category_name)
         zipObj.close()
-        price = await get_crypto_currency("btc")
-        x = await payment.create_payment((cost/price), "btc".upper())
+        price = 1
+        x = await payment.create_payment((cost/price), "usdt".upper())
 
         tokens.add_payment(payment_id=x['result']['id'], email=session['email'], zipname=zip_filename)
         return redirect(f"{x['result']['redirectUrl']}'")
