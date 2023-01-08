@@ -220,8 +220,23 @@ class Tokens:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS tokens (token TEXT NOT NULL,
                                                                status TEXT NOT NULL)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS resetEmail (token TEXT NOT NULL,
-                                                               email TEXT NOT NULL)""")
+                                                                       email TEXT NOT NULL)""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS guestpayments (id TEXT NOT NULL,
+                                                                       email TEXT NOT NULL,
+                                                                       zipname TEXT NOT NULL)""")
         self.db.commit()
+
+    def __iter__(self):
+        return iter(self.cur.execute("SELECT * FROM guestpayments").fetchall())
+
+    def add_payment(self, payment_id, email, zipname):
+        self.cur.execute("INSERT INTO guestpayments VALUES (?, ?, ?)", (payment_id, email, zipname))
+        self.db.commit()
+
+    def remove_payment(self, payment_id):
+        self.cur.execute("DELETE FROM guestpayments WHERE id = ?", (payment_id,))
+        self.db.commit()
+
 
     def get(self, token):
         return self.cur.execute("SELECT * FROM tokens WHERE token = ?", (token,)).fetchone()

@@ -2,6 +2,7 @@ import asyncio
 import os
 
 from handlers import *
+from index import send_email_attachment
 from utils import keyboards
 from datetime import datetime
 import zipfile
@@ -164,6 +165,19 @@ async def check_for_payments():
                     elif status == "DECLINED" or status == "CANCELLED":
                         send_mail(email, f"You payment {payment_id}, declined/cancelled")
                         users.remove_payment(payment_id, email=email)
+        for guest in tokens:
+            payment_id = guest[0]
+            email = guest[1]
+            zipname = guest[2]
+            payment_data = await payment.get_payment(payment_id)
+            payment_data = payment_data.get("result", None)
+            if not payment_data:
+                continue
+            status = payment_data["state"]
+            if status == "COMPLETED":
+                send_email_attachment(zipname, email)
+            elif status == "DECLINED" or status == "CANCELLED":
+                send_mail(email, f"You payment {payment_id}, declined/cancelled")
         await asyncio.sleep(30)
 
 

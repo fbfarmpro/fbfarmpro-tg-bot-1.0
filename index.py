@@ -415,64 +415,90 @@ def addd():
 
 @app.route("/payment", methods=['POST'])
 async def buy():
-    if request.method == 'POST':
+    if 'userLogged' in session:
+        if request.method == 'POST':
+            category_name = request.form['name']
+            for category in products.get_categories():
+                if category_name in category:
+                    category_name = category
+                    break
+            if session['method'] == "tg":
+                balance = usersTG.get_balance(userID=session['user']['id'])
+                cost = int(float(request.form['price'])) * int(float(request.form['amount']))
+                if cost <= balance:
+                    usersTG.add_balance(-cost, userID=session['user']['id'])
+                    zip_filename = create_random_filename_zip()
+                    zip_path = os.path.join("DB", "bought", zip_filename)
+                    print(zip_path)
+                    zipObj = ZipFile(zip_path, "w")
+                    for file in products.get_N_products(category_name, int(float(request.form['amount']))):
+                        path = os.path.join("DB", category_name, file[0])
+                        zipObj.write(path, os.path.basename(path))
+                        products.set_isBought(file[0], category_name)
+                    zipObj.close()
+                    await send_zip(session['user']['id'], zip_path)
+                    flash("Product(s) was(were) sended to your Telegram!", "error")
+                    usersTG.add_purchase(category_name, int(float(request.form['amount'])),
+                                         int(float(request.form['price'])) * int(float(request.form['amount'])),
+                                         zip_filename,
+                                         userID=session['user']['id'])
+                    return redirect(url_for('profile'))
+                else:
+                    flash("Please replenish the balance!", "error")
+                    return redirect(url_for('profile'))
+            else:
+                # category_name = request.form['name']
+                balance = users.get_balance(email=session['email'])
+                cost = int(float(request.form['price'])) * int(float(request.form['amount']))
+                if cost <= balance:
+                    users.add_balance(-cost, email=session['email'])
+                    zip_filename = create_random_filename_zip()
+                    zip_path = os.path.join("DB", "bought", zip_filename)
+                    zipObj = ZipFile(zip_path, "w")
+                    for file in products.get_N_products(category_name, int(float(request.form['amount']))):
+                        path = os.path.join("DB", category_name, file[0])
+                        zipObj.write(path, os.path.basename(path))
+                        products.set_isBought(file[0], category_name)
+                    zipObj.close()
+                    send_email_attachment(zip_filename, session['email'])
+                    flash("Product(s) was(were) sended to your email!", "error")
+                    # await get_crypto_currency("btc")
+
+                    users.add_purchase(category_name, int(float(request.form['amount'])),
+                                       int(float(request.form['price'])) * int(float(request.form['amount'])),
+                                       zip_filename,
+                                       email=session['email'])
+                    return redirect(url_for('profile'))
+                else:
+                    flash("Please replenish the balance!", "error")
+                    return redirect(url_for('profile'))
+
+
+
+        else:
+            return redirect(url_for('profile'))
+    else:
         category_name = request.form['name']
         for category in products.get_categories():
             if category_name in category:
                 category_name = category
                 break
-        if session['method'] == "tg":
-            balance = usersTG.get_balance(userID=session['user']['id'])
-            cost = int(float(request.form['price'])) * int(float(request.form['amount']))
-            if cost <= balance:
-                usersTG.add_balance(-cost, userID=session['user']['id'])
-                zip_filename = create_random_filename_zip()
-                zip_path = os.path.join("DB", "bought", zip_filename)
-                print(zip_path)
-                zipObj = ZipFile(zip_path, "w")
-                for file in products.get_N_products(category_name, int(float(request.form['amount']))):
-                    path = os.path.join("DB", category_name, file[0])
-                    zipObj.write(path, os.path.basename(path))
-                    products.set_isBought(file[0], category_name)
-                zipObj.close()
-                await send_zip(session['user']['id'], zip_path)
-                flash("Product(s) was(were) sended to your Telegram!", "error")
-                usersTG.add_purchase(category_name, int(float(request.form['amount'])),
-                                     int(float(request.form['price'])) * int(float(request.form['amount'])),
-                                     zip_filename,
-                                     userID=session['user']['id'])
-                return redirect(url_for('profile'))
-            else:
-                flash("Please replenish the balance!", "error")
-                return redirect(url_for('profile'))
-        else:
-            # category_name = request.form['name']
-            balance = users.get_balance(email=session['email'])
-            cost = int(float(request.form['price'])) * int(float(request.form['amount']))
-            if cost <= balance:
-                users.add_balance(-cost, email=session['email'])
-                zip_filename = create_random_filename_zip()
-                zip_path = os.path.join("DB", "bought", zip_filename)
-                zipObj = ZipFile(zip_path, "w")
-                for file in products.get_N_products(category_name, int(float(request.form['amount']))):
-                    path = os.path.join("DB", category_name, file[0])
-                    zipObj.write(path, os.path.basename(path))
-                    products.set_isBought(file[0], category_name)
-                zipObj.close()
-                send_email_attachment(zip_filename, session['email'])
-                flash("Product(s) was(were) sended to your email!", "error")
-                # await get_crypto_currency("btc")
+        cost = int(float(request.form['price'])) * int(float(request.form['amount']))
 
-                users.add_purchase(category_name, int(float(request.form['amount'])),
-                                   int(float(request.form['price'])) * int(float(request.form['amount'])), zip_filename,
-                                   email=session['email'])
-                return redirect(url_for('profile'))
-            else:
-                flash("Please replenish the balance!", "error")
-                return redirect(url_for('profile'))
+        zip_filename = create_random_filename_zip()
+        zip_path = os.path.join("DB", "bought", zip_filename)
+        zipObj = ZipFile(zip_path, "w")
+        for file in products.get_N_products(category_name, int(float(request.form['amount']))):
+            path = os.path.join("DB", category_name, file[0])
+            zipObj.write(path, os.path.basename(path))
+            products.set_isBought(file[0], category_name)
+        zipObj.close()
+        price = await get_crypto_currency("btc")
+        x = await payment.create_payment((cost/price), "btc".upper())
 
-    else:
-        return redirect(url_for('profile'))
+        tokens.add_payment(payment_id=x['result']['id'], email=session['email'], zipname=zip_filename)
+        return redirect(f"{x['result']['redirectUrl']}'")
+
 
 
 @app.route("/buy", methods=['POST'])
@@ -482,7 +508,7 @@ async def pay():
         amount = int(float(request.form['amount']))
         if currency in MIN_MONEY_PER_BUY and amount >= MIN_MONEY_PER_BUY[currency]:
             price = await get_crypto_currency(currency) if currency != "usdt" else 1
-            amount = int(float(request.form['amount'])) / price
+            amount = amount / price
             x = await payment.create_payment(amount, currency.upper())
             return redirect(f"{x['result']['redirectUrl']}'")
         else:
