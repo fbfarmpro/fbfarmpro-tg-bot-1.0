@@ -4,7 +4,7 @@ services:
   fbfarm:
     build: .
     stop_signal: SIGINT
-    restart: on-failure
+    restart: always
     volumes:
       - ./DB:/app/DB
     ports:
