@@ -15,6 +15,7 @@ services:
       - default
 
   redis:
+    restart: always
     image: "redis:alpine"
     ports:
       - "6379"
