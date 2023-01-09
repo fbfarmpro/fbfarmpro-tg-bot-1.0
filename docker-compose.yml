@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  fbfarm:
+    build: .
+    stop_signal: SIGINT
+    restart: on-failure
+    volumes:
+      - ./DB:/app/DB
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+    networks:
+      - default
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - default
+
+
+networks:
+  default:
+    driver: bridge
