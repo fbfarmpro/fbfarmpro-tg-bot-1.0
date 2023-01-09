@@ -1,14 +1,9 @@
-bot
 dump.rdb
 __pycache__
 .idea
 log.txt
 logsite.txt
-settings.py
 secret.py
 DB
-greeting_msg*
-purchase_gif.gif
 venv
-obj
 nohup.out

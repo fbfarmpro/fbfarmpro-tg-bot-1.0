@@ -1,0 +1,10 @@
+{
+  "ru": {
+    "text": null,
+    "gif": "assets/greeting_msg_gif_ru.gif"
+  },
+  "en": {
+    "text": "eng hi!!",
+    "gif": "assets/greeting_msg_gif_en.gif"
+  }
+}

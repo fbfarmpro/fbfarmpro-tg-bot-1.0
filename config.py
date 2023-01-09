@@ -4,10 +4,11 @@ from os import path
 
 ADMIN_ID = [1787686208, 730161327, 5639593336, 948640825]
 
-GREETING_MSG_FILENAME = "greeting_msg.json"
-GREETING_MSG_GIF_RU_FILENAME = "greeting_msg_gif_ru.gif"
-GREETING_MSG_GIF_EN_FILENAME = "greeting_msg_gif_en.gif"
-PURCHASE_GIF_FILENAME = "purchase_gif.gif"
+ASSETS_GREETING_DIRECTORY = "assets"
+GREETING_MSG_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "greeting_msg.json")
+GREETING_MSG_GIF_RU_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "greeting_msg_gif_ru.gif")
+GREETING_MSG_GIF_EN_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "greeting_msg_gif_en.gif")
+PURCHASE_GIF_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "purchase_gif.gif")
 AD_FOLDER = path.join("static", "obj")
 AD_CURRENT_FOLDER = path.join(AD_FOLDER, "current")
 AD_DEFAULT_FOLDER = path.join(AD_FOLDER, "default")
