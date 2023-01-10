@@ -34,19 +34,6 @@
 
         {% endif %}
     {% endwith %}
-    {% with errors = get_flashed_messages(category_filter=["success"]) %}
-        {% if errors %}
-
-            {%- for msg in errors %}
-                <div class="condition positively">
-                    <p class="condition-title">
-                        {{ msg }}
-                    </p>
-                </div>
-            {% endfor -%}
-
-        {% endif %}
-    {% endwith %}
     <div class="bg-item first">
         <img src="{{url_for('static', filename='img/bg-item-one.png')}}" alt="">
     </div>
@@ -685,6 +672,28 @@ $('.pay-amount-btn.plus').click(function(){
                                         <form action="/create" method="post">
                                             <div class="reg-input">
                                                 <input type="text" placeholder="Code" name="code" required>
+                                            </div>
+                                            <div class="reg-sub">
+                                                <input type="submit" value="Send" class="h-btn">
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        {% elif sost == 13 %}
+                    <div class="content-item active">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="forgot">
+                                    <h2 class="title">
+                                        Enter your email to buy
+                                    </h2>
+                                    <div class="forgot-block">
+                                        <form action="/setmail" method="post">
+                                            <div class="reg-input">
+                                                <input type="text" placeholder="Email" name="email" required>
                                             </div>
                                             <div class="reg-sub">
                                                 <input type="submit" value="Send" class="h-btn">

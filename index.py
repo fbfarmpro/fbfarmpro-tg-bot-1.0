@@ -405,6 +405,11 @@ def balance():
 @app.route("/setguest")
 def setguest():
     session['isguest'] = True
+    return render_template('index.html', sost = 13, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+
+@app.route("/setmail", methods = ['POST'])
+def setguestmail():
+    session['email'] = request.form['email']
     return redirect(url_for('shop'))
 
 @app.route("/addmee")
