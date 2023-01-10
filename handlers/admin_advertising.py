@@ -43,6 +43,12 @@ async def _(call: types.CallbackQuery):
         elif action == "upd_pack":
             await call.message.answer("Enter pack name", reply_markup=kb)
             await storage.set_state(user=call.from_user.id, state="upd_pack_name")
+        elif action == "default":
+            # copy from default to current
+            for filename in config.AD_FILES:
+                shutil.copy(os.path.join(config.AD_DEFAULT_FOLDER, filename),
+                            os.path.join(config.AD_CURRENT_FOLDER, filename))
+            await call.message.answer("Success")
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("ad_"))
