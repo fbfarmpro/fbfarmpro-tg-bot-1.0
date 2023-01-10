@@ -17,6 +17,7 @@ AD_MOBILE_FILENAME = "obj-340x70.gif"
 AD_DESKTOP_TOP_FILENAME = "obj-88x30.gif"
 AD_DESKTOP_BOTTOM_FILENAME = "obj-468x60.gif"
 AD_TEXT_FILENAME = "config.json"
+AD_LINK = "https://t.me/fbfarmpro"
 SITE_BACKGROUND_FILENAME = "site_background-1920x980.png"
 AD_FILES = [AD_MOBILE_FILENAME,
             AD_DESKTOP_BOTTOM_FILENAME,

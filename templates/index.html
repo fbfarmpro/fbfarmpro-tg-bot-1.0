@@ -82,7 +82,7 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="header-cont-a">
+                        <div class="header-cont-a" onclick="window.location.href = '{{ ad_link }}'">
                             <img src="{{url_for('static', filename='obj/current/' + pc_top)}} " alt="">
 
 
@@ -699,7 +699,7 @@ $('.pay-amount-btn.plus').click(function(){
                     {% endblock content %}
                 </div>
             </div>
-            <div class="content-cont-a">
+            <div class="content-cont-a" onclick="window.location.href = '{{ ad_link }}'">
                 <img src="{{url_for('static', filename='obj/current/' + mobile)}} " alt="">
 
             </div>
@@ -746,7 +746,7 @@ $('.pay-amount-btn.plus').click(function(){
             </div>
         </div>
     </footer>
-    <div class="block-cont-a">
+    <div class="block-cont-a" onclick="window.location.href = '{{ ad_link }}'">
         <img src="{{url_for('static', filename='obj/current/' + pc_bottom)}} " alt="">
 
     </div>
