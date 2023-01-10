@@ -48,7 +48,7 @@ async def _(call: types.CallbackQuery):
             for filename in config.AD_FILES:
                 shutil.copy(os.path.join(config.AD_DEFAULT_FOLDER, filename),
                             os.path.join(config.AD_CURRENT_FOLDER, filename))
-            await call.message.answer("Success")
+            await call.message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
 
 
 @dp.callback_query_handler(lambda c: c.data.startswith("ad_"))
@@ -140,7 +140,7 @@ async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await message.animation.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_BOTTOM_FILENAME))
-    await message.answer("Success")
+    await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 
 
@@ -162,7 +162,7 @@ async def _(message: types.Message, state: FSMContext):
         return
     await message.animation.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_TOP_FILENAME))
-    await message.answer("Success")
+    await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 
 
@@ -176,7 +176,7 @@ async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await message.animation.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
-    await message.answer("Success")
+    await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 
 
@@ -258,5 +258,5 @@ async def _(message: types.Message, state: FSMContext):
     with open(os.path.join(config.AD_FOLDER, data["theme"], config.AD_TEXT_FILENAME), "w") as file:
         file.write(dumps(current_text, ensure_ascii=False))
 
-    await message.answer("Success")
+    await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
