@@ -141,7 +141,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         return
     data = await state.get_data()
-    await message.animation.download(destination=os.path.join(
+    await message.animation.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_BOTTOM_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
@@ -163,7 +163,7 @@ async def _(message: types.Message, state: FSMContext):
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
         await state.set_state("advertising_photo_top")
         return
-    await message.animation.download(destination=os.path.join(
+    await message.animation.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_TOP_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
