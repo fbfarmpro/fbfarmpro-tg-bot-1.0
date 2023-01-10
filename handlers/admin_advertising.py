@@ -60,18 +60,21 @@ async def _(call: types.CallbackQuery):
         return
     await storage.update_data(user=call.from_user.id, data={"theme": call.message.text})
 
-    await call.message.answer("Send photo without compression")
     if action == "bg":
-        await call.message.answer("Send photo with 1920x980 resolution", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
+        await call.message.answer("Send photo without compression")
+        await call.message.answer("Send photo with 1920x980 resolution (bg)", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
         await storage.set_state(user=call.from_user.id, state="advertising_photo_bg")
     elif action == "mobile":
-        await call.message.answer("Send photo with 340x70 resolution", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
+        await call.message.answer("Send photo without compression")
+        await call.message.answer("Send photo with 340x70 resolution (mobile)", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
         await storage.set_state(user=call.from_user.id, state="advertising_photo_mobile")
     elif action == "top":
-        await call.message.answer("Send photo", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
+        await call.message.answer("Send photo without compression")
+        await call.message.answer("Send photo (desktop top)", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
         await storage.set_state(user=call.from_user.id, state="advertising_photo_top")
     elif action == "bottom":
-        await call.message.answer("Send photo with 468x60 resolution", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
+        await call.message.answer("Send photo without compression")
+        await call.message.answer("Send photo with 468x60 resolution (desktop bottom)", reply_markup=keyboards.CANCEL_ADMIN_REPLY)
         await storage.set_state(user=call.from_user.id, state="advertising_photo_bottom")
     elif action == "text":
         await call.message.answer("Send russian text", reply_markup=types.ReplyKeyboardRemove())
@@ -177,7 +180,8 @@ async def _(message: types.Message, state: FSMContext):
     await message.animation.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
-    await state.reset_state(with_data=False)
+    await state.finish()
+    # await state.reset_state(with_data=False)
 
 
 @dp.message_handler(state="advertising_photo_bg", content_types=["document", "text"])
@@ -185,7 +189,8 @@ async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
         await message.answer("ok", reply_markup=types.ReplyKeyboardRemove())
         await message.answer("What do you want to do", reply_markup=keyboards.ADVERTISING_MENU)
-        await state.reset_state(with_data=False)
+        # await state.reset_state(with_data=False)
+        await state.finish()
         return
 
     # I need to download this file to get resolution
@@ -205,7 +210,8 @@ async def _(message: types.Message, state: FSMContext):
     await message.document.download(destination_file=os.path.join(
         config.AD_FOLDER, data["theme"], config.SITE_BACKGROUND_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
-    await state.reset_state(with_data=False)
+    # await state.reset_state(with_data=False)
+    await state.finish()
 
 
 @dp.message_handler(state="advertising_text_ru")
@@ -232,7 +238,8 @@ async def _(message: types.Message, state: FSMContext):
     with open(path, "w") as file:
         file.write(dumps(content, ensure_ascii=False))
     await message.answer("Success")
-    await state.reset_state(with_data=False)
+    # await state.reset_state(with_data=False)
+    await state.finish()
 
 
 @dp.message_handler(state="advertising_time")
@@ -259,4 +266,5 @@ async def _(message: types.Message, state: FSMContext):
         file.write(dumps(current_text, ensure_ascii=False))
 
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
-    await state.reset_state(with_data=False)
+    # await state.reset_state(with_data=False)
+    await state.finish()
