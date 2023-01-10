@@ -53,7 +53,9 @@ async def _(call: types.CallbackQuery):
             await call.message.answer(f"{coupon[0]} {coupon[3] if coupon[3] else 'one-time coupon'}",
                                       reply_markup=keyboards.COUPON_CHANGE_MENU)
     elif action == "send":
-        pass
+        await call.message.answer("Send message from person or userID")
+        await storage.update_data(user=call.from_user.id, data={"name": name})
+        await storage.set_state(user=call.from_user.id, state="coupon_send")
 
 
 @dp.message_handler(state="coupon_delete")
@@ -124,4 +126,35 @@ async def _(msg: types.Message, state: FSMContext):
     expires = expires.strftime("%d.%m.%Y") if expires else expires
     products.change_coupon_expires(coupon_name, expires)
     await msg.answer("Success")
+    await state.finish()
+
+
+@dp.message_handler(state="coupon_send")
+async def _(msg: types.Message, state: FSMContext):
+    if msg.is_forward():
+        forward = msg.forward_from
+        if not forward:
+            await msg.answer("I can't get user. Please, send userID")
+            await state.set_state("coupon_send")
+            return
+        userID = forward.id
+    else:
+        if not msg.text.isdigit():
+            await msg.answer("You should forward me message from that user or send me his userID")
+            await state.set_state("coupon_send")
+            return
+        userID = msg.text
+
+    if not users.is_registered(userID=userID):
+        await msg.answer(f"There is no {userID} in my database")
+    else:
+        data = await state.get_data()
+        name = data["name"]
+        coupon = products.get_coupon(name)
+        coupon_value = f"%{coupon[2]}" if coupon[1] == "percent" else f"{coupon[2]}$"
+        await bot.send_message(userID, fr"""
+Success\! You have been assigned promo code, coupon by {msg.from_user.mention} for *{coupon_value}*\.
+Your unique combination *{coupon[0]}*\.""", parse_mode="MarkdownV2")
+        await msg.answer("Coupon was successfully sent")
+
     await state.finish()
