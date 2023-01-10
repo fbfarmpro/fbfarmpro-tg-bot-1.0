@@ -642,12 +642,20 @@ async def _(message: types.Message, state: FSMContext):
     await state.set_state("product_file")
 
 
-@dp.message_handler(content_types=["document"], state="product_file")
+@dp.message_handler(content_types=["document", "text"], state="product_file")
 async def _(message: types.Message, state: FSMContext):
+    if message.text and message.text.lower() == "cancel":
+        await message.answer("canceling", reply_markup=types.ReplyKeyboardRemove())
+        await message.answer("What do you want to do", reply_markup=keyboards.ADMIN_MENU)
+        await state.finish()
+        return
+
     data = await state.get_data()
     await products.add_product(data["category_name"], message.document)
     await message.answer("Successfully added product to category")
-    await state.finish()
+    await message.answer("Send another file or press Cancel to return to admin panel",
+                         reply_markup=types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True).add("Cancel"))
+    await state.set_state("product_file")
 
 
 @dp.callback_query_handler(lambda c: c.data == "product_replace")

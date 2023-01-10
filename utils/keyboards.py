@@ -77,6 +77,7 @@ AD_SETTINGS_BTN = InlineKeyboardButton("Advertising", callback_data="advertising
 AD_ADD_PACK = InlineKeyboardButton("Add pack", callback_data="advertising_add_pack")
 AD_DEL_PACK = InlineKeyboardButton("Delete pack", callback_data="advertising_del_pack")
 AD_UPD_PACK = InlineKeyboardButton("Update pack", callback_data="advertising_upd_pack")
+AD_SET_DEFAULT = InlineKeyboardButton("Set default (for devs)", callback_data="advertising_default")
 
 AD_MOBILE_CHANGE_PIC_BTN = InlineKeyboardButton("Change mobile ad", callback_data="ad_mobile")
 AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN = InlineKeyboardButton("Change desktop bottom ad", callback_data="ad_bottom")
@@ -144,7 +145,7 @@ CHANGE_USER_DATA_MENU = InlineKeyboardMarkup(row_width=2)
 CHANGE_USER_DATA_MENU.add(CHANGE_USER_DATA_BAN_BTN, CHANGE_USER_DATA_BALANCE_BTN)
 
 ADVERTISING_MENU = InlineKeyboardMarkup(row_width=1)
-ADVERTISING_MENU.add(AD_ADD_PACK, AD_DEL_PACK, AD_UPD_PACK)
+ADVERTISING_MENU.add(AD_ADD_PACK, AD_DEL_PACK, AD_UPD_PACK, AD_SET_DEFAULT)
 
 ADVERTISING_CHANGE_MENU = InlineKeyboardMarkup(row_width=1)
 ADVERTISING_CHANGE_MENU.add(AD_MOBILE_CHANGE_PIC_BTN, AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN)
@@ -155,4 +156,4 @@ COUPON_EDIT_MENU = InlineKeyboardMarkup(row_width=1)
 COUPON_EDIT_MENU.add(COUPON_CREATE_BTN, COUPON_DELETE_BTN, COUPON_GET_ALL_BTN)
 
 COUPON_CHANGE_MENU = InlineKeyboardMarkup(row_width=1)
-COUPON_CHANGE_MENU.add(COUPON_EDIT_DATE_BTN, COUPON_DELETE_BTN)
+COUPON_CHANGE_MENU.add(COUPON_EDIT_DATE_BTN, COUPON_DELETE_BTN, COUPON_GIVE_BTN)

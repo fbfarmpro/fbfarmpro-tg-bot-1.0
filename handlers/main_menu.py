@@ -1,6 +1,7 @@
 import os
 from zipfile import ZipFile
 from datetime import datetime
+from json import loads
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -10,7 +11,7 @@ from aiogram.utils.exceptions import ChatNotFound
 
 from utils.database import UsersDB, ProductsDB, create_random_filename_zip
 import utils.keyboards as keyboards
-from config import ADMIN_ID, PURCHASE_GIF_FILENAME
+from config import ADMIN_ID, PURCHASE_GIF_FILENAME, AD_CURRENT_FOLDER, AD_TEXT_FILENAME
 from handlers import *
 from loader import storage
 
@@ -183,16 +184,76 @@ async def _(message: types.Message, state: FSMContext):
         else:
             await message.answer(f"There are only {amount} in this category. Limit changed")
 
+    kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     if userLang == "RU":
-        await message.answer(f"Вы покупаете {amount} продуктов по {category_price}$ каждый.\n"
-                             f"Итоговая стоимость: {amount*category_price}\nВы подтверждаете покупку?(да/нет)")
+        kb.add("Пропустить")
+        await message.answer("Введите промокод чтобы воспользоваться промокодом или нажмите кнопку Пропустить",
+                             reply_markup=kb)
     else:
-        await message.answer(f"You purchase {amount} products, which costs {category_price}$\n"
-                             f"Final price: {amount*category_price}\nPurchase?(yes/no)")
+        kb.add("Skip")
+        await message.answer("Enter promocode or press Skip button",
+                             reply_markup=kb)
 
     await state.update_data(data={"amount": amount})
-    await state.set_state("purchase_accept")
+    await state.set_state("purchase_promocode")
 
+
+@dp.message_handler(state="purchase_promocode")
+async def _(msg: types.Message, state: FSMContext):
+    userData = await state.get_data()
+    userLang = userData["lang"]
+    category_price = userData["category_price"]
+    amount = userData["amount"]
+
+    if msg.text.lower() in ["skip", "пропустить"]:
+        await state.update_data(data={"promocode": None})
+        if userLang == "RU":
+            await msg.answer(f"Вы покупаете {amount} продуктов по {category_price}$ каждый.\n"
+                                 f"Итоговая стоимость: {amount*category_price}\nВы подтверждаете покупку?(да/нет)",
+                                 reply_markup=types.ReplyKeyboardRemove())
+        else:
+            await msg.answer(f"You purchase {amount} products, which costs {category_price}$\n"
+                                 f"Final price: {amount*category_price}\nPurchase?(yes/no)",
+                                 reply_markup=types.ReplyKeyboardRemove())
+        await state.set_state("purchase_accept")
+    else:
+        coupon_name = msg.text
+        coupon = products.get_coupon(coupon_name)
+        if coupon:
+            discount = f"%{coupon[2]}" if coupon[1] == "percent" else f"${coupon[2]}"
+            await state.update_data(data={"coupon": coupon})
+            await state.set_state("purchase_accept")
+            if coupon[1] == "percent":
+                discount = f"%{coupon[2]}"
+                if userLang == "RU":
+                    await msg.answer(f"Вы ввели промокод на {discount}")
+                    await msg.answer(f"Вы покупаете {amount} продуктов по {category_price}$ каждый.\n"
+                                         f"Итоговая стоимость: {(category_price * amount) - (category_price * amount * coupon[2]/100)}\nВы подтверждаете покупку?(да/нет)",
+                                         reply_markup=types.ReplyKeyboardRemove())
+                else:
+                    await msg.answer(f"You entered promocode to {discount}")
+                    await msg.answer(f"You purchase {amount} products, which costs {category_price}$\n"
+                                         f"Final price: {(category_price * amount) - (category_price * amount * coupon[2]/100)}\nPurchase?(yes/no)",
+                                         reply_markup=types.ReplyKeyboardRemove())
+            else:
+                discount = f"${coupon[2]}"
+                if userLang == "RU":
+                    await msg.answer(f"Вы ввели промокод на {discount}")
+                    await msg.answer(f"Вы покупаете {amount} продуктов по {category_price}$ каждый.\n"
+                                     f"Итоговая стоимость: {(category_price * amount) - coupon[2]}\nВы подтверждаете покупку?(да/нет)",
+                                     reply_markup=types.ReplyKeyboardRemove())
+                else:
+                    await msg.answer(f"You entered promocode to {discount}")
+                    await msg.answer(f"You purchase {amount} products, which costs {category_price}$\n"
+                                     f"Final price: {(category_price * amount) - coupon[2]}\nPurchase?(yes/no)",
+                                     reply_markup=types.ReplyKeyboardRemove())
+        else:
+            if userLang =="RU":
+                await msg.answer("Такого промокода нет. Повторите попытку или пропустите этот шаг")
+                await state.set_state("purchase_promocode")
+            else:
+                await msg.answer("No such promocode. Try again or skip this step")
+                await state.set_state("purchase_promocode")
 
 
 @dp.message_handler(lambda msg: msg.text.lower() in ["да", "yes", "no", "нет"], state="purchase_accept")
@@ -206,8 +267,17 @@ async def _(message: types.Message, state: FSMContext):
     category_price = userData["category_price"]
     category_name = userData["category_name"]
     if message.text.lower() in ["да", "yes"]:
+        coupon = userData["coupon"]
         if userBalance >= amount * category_price:
-            users.add_balance(-(category_price * amount), userID=userID)
+            if coupon:
+                if coupon[1] == "sum":
+                    users.add_balance(coupon[2], userID=userID)
+                    price = category_price * amount
+                elif coupon[1] == "percent":
+                    # price - discount
+                    price = (category_price * amount) - (category_price * amount * coupon[2]/100)
+                products.remove_coupon(coupon[0])
+            users.add_balance(-price, userID=userID)
             zip_filename = create_random_filename_zip()
             zip_path = os.path.join("DB", "bought", zip_filename)
             zipObj = ZipFile(zip_path, "w")
@@ -218,7 +288,7 @@ async def _(message: types.Message, state: FSMContext):
             zipObj.close()
             await message.answer_document(InputFile(zip_path))
             users.add_purchase(category_name, amount, category_price*amount, zip_filename, userID=userID)
-            with open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "r") as file:
+            with open(os.path.join(AD_CURRENT_FOLDER, AD_TEXT_FILENAME), "r") as file:
                 texts = loads(file.read())
             if userLang == "RU":
                 await message.answer("Спасибо за покупку!\n"

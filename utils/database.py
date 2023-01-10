@@ -299,8 +299,7 @@ class ProductsDB:
         self.db.commit()
 
     def get_coupon(self, name):
-        coupon = self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()
-        return coupon[0] if coupon else None
+        return self.cur.execute("SELECT * FROM coupons WHERE coupon = ?", (name,)).fetchone()
 
     def get_all_coupons(self):
         return self.cur.execute("SELECT * FROM coupons").fetchall()
