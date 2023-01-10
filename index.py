@@ -44,7 +44,7 @@ def create_random_token():
 
 
 app = Flask(__name__)
-app.secret_key = 'hhhkhkhkkh'
+app.secret_key = 'hhasdhkhkhkkh'
 
 
 # app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
