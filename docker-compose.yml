@@ -7,6 +7,9 @@ services:
     restart: always
     volumes:
       - ./DB:/app/DB
+      - ./log.txt:/app/log.txt
+      - ./logsite.txt:/app/logsite.txt
+      - ./static/ad:/app/static/ad
     ports:
       - "5000:5000"
     depends_on:
