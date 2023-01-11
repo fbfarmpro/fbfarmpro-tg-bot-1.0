@@ -141,7 +141,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         return
     data = await state.get_data()
-    await message.animation.download(destination_file=os.path.join(
+    await message.animation.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_BOTTOM_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
@@ -163,8 +163,12 @@ async def _(message: types.Message, state: FSMContext):
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
         await state.set_state("advertising_photo_top")
         return
-    await message.animation.download(destination_file=os.path.join(
+    """
+    await message.animation.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_TOP_FILENAME))
+    """
+    await message.animation.download(destination_file=os.path.join(
+        config.AD_CURRENT_FOLDER, config.AD_DESKTOP_TOP_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
 
@@ -177,7 +181,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         return
     data = await state.get_data()
-    await message.animation.download(destination_file=os.path.join(
+    await message.animation.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.AD_MOBILE_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
@@ -194,7 +198,7 @@ async def _(message: types.Message, state: FSMContext):
         return
 
     # I need to download this file to get resolution
-    await message.document.download(destination_file="tmp.png")
+    await message.document.download(destination="tmp.png")
     with Image.open("tmp.png") as file:
         width, height = file.size
 
@@ -207,7 +211,7 @@ async def _(message: types.Message, state: FSMContext):
         await state.set_state("advertising_photo_bg")
         return
     data = await state.get_data()
-    await message.document.download(destination_file=os.path.join(
+    await message.document.download(destination=os.path.join(
         config.AD_FOLDER, data["theme"], config.SITE_BACKGROUND_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     # await state.reset_state(with_data=False)
