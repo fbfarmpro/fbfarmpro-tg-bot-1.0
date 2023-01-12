@@ -1304,3 +1304,32 @@ p {
         font-size: 12px;
     }
 }
+.coupon{
+    margin-top: 40px;
+}
+.coupon-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.coupon-input{
+    width: 60%;
+}
+
+.coupon-input input{
+    height: 40px;
+    width: 100%;
+    border-bottom: 1px solid #565D6A;
+    background: transparent;
+    font-size: 15px;
+    color: #fff;
+}
+.coupon-sub{
+    width: 35%;
+}
+.coupon-sub input{
+    width: 100%;
+    height: 40px;
+}

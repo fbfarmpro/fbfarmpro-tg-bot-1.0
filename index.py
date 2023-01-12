@@ -105,7 +105,6 @@ def send_mail(receiver, mail):
 
 
 
-
 @app.route("/tgauth<token>")
 def telegauth(token):
     if token:
