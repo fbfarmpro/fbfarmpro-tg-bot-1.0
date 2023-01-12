@@ -14,9 +14,9 @@ AD_IMG_FOLDER = path.join("static", "img")
 AD_CURRENT_FOLDER = path.join(AD_FOLDER, "current")
 AD_DEFAULT_FOLDER = path.join(AD_FOLDER, "default")
 # width x height
-AD_MOBILE_FILENAME = "obj-340x70.gif"
-AD_DESKTOP_TOP_FILENAME = "obj-88x30.gif"
-AD_DESKTOP_BOTTOM_FILENAME = "obj-468x60.gif"
+AD_MOBILE_FILENAME = "obj_340x70.gif"
+AD_DESKTOP_TOP_FILENAME = "obj_88x30.gif"
+AD_DESKTOP_BOTTOM_FILENAME = "obj_468x60.gif"
 AD_TEXT_FILENAME = "config.json"
 AD_LINK = "https://t.me/fbfarmpro"
 SITE_BACKGROUND_FILENAME = "site_background-1920x980.png"
