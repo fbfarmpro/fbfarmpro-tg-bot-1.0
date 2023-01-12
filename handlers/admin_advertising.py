@@ -157,7 +157,7 @@ async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
 
     res = f"{message.animation.width}x{message.animation.height}"
-    need_res = config.AD_DESKTOP_TOP_FILENAME.split("-")[-1].split(".")[0]
+    need_res = config.AD_DESKTOP_TOP_FILENAME.split("_")[-1].split(".")[0]
 
     if res != need_res:
         await message.answer(f"Wrong resolution. Resolution of your image is: {res} and i need {need_res}")
@@ -199,7 +199,7 @@ async def _(message: types.Message, state: FSMContext):
         width, height = file.size
 
     res = f"{width}x{height}"
-    need_res = config.SITE_BACKGROUND_FILENAME.split("-")[-1].split(".")[0]
+    need_res = config.SITE_BACKGROUND_FILENAME.split("_")[-1].split(".")[0]
     os.remove("tmp.png")
 
     if res != need_res:
