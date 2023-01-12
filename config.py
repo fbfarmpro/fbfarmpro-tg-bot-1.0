@@ -10,6 +10,7 @@ GREETING_MSG_GIF_RU_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "greeting_ms
 GREETING_MSG_GIF_EN_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "greeting_msg_gif_en.gif")
 PURCHASE_GIF_FILENAME = path.join(ASSETS_GREETING_DIRECTORY, "purchase_gif.gif")
 AD_FOLDER = path.join("static", "obj")
+AD_IMG_FOLDER = path.join("static", "img")
 AD_CURRENT_FOLDER = path.join(AD_FOLDER, "current")
 AD_DEFAULT_FOLDER = path.join(AD_FOLDER, "default")
 # width x height

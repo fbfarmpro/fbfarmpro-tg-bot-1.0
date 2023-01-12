@@ -223,12 +223,26 @@ async def change_advertisement():
                 # if it is not the same theme as previous
                 # dircmp().diff_files returns list of files that didn't match
                 # So if this list is empty folders have the same content, and we don't need this theme to be next
+                # TODO fix cmp files
+                for filename in config.AD_FILES:
+                    if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
+                                   os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
+                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
+                                    os.path.join(config.AD_IMG_FOLDER, filename))
+                        ok = True
+
+                """
                 if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
                     ok = True  # ok, i found new theme
                     # now copy files from that theme to 'current' folder
                     for filename in config.AD_FILES:
+                        # copy from next_theme to current
                         shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
                                     os.path.join(config.AD_FOLDER, "current", filename))
+                        # and copy from current to img folder
+                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
+                                    os.path.join(config.AD_FOLDER, "current", filename))
+                """
             await asyncio.sleep(random.randint(10, 60))  # sleep 'till next change
         else:
             # if there are only default theme and current theme is not default -> change theme
