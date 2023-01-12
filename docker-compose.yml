@@ -9,7 +9,8 @@ services:
       - ./DB:/app/DB
       - ./log.txt:/app/log.txt
       - ./logsite.txt:/app/logsite.txt
-      - ./static/ad:/app/static/ad
+      - ./static/obj:/app/static/obj
+      - ./static/img:/app/static/img
     ports:
       - "5000:5000"
     depends_on:
