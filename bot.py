@@ -215,7 +215,9 @@ async def change_advertisement():
     while True:
         themes = get_themes()
         # there are any themes and not only default
+        print("here")
         if len(themes) != 1:
+            print("there")
             ok = False
             # search for next theme
             while not ok:
@@ -229,7 +231,12 @@ async def change_advertisement():
                                    os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
                         shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
                                     os.path.join(config.AD_IMG_FOLDER, filename))
+                        print("found", next_theme)
                         ok = True
+                if ok:
+                    print("copy config")
+                    shutil.copy(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME),
+                                os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME))
 
                 """
                 if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
@@ -246,11 +253,16 @@ async def change_advertisement():
             await asyncio.sleep(random.randint(10, 60))  # sleep 'till next change
         else:
             # if there are only default theme and current theme is not default -> change theme
-            if len(filecmp.dircmp(config.AD_DEFAULT_FOLDER, config.AD_CURRENT_FOLDER).diff_files) != 0:
-                for filename in config.AD_FILES:
-                    shutil.copy(os.path.join(config.AD_FOLDER, "default", filename),
-                                os.path.join(config.AD_FOLDER, "current", filename))
-            else:
+            ok = True
+            for filename in config.AD_FILES:
+                print("cmp0")
+                if not filecmp.cmp(os.path.join(config.AD_DEFAULT_FOLDER, filename),
+                               os.path.join(config.AD_IMG_FOLDER, filename)):
+                    print("cmpSUCCESS")
+                    shutil.copy(os.path.join(config.AD_DEFAULT_FOLDER, filename),
+                                os.path.join(config.AD_IMG_FOLDER, filename))
+                    ok = False
+            if ok:
                 await asyncio.sleep(60)  # wait for updates
 
 
