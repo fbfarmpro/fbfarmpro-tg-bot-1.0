@@ -439,11 +439,12 @@ async def buy():
 
                         cost = int(float(request.form['price'])) * int(float(request.form['amount']))
                         if promo[1] == 'percent':
-                            cost = cost - (cost * coupon[2] / 100)
-                            flash(f'You used a promo code for -{coupon[2]}% off!', 'error')
+                            cost = cost - (cost * promo[2] / 100)
+                            flash(f'You used a promo code for -{promo[2]}% off!', 'error')
                         elif promo[1] == 'summ':
-                            usersTG.add_balance(coupon[2], userID=session['user']['id'])
-                            flash(f'{coupon[2]} was added to your balance!', 'error')
+                            usersTG.add_balance(promo[2], userID=session['user']['id'])
+                            flash(f'{promo[2]} was added to your balance!', 'error')
+                        products.remove_coupon(promo[0])
                         balance = usersTG.get_balance(userID=session['user']['id'])
                         if cost <= balance:
                             usersTG.add_balance(-cost, userID=session['user']['id'])
@@ -471,11 +472,12 @@ async def buy():
 
                         cost = int(float(request.form['price'])) * int(float(request.form['amount']))
                         if promo[1] == 'percent':
-                            cost = cost - (cost * coupon[2] / 100)
-                            flash(f'You used a promo code for -{coupon[2]}% off!', 'error')
+                            cost = cost - (cost * promo[2] / 100)
+                            flash(f'You used a promo code for -{promo[2]}% off!', 'error')
                         elif promo[1] == 'summ':
-                            users.add_balance(coupon[2], email=session['email'])
-                            flash(f'{coupon[2]} was added to your balance!', 'error')
+                            users.add_balance(promo[2], email=session['email'])
+                            flash(f'{promo[2]} was added to your balance!', 'error')
+                        products.remove_coupon(promo[0])
                         balance = users.get_balance(email=session['email'])
                         if cost <= balance:
                             users.add_balance(-cost, email=session['email'])
