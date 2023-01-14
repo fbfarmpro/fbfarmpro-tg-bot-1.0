@@ -137,12 +137,7 @@ def upload():
 
         if allowed_file(dtop.filename) and allowed_file(dbottom.filename) and allowed_file(mbottom.filename):
             path = os.path.join(config.AD_FOLDER, pack, config.AD_TEXT_FILENAME)
-            with open(path, "r") as file:
-                file_data = file.read()
-                if not file_data:
-                    content = {"ru": None, "en": None, "time": None}
-                else:
-                    content = loads(file_data)
+            content = {"ru": None, "en": None, "time": None}
             content["ru"] = bottextru
             content["en"] = bottexten
             with open(path, "w") as file:
