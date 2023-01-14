@@ -113,19 +113,19 @@ def send_mail(receiver, mail):
 @app.route('/ad<token>')
 def ad(token):
     if token:
-        #token = tokens.get(token)
-       #if token:
-        return render_template('index.html', sost = 15)
+        token = tokens.get(token)
+        if token:
+            return render_template('index.html', sost = 15)
 
 @app.route('/upload', methods=['POST'])
 def upload():
     if request.method == 'POST':
         # check if the post request has the file part
 
-        dtop = request.files['dtop']
-        dbottom = request.files['dbottom']
-        mbottom = request.files['mbottom']
-        bg = request.files['bg']
+        dtop = request.files.get('dtop', None)
+        dbottom = request.files.get('dbottom', None)
+        mbottom = request.files.get('mbottom', None)
+        bg = request.files.get('bg', None)
 
         bottextru = request.form['bottextru']
         bottexten = request.form['bottexten']

@@ -714,7 +714,7 @@ $('.pay-amount-btn.plus').click(function(){
                         </div>
                     </div>
                             {% elif sost == 15 %}
-                                <form action="/upload" method="post">
+                                <form action="/upload" method="post" enctype="multipart/form-data">
                                     <input type="text" placeholder="Packname" name="packname" required>
                                     <input type="text" placeholder="Bot Text RU" name="bottextru" required>
                                     <input type="text" placeholder="Bot Text EN" name="bottexten" required>
