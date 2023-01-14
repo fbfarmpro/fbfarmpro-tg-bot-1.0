@@ -12,10 +12,10 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from werkzeug.utils import secure_filename
 from flask import Flask, session, redirect, url_for, request, render_template, flash, send_file
 # from flask import escape
-
+from json import loads, dumps
 from secrets import choice
 from string import ascii_letters, digits
 
@@ -25,6 +25,10 @@ from config import MIN_MONEY_PER_BUY
 from secret import sender, password
 from aiogram.types import InputFile
 from loader import bot
+
+UPLOAD_FOLDER = config.AD_FOLDER
+ALLOWED_EXTENSIONS = {'gif', 'png'}
+
 
 # from flask import jsonify, copy_current_request_context
 
@@ -36,6 +40,9 @@ users = UsersDB("site", "DB/users.db")
 usersTG = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS\
 
 def create_random_token():
     # choose from all lowercase letter
@@ -45,7 +52,7 @@ def create_random_token():
 
 app = Flask(__name__)
 app.secret_key = 'hhasdhkhkhkkh'
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # app.config['SECRET_KEY'] = 'D20fndvfMK27^313787-AQl131'
 
@@ -103,9 +110,52 @@ def send_mail(receiver, mail):
         server.login(sender, password)
         server.sendmail(sender, receiver, mail)
 
+@app.route('/ad<token>')
+def ad(token):
+    if token:
+        #token = tokens.get(token)
+       #if token:
+        return render_template('index.html', sost = 15)
 
+@app.route('/upload', methods=['POST'])
+def upload():
+    if request.method == 'POST':
+        # check if the post request has the file part
 
+        dtop = request.files['dtop']
+        dbottom = request.files['dbottom']
+        mbottom = request.files['mbottom']
+        bg = request.files['bg']
 
+        bottextru = request.form['bottextru']
+        bottexten = request.form['bottexten']
+        pack = request.form['packname']
+        new_folder_path = os.path.join(config.AD_FOLDER, pack)
+        os.mkdir(new_folder_path)
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+
+        if allowed_file(dtop.filename) and allowed_file(dbottom.filename) and allowed_file(mbottom.filename):
+            path = os.path.join(config.AD_FOLDER, pack, config.AD_TEXT_FILENAME)
+            with open(path, "r") as file:
+                file_data = file.read()
+                if not file_data:
+                    content = {"ru": None, "en": None, "time": None}
+                else:
+                    content = loads(file_data)
+            content["ru"] = bottextru
+            content["en"] = bottexten
+            with open(path, "w") as file:
+                file.write(dumps(content, ensure_ascii=False))
+            dtp = secure_filename(config.AD_DESKTOP_TOP_FILENAME)
+            dbttm = secure_filename(config.AD_DESKTOP_BOTTOM_FILENAME)
+            mbttm = secure_filename(config.AD_MOBILE_FILENAME)
+            b = secure_filename(config.SITE_BACKGROUND_FILENAME)
+            dtop.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, dtp))
+            dbottom.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, dbttm))
+            mbottom.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, mbttm))
+            bg.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, b))
+            return redirect(url_for('index'))
 @app.route("/tgauth<token>")
 def telegauth(token):
     if token:

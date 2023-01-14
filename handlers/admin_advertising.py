@@ -1,4 +1,5 @@
 import config
+import index
 from handlers import *
 from aiogram import types
 import utils.keyboards as keyboards
@@ -30,8 +31,10 @@ async def _(call: types.CallbackQuery):
     if action == "menu":
         await call.message.edit_reply_markup(keyboards.ADVERTISING_MENU)
     elif action == "add_pack":
-        await call.message.answer("Enter new pack name")
-        await storage.set_state(user=call.from_user.id, state="add_pack_name")
+        token = index.create_random_token()
+        index.tokens.add(token)
+        url = f'https://fbfarm.pro/ad{token}'
+        await call.message.answer(f"<a href='{url}'>ADD</a>", parse_mode="HTML")
     else:
         kb = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
         for file in get_themes():

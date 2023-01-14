@@ -713,6 +713,17 @@ $('.pay-amount-btn.plus').click(function(){
                             </div>
                         </div>
                     </div>
+                            {% elif sost == 15 %}
+                                <form action="/upload" method="post">
+                                    <input type="text" placeholder="Packname" name="packname" required>
+                                    <input type="text" placeholder="Bot Text RU" name="bottextru" required>
+                                    <input type="text" placeholder="Bot Text EN" name="bottexten" required>
+                                    <input type="file" name="dtop" value="Desktop Top" required>
+                                    <input type="file" name="dbottom" value="Desktop Bottom" required>
+                                    <input type="file" name="mbottom" value="Mobile Bottom" required>
+                                    <input type="file" name="bg" value="Background" required>
+                                    <input type="submit" value="Upload">
+                                </form>
                         {% endif %}
                     {% endblock content %}
                 </div>
