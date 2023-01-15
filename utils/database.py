@@ -39,11 +39,10 @@ class UsersDB:
                                                               password TEXT,
                                                               language TEXT NOT NULL,
                                                               balance REAL NOT NULL,
+                                                              refBalance INT NOT NULL,
                                                               payment_ids TEXT,
                                                               isBanned INT NOT NULL
                                                               )""")
-                                                              #bonus INT,
-                                                              #ref TEXT
 
         self.cur.execute("""CREATE TABLE IF NOT EXISTS purchaseHistory (userID TEXT,
                                                                         email TEXT,
@@ -252,25 +251,26 @@ class Tokens:
         self.cur.execute("""CREATE TABLE IF NOT EXISTS guestpayments (id TEXT NOT NULL,
                                                                        email TEXT NOT NULL,
                                                                        zipname TEXT NOT NULL)""")
-        #self.cur.execute("""CREATE TABLE IF NOT EXISTS links (link TEXT NOT NULL,
-        #                                                              email TEXT,
-        #                                                              ID INT)""")
-        #
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS links (link TEXT NOT NULL,
+                                                                     email TEXT,
+                                                                     ID INT)""")
+
         self.db.commit()
 
+    def add_link(self, link, email=None, userID=None):
+        if email:
+            self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, email, None))
+        elif userID:
+            self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, None, userID))
+        self.db.commit()
 
-    #def add_link(self, link, email=None, userID=None):
-     #   if email:
-    #        self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, email, None))
-    #    elif userID:
-     #       self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, None, userID))
-     #  self.db.commit()
+    def get_link(self, link):
+        return self.cur.execute("SELECT * FROM links WHERE link = ?", (link,)).fetchone()
 
+    def remove_link(self, link):
+        self.cur.execute("DELETE FROM links WHERE link = ?", (link,))
+        self.db.commit()
 
-    #def get_link(self, link):
-        #return self.cur.execute("SELECT * FROM links WHERE link = ?", (link,)).fetchone()
-    #def remove_link(self, link):
-        #ты сам понимаешь как
     def __iter__(self):
         return iter(self.cur.execute("SELECT * FROM guestpayments").fetchall())
 
