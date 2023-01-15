@@ -25,38 +25,46 @@ users0 = UsersDB("site", "DB/users.db")
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
     userID = message.from_user.id
+    await message.answer(userID)
     token = message.get_args()
+    print(token)
     if token:
-        status = tokens.get(token)[1]
+        if token.isdigit():
+            if users.is_registered(userID=message.from_user.id):
+                await message.answer("You are already registered")
+            else:
+                users.add_balance(1, userID=token)  # add 1$ to user who invited me
+        else:
+            status = tokens.get(token)[1]
 
-        if 'link' in status:
-            if users.is_registered(userID=userID):
-                email = status.split("|")[1]
-                users0.add_balance(users.get_balance(userID=userID), email=email)
-                for x in users.get_payments(userID=userID):
-                    users0.add_payment(x, email=email)
-                users.remove_user(userID=userID)
-                users.link_tg(userID, email)
-                tokens.set_status(token, f"linked|{userID}|{email}")
-                await message.answer(f"Для завершения перейдите по ссылке <b><a href='https://fbfarm.pro/tgauth{token}'>Завершить</a></b>", parse_mode="HTML")
+            if 'link' in status:
+                if users.is_registered(userID=userID):
+                    email = status.split("|")[1]
+                    users0.add_balance(users.get_balance(userID=userID), email=email)
+                    for x in users.get_payments(userID=userID):
+                        users0.add_payment(x, email=email)
+                    users.remove_user(userID=userID)
+                    users.link_tg(userID, email)
+                    tokens.set_status(token, f"linked|{userID}|{email}")
+                    await message.answer(f"Для завершения перейдите по ссылке <b><a href='https://fbfarm.pro/tgauth{token}'>Завершить</a></b>", parse_mode="HTML")
+                    return
+                else:
+                    email = status.split("|")[1]
+                    users.link_tg(userID, email)
+                    tokens.set_status(token, f"linked|{userID}|{email}")
+                    await message.answer(
+                        f"Для завершения перейдите по ссылке <b><a href='https://fbfarm.pro/tgauth{token}'>Завершить</a></b>",
+                        parse_mode="HTML")
+                    return
+            elif 'waiting' in status:
+                if not users.is_registered(userID=userID):
+                    users.register_site_via_tg(userID)
+                    # users.register(userID=userID)
+                    await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
+                else:
+                    await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
+                tokens.set_status(token, f"done|{userID}")
                 return
-            else:
-                email = status.split("|")[1]
-                users.link_tg(userID, email)
-                tokens.set_status(token, f"linked|{userID}|{email}")
-                await message.answer(
-                    f"Для завершения перейдите по ссылке <b><a href='https://fbfarm.pro/tgauth{token}'>Завершить</a></b>",
-                    parse_mode="HTML")
-                return
-        elif 'waiting' in status:
-            if not users.is_registered(userID=userID):
-                users.register_site_via_tg(userID)
-                # users.register(userID=userID)
-                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
-            else:
-                await message.answer(f"Для завершения перейдите по ссылке <a href='https://fbfarm.pro/tgauth{token}'>Завершить</a>", parse_mode="HTML")
-            tokens.set_status(token, f"done|{userID}")
-            return
 
     with open(config.GREETING_MSG_FILENAME) as file:
         greeting_msg = loads(file.read())
@@ -281,11 +289,18 @@ async def check_advertisement():
         await asyncio.sleep(600)
 
 
+async def check_refs():
+    while True:
+        # TODO
+        await asyncio.sleep(300)
+
+
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(dp.start_polling())
     loop.create_task(check_for_payments())
     loop.create_task(check_for_bought_products())
-    loop.create_task(change_advertisement())
-    loop.create_task(check_advertisement())
+    loop.create_task(check_refs())
+    # loop.create_task(change_advertisement())
+    # loop.create_task(check_advertisement())
     loop.run_forever()

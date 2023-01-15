@@ -39,6 +39,7 @@ class UsersDB:
                                                               password TEXT,
                                                               language TEXT NOT NULL,
                                                               balance REAL NOT NULL,
+                                                              refBalance REAL NOT NULL,
                                                               payment_ids TEXT,
                                                               isBanned INT NOT NULL)""")
 
@@ -108,9 +109,11 @@ class UsersDB:
         else:
             assert email is not None
             return self.cur.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+
     def remove_user(self, userID):
         self.cur.execute("DELETE FROM users where userID = ?", (userID,))
         self.db.commit()
+
     def link_tg(self, userID, email):
         self.cur.execute("UPDATE users SET userID = ?, language = ? WHERE email = ?", (userID, "RU", email))
         self.db.commit()
@@ -146,8 +149,8 @@ class UsersDB:
             return [i for i in filter(lambda t: str(t[1]) == str(email), self.get_purchases())]
 
     def change_password(self, email, password):
-        # hashlib.sha256(password.encode()).hexdigest(), "EN", 0,
-        self.cur.execute("UPDATE users SET password = ? where email = ?", (hashlib.sha256(password.encode()).hexdigest(), email))
+        self.cur.execute("UPDATE users SET password = ? where email = ?", (
+            hashlib.sha256(password.encode()).hexdigest(), email))
         self.db.commit()
 
     def change_language(self, *, userID=None, email=None):
@@ -181,6 +184,23 @@ class UsersDB:
             self.cur.execute("UPDATE users SET balance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
         else:
             self.cur.execute("UPDATE users SET balance = ? WHERE email = ?", (result if result > 0 else 0, email))
+        self.db.commit()
+
+    def get_ref_balance(self, *, userID=None, email=None):
+        if self.method == "tg":
+            assert userID is not None
+            return self.cur.execute("SELECT refBalance FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+        else:
+            assert email is not None
+            return self.cur.execute("SELECT refBalance FROM users WHERE email = ?", (email,)).fetchone()[0]
+
+    def add_ref_balance(self, amount, *, userID=None, email=None):
+        balance = self.get_ref_balance(userID=userID, email=email)
+        result = balance + amount
+        if self.method == "tg":
+            self.cur.execute("UPDATE users SET refBalance = ? WHERE userID = ?", (result if result > 0 else 0, userID))
+        else:
+            self.cur.execute("UPDATE users SET refBalance = ? WHERE email = ?", (result if result > 0 else 0, email))
         self.db.commit()
 
     def get_count_of_users(self):
