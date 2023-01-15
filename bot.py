@@ -197,7 +197,7 @@ async def check_for_bought_products():
             if not zip_filename:
                 continue
             zip_path = os.path.join("DB", "bought", zip_filename)
-            category_name = product[2]
+            category_name = product[3]
             if difference.days >= 3 and zip_filename:
                 # remove files from our DB
                 with zipfile.ZipFile(zip_path, "r") as file:
@@ -229,14 +229,14 @@ async def change_advertisement():
                 for filename in config.AD_FILES:
                     if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
                                    os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
-                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                    os.path.join(config.AD_IMG_FOLDER, filename))
+                        shutil.copyfile(os.path.join(config.AD_FOLDER, next_theme, filename),
+                                        os.path.join(config.AD_IMG_FOLDER, filename))
                         print("found", next_theme)
                         ok = True
                 if ok:
                     print("copy config")
-                    shutil.copy(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME),
-                                os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME))
+                    shutil.copyfile(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME),
+                                    os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME))
 
                 """
                 if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
@@ -257,10 +257,10 @@ async def change_advertisement():
             for filename in config.AD_FILES:
                 print("cmp0")
                 if not filecmp.cmp(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                               os.path.join(config.AD_IMG_FOLDER, filename)):
+                                   os.path.join(config.AD_IMG_FOLDER, filename)):
                     print("cmpSUCCESS")
-                    shutil.copy(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                                os.path.join(config.AD_IMG_FOLDER, filename))
+                    shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
+                                    os.path.join(config.AD_IMG_FOLDER, filename))
                     ok = False
             if ok:
                 await asyncio.sleep(60)  # wait for updates

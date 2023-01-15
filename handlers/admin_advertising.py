@@ -49,7 +49,7 @@ async def _(call: types.CallbackQuery):
         elif action == "default":
             # copy from default to current
             for filename in config.AD_FILES:
-                shutil.copy(os.path.join(config.AD_DEFAULT_FOLDER, filename),
+                shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
                             os.path.join(config.AD_CURRENT_FOLDER, filename))
             await call.message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
 
@@ -98,7 +98,7 @@ async def _(message: types.Message, state: FSMContext):
     default_path = os.path.join(config.AD_FOLDER, "default")
     os.mkdir(new_folder_path)
     for filename in config.AD_FILES:
-        shutil.copy(os.path.join(default_path, filename), os.path.join(new_folder_path, filename))
+        shutil.copyfile(os.path.join(default_path, filename), os.path.join(new_folder_path, filename))
     await message.answer(message.text, reply_markup=keyboards.ADVERTISING_CHANGE_MENU)
     await state.finish()
 
