@@ -31,6 +31,9 @@ PURCHASE_BTN_EN = InlineKeyboardButton("Purchase", callback_data="purchase")
 RULES_BTN_RU = InlineKeyboardButton("Правила", callback_data="rules")
 RULES_BTN_EN = InlineKeyboardButton("Rules", callback_data="rules")
 
+GET_REFERRAL_RU = InlineKeyboardButton("Получить реферальную ссылку", callback_data="referral")
+GET_REFERRAL_EN = InlineKeyboardButton("Get referral link", callback_data="referral")
+
 HELP_BTN_RU = InlineKeyboardButton("Помощь", url="tg://user?id=5597114355")
 HELP_BTN_EN = InlineKeyboardButton("Help", url="tg://user?id=5597114355")
 
@@ -109,13 +112,13 @@ MAIN_MENU_RU = InlineKeyboardMarkup(row_width=2)
 MAIN_MENU_RU.add(MY_PROFILE_BTN_RU, ADD_BALANCE_BTN_RU)
 MAIN_MENU_RU.add(MY_PREORDERS_BTN_RU, PREORDER_BTN_RU)
 MAIN_MENU_RU.add(PURCHASE_BTN_RU).add(MY_PURCHASE_HISTORY_RU)
-MAIN_MENU_RU.add(RULES_BTN_RU).add(HELP_BTN_RU, LANGUAGE_BTN_RU)
+MAIN_MENU_RU.add(RULES_BTN_RU).add(GET_REFERRAL_RU).add(HELP_BTN_RU, LANGUAGE_BTN_RU)
 
 MAIN_MENU_EN = InlineKeyboardMarkup(row_width=2)
 MAIN_MENU_EN.add(MY_PROFILE_BTN_EN, ADD_BALANCE_BTN_EN)
 MAIN_MENU_EN.add(MY_PREORDERS_BTN_EN, PREORDER_BTN_EN)
 MAIN_MENU_EN.add(PURCHASE_BTN_EN).add(MY_PURCHASE_HISTORY_EN)
-MAIN_MENU_EN.add(RULES_BTN_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
+MAIN_MENU_EN.add(RULES_BTN_EN).add(GET_REFERRAL_EN).add(HELP_BTN_EN, LANGUAGE_BTN_EN)
 
 ADMIN_MENU = InlineKeyboardMarkup(row_width=1)
 ADMIN_MENU.add(GREETING_MSG_BTN, PURCHASE_GIF_CHANGE, MAILING_BTN)

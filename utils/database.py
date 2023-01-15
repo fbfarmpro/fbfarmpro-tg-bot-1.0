@@ -267,8 +267,12 @@ class Tokens:
     def get_link(self, link):
         return self.cur.execute("SELECT * FROM links WHERE link = ?", (link,)).fetchone()
 
-    def remove_link(self, link):
-        self.cur.execute("DELETE FROM links WHERE link = ?", (link,))
+    def clear_links(self):
+        """Re-create table. This is the fastest way to clear table :)"""
+        self.cur.execute("DROP TABLE links")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS links (link TEXT NOT NULL,
+                                                                     email TEXT,
+                                                                     ID INT)""")
         self.db.commit()
 
     def __iter__(self):
