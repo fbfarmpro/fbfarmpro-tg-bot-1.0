@@ -378,7 +378,12 @@ If you have linked business manager to your account and for some reason Facebook
 
 @dp.callback_query_handler(lambda c: c.data == "referral")
 async def _(call: types.CallbackQuery):
+    await bot.answer_callback_query(call.id)
     userLang = users.get_language(userID=call.from_user.id)
+    if userLang == "RU":
+        await call.message.answer("Ваша реферальная ссылка: ")
+    else:
+        pass
 
 @dp.callback_query_handler(lambda c: c.data == "purchase_history")
 async def _(callback_query: types.CallbackQuery):

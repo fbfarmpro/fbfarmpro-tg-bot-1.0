@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import string
 from datetime import datetime
 from json import loads
 from secrets import choice
@@ -257,7 +258,8 @@ class Tokens:
 
         self.db.commit()
 
-    def add_link(self, link, email=None, userID=None):
+    def add_link(self, email=None, userID=None):
+        link = "".join(choice(string.ascii_uppercase+string.ascii_lowercase) for _ in range(20))
         if email:
             self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, email, None))
         elif userID:
