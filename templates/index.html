@@ -717,11 +717,11 @@ $('.pay-amount-btn.plus').click(function(){
                                 <form action="/upload" method="post" enctype="multipart/form-data">
                                     <input type="text" placeholder="Packname" name="packname" required>
                                     <input type="text" placeholder="Bot Text RU" name="bottextru" required>
-                                    <input type="text" placeholder="Bot Text EN" name="bottexten" required>
-                                    <input type="file" name="dtop" placeholder="Desktop Top" required>
-                                    <input type="file" name="dbottom" placeholder="Desktop Bottom" required>
-                                    <input type="file" name="mbottom" placeholder="Mobile Bottom" required>
-                                    <input type="file" name="bg" placeholder="Background" required>
+                                    <input type="text" placeholder="Bot Text EN" name="bottexten" required><br>
+                                    Desktop Top: <input type="file" name="dtop" placeholder="Desktop Top" required><br>
+                                    Desktop Bottom: <input type="file" name="dbottom" placeholder="Desktop Bottom" required><br>
+                                    Mobile Bottom: <input type="file" name="mbottom" placeholder="Mobile Bottom" required><br>
+                                    Background: <input type="file" name="bg" placeholder="Background" required><br>
                                     <input type="submit" value="Upload">
                                 </form>
                         {% endif %}
