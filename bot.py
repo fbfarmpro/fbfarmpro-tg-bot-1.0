@@ -334,6 +334,6 @@ if __name__ == "__main__":
     loop.create_task(check_for_payments())
     loop.create_task(check_for_bought_products())
     loop.create_task(check_refs())
-    # loop.create_task(change_advertisement())
-    # loop.create_task(check_advertisement())
+    loop.create_task(change_advertisement())
+    loop.create_task(check_advertisement())
     loop.run_forever()
