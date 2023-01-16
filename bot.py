@@ -296,6 +296,7 @@ async def check_advertisement():
         themes = get_themes()
         for theme in themes:
             with open(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME)) as file:
+                print(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME))
                 data = loads(file.read())
                 if data["time"]:
                     difference = (datetime.fromisoformat(data["time"]) - datetime.now()).days
