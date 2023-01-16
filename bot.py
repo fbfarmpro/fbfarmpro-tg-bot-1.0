@@ -244,24 +244,34 @@ async def change_advertisement():
             # search for next theme
             while not ok:
                 next_theme = random.choice(themes)
-                # if it is not the same theme as previous
-                # dircmp().diff_files returns list of files that didn't match
-                # So if this list is empty folders have the same content, and we don't need this theme to be next
                 # TODO fix cmp files
                 for filename in config.AD_FILES:
                     if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
                                    os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
+
+                        need_to_copy = open(os.path.join(config.AD_FOLDER, next_theme, filename), "rb")
+                        where_to_copy = open(os.path.join(config.AD_IMG_FOLDER, filename), "wb")
+                        where_to_copy.write(need_to_copy.read())
+                        need_to_copy.close()
+                        where_to_copy.close()
+                        """
                         path1 = os.path.join(config.AD_FOLDER, next_theme, filename)
                         path2 = os.path.join(config.AD_IMG_FOLDER, filename)
                         shutil.copyfile(path1,
                                         path2)
                         print(path1, path2)
                         print("found", next_theme)
+                        """
                         ok = True
                 if ok:
                     print("copy config")
+                    """
                     shutil.copyfile(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME),
                                     os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME))
+                    """
+                    with open(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME), "r") as file:
+                        with open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "w") as file2:
+                            file2.write(file.read())
 
                 """
                 if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
@@ -284,8 +294,15 @@ async def change_advertisement():
                 if not filecmp.cmp(os.path.join(config.AD_DEFAULT_FOLDER, filename),
                                    os.path.join(config.AD_IMG_FOLDER, filename)):
                     print("cmpSUCCESS")
+                    """
                     shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
                                     os.path.join(config.AD_IMG_FOLDER, filename))
+                    """
+                    need_to_copy = open(os.path.join(config.AD_FOLDER, filename), "rb")
+                    where_to_copy = open(os.path.join(config.AD_IMG_FOLDER, filename), "wb")
+                    where_to_copy.write(need_to_copy.read())
+                    need_to_copy.close()
+                    where_to_copy.close()
                     ok = False
             if ok:
                 await asyncio.sleep(60)  # wait for updates
