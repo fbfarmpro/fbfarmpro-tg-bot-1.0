@@ -101,7 +101,14 @@ def send_email_attachment(file, receiver_email):
         server.login(sender, password)
         server.sendmail(sender, receiver_email, text)
 
-
+@app.route("/ref<ref>")
+def ref(ref):
+    link = tokens.get_link(ref)
+    if link:
+        session['ref'] = link
+    else:
+        flash("Invalid referal link!", "error")
+    return redirect(url_for('sign_up'))
 def send_mail(receiver, mail):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
@@ -151,6 +158,8 @@ def upload():
             mbottom.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, mbttm))
             bg.save(os.path.join(app.config['UPLOAD_FOLDER'], pack, b))
             return redirect(url_for('index'))
+
+
 @app.route("/tgauth<token>")
 def telegauth(token):
     if token:
@@ -319,6 +328,8 @@ def sendpass():
     else:
         flash("User is not exists!", "error")
         return redirect(url_for("loginpage"))
+
+
 @app.route("/sendcode", methods=['POST'])
 def code():
     if request.method == "POST":
@@ -344,8 +355,8 @@ def forgot():
 @app.route("/create", methods=['POST'])
 def reg():
     if request.method == "POST":
-        email = session['mEmail']
-        passwd = session['mPasswd']
+        email = request.form['r-email']
+        passwd = request.form['r-password']
 
         if users.is_registered(email=email):
             flash("User is already exists!", "error")
@@ -353,6 +364,14 @@ def reg():
             return redirect(url_for("sign_up"))
 
         else:
+            if 'ref' in session:
+                link = tokens.get_link(session['ref'])
+                if link[2]:
+                    usersTG.add_ref_balance(1, userID=link[2])
+                    usersTG.add_balance(1, userID=link[2])
+                elif link[1]:
+                    users.add_ref_balance(1, email=link[1])
+                    users.add_balance(1, email=link[1])
             users.register(email=email, password=passwd)
             session['userLogged'] = True
             session['email'] = email

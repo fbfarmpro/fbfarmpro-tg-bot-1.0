@@ -251,8 +251,11 @@ async def change_advertisement():
                 for filename in config.AD_FILES:
                     if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
                                    os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
-                        shutil.copyfile(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                        os.path.join(config.AD_IMG_FOLDER, filename))
+                        path1 = os.path.join(config.AD_FOLDER, next_theme, filename)
+                        path2 = os.path.join(config.AD_IMG_FOLDER, filename)
+                        shutil.copyfile(path1,
+                                        path2)
+                        print(path1, path2)
                         print("found", next_theme)
                         ok = True
                 if ok:
