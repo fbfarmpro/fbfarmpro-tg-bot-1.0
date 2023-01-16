@@ -298,7 +298,7 @@ async def change_advertisement():
                     shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
                                     os.path.join(config.AD_IMG_FOLDER, filename))
                     """
-                    need_to_copy = open(os.path.join(config.AD_FOLDER, filename), "rb")
+                    need_to_copy = open(os.path.join(config.AD_DEFAULT_FOLDER, filename), "rb")
                     where_to_copy = open(os.path.join(config.AD_IMG_FOLDER, filename), "wb")
                     where_to_copy.write(need_to_copy.read())
                     need_to_copy.close()
