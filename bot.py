@@ -2,6 +2,7 @@ import asyncio
 import os
 import filecmp
 import random
+import calendar
 
 import config
 from handlers import *
@@ -25,16 +26,29 @@ users0 = UsersDB("site", "DB/users.db")
 @dp.message_handler(commands=["start"])
 async def _(message: types.Message):
     userID = message.from_user.id
-    await message.answer(userID)
     token = message.get_args()
-    print(token)
     if token:
-        if token.isdigit():
-            if users.is_registered(userID=message.from_user.id):
-                await message.answer("You are already registered")
+        if tokens.get_link(token):
+            if users.is_registered(userID=userID):
+                userLang = users.get_language(userID=userID)
+                if userLang == "RU":
+                    await message.answer("Вы уже загерестрированы")
+                else:
+                    await message.answer("You are already registered")
             else:
-                users.add_balance(1, userID=token)  # add 1$ to user who invited me
-        else:
+                if tokens.get_link_usages(token) < 5:
+                    referral_user = tokens.get_link(token)
+                    if referral_user[2]:
+                        users.add_ref_balance(1, userID=referral_user[2])
+                        users.add_balance(1, userID=referral_user[2])
+                    else:
+                        users0.add_ref_balance(1, email=referral_user[1])
+                        users0.add_balance(1, userID=referral_user[2])
+                    tokens.add_link_usages(token)
+                    await message.answer("I'm here")
+                else:
+                    await message.answer("This referral link was used more than 5 times")
+        elif tokens.get(token):
             status = tokens.get(token)[1]
 
             if 'link' in status:
@@ -291,8 +305,24 @@ async def check_advertisement():
 
 async def check_refs():
     while True:
-        # TODO
-        await asyncio.sleep(300)
+        now = datetime.now()
+        # if it is not a last day in month
+        if now.day < calendar.monthrange(now.year, now.month)[1]:
+            await asyncio.sleep(2160000)  # sleep 10 hours
+        else:
+            if now.hour >= 20:  # if it is the last 4 hours -> clear referrals
+                for referral in tokens.get_all_links():
+                    if referral[1]:  # email
+                        money = users0.get_ref_balance(email=referral[1])
+                        users0.add_ref_balance(-money, email=referral[1])  # remove ref money
+                        users0.add_balance(-money, email=referral[1])      # remove from balance N ref money
+                    elif referral[2]:  # userID
+                        money = users.get_ref_balance(userID=referral[2])
+                        users.add_ref_balance(-money, userID=referral[2])  # remove ref money
+                        users.add_balance(-money, userID=referral[2])
+                tokens.clear_links()
+            else:
+                await asyncio.sleep(216000)  # sleep 1 hour
 
 
 if __name__ == "__main__":

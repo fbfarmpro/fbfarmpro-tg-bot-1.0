@@ -9,7 +9,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types import InputFile
 from aiogram.utils.exceptions import ChatNotFound
 
-from utils.database import UsersDB, ProductsDB, create_random_filename_zip
+from utils.database import UsersDB, ProductsDB, create_random_filename_zip, Tokens
 import utils.keyboards as keyboards
 from config import ADMIN_ID, PURCHASE_GIF_FILENAME, AD_CURRENT_FOLDER, AD_TEXT_FILENAME
 from handlers import *
@@ -18,6 +18,7 @@ from loader import storage
 
 users = UsersDB("tg", "DB/users.db")
 products = ProductsDB("DB/products.db")
+tokens = Tokens("DB/tokens.db")
 
 
 @dp.callback_query_handler(lambda c: int(users.get_banned(userID=c.from_user.id)))
@@ -379,11 +380,18 @@ If you have linked business manager to your account and for some reason Facebook
 @dp.callback_query_handler(lambda c: c.data == "referral")
 async def _(call: types.CallbackQuery):
     await bot.answer_callback_query(call.id)
-    userLang = users.get_language(userID=call.from_user.id)
+    userID = call.from_user.id
+    userLang = users.get_language(userID=userID)
+    link = tokens.get_link_by_user(userID=userID)
+    link = link[0] if link else None
+    if not link:
+        link = tokens.add_link(userID=userID)
+    usages = tokens.get_link_usages(link)
     if userLang == "RU":
-        await call.message.answer("Ваша реферальная ссылка: ")
+        await call.message.answer(f"Ваша реферальная ссылка:\nhttps://t.me/fbfarm_testbot?start={link}\n{'АКТИВНАЯ' if usages < 5 else 'ИСТЕКШАЯ'} ({usages}/5)")
     else:
-        pass
+        await call.message.answer(f"Your referral link is:\nhttps://t.me/fbfarm_testbot?start={link}\n{'ACTIVE' if usages < 5 else 'EXPIRED'} ({usages}/5)")
+
 
 @dp.callback_query_handler(lambda c: c.data == "purchase_history")
 async def _(callback_query: types.CallbackQuery):

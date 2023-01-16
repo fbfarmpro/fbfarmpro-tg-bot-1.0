@@ -81,24 +81,19 @@ class UsersDB:
             self.cur.execute("UPDATE users SET payment_ids = ? WHERE email = ?", (",".join(payments), email))
         self.db.commit()
 
-    def register(self, *, userID=None, email=None, password=None): #, ref=None
+    def register(self, *, userID=None, email=None, password=None):
         """If you pass email and password, this function will calculate hash for this password and store it to db"""
         if self.method == "tg":
             assert userID is not None
-            # if ref:
-                #add bonus balance and reg
-            #else:
-            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("tg", userID, None,
-                                                                                   None, "RU", 0,
-                                                                                   None, 0))
+            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", ("tg", userID, None,
+                                                                                      None, "RU", 0, 0,
+                                                                                      None, 0))
         else:
             assert password is not None and email is not None
-            # if ref:
-            # add bonus balance and reg
-            # else:
-            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("site", None, email,
-                                                                                   hashlib.sha256(password.encode()).hexdigest(), "EN", 0,
-                                                                                   None, 0))
+            self.cur.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", ("site", None, email,
+                                                                                      hashlib.sha256(password.encode()).hexdigest(),
+                                                                                      "EN", 0, 0,
+                                                                                      None, 0))
         self.db.commit()
 
     def register_site_via_tg(self, userID):
@@ -197,10 +192,10 @@ class UsersDB:
     def get_ref_balance(self, *, userID=None, email=None):
         if self.method == "tg":
             assert userID is not None
-            return self.cur.execute("SELECT refBalance FROM users WHERE userID = ?", (userID,)).fetchone()[0]
+            return int(self.cur.execute("SELECT refBalance FROM users WHERE userID = ?", (userID,)).fetchone()[0])
         else:
             assert email is not None
-            return self.cur.execute("SELECT refBalance FROM users WHERE email = ?", (email,)).fetchone()[0]
+            return int(self.cur.execute("SELECT refBalance FROM users WHERE email = ?", (email,)).fetchone()[0])
 
     def add_ref_balance(self, amount, *, userID=None, email=None):
         balance = self.get_ref_balance(userID=userID, email=email)
@@ -254,27 +249,47 @@ class Tokens:
                                                                        zipname TEXT NOT NULL)""")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS links (link TEXT NOT NULL,
                                                                      email TEXT,
-                                                                     ID INT)""")
+                                                                     ID INT,
+                                                                     usages INT)""")
 
         self.db.commit()
 
     def add_link(self, email=None, userID=None):
         link = "".join(choice(string.ascii_uppercase+string.ascii_lowercase) for _ in range(20))
         if email:
-            self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, email, None))
+            self.cur.execute("INSERT INTO links VALUES (?, ?, ?, ?)", (link, email, None, 0))
         elif userID:
-            self.cur.execute("INSERT INTO links VALUES (?, ?, ?)", (link, None, userID))
+            self.cur.execute("INSERT INTO links VALUES (?, ?, ?, ?)", (link, None, userID, 0))
         self.db.commit()
+        return link
 
     def get_link(self, link):
         return self.cur.execute("SELECT * FROM links WHERE link = ?", (link,)).fetchone()
+
+    def get_all_links(self):
+        return self.cur.execute("SELECT * FROM links").fetchall()
+
+    def get_link_by_user(self, userID=None, email=None):
+        if userID:
+            return self.cur.execute("SELECT * FROM links WHERE ID = ?", (userID,)).fetchone()
+        elif email:
+            return self.cur.execute("SELECT * FROM links WHERE email = ?", (email,)).fetchone()
+
+    def get_link_usages(self, link):
+        return int(self.cur.execute("SELECT usages FROM links WHERE link = ?", (link,)).fetchone()[0])
+
+    def add_link_usages(self, link):
+        usages = self.get_link_usages(link)
+        self.cur.execute("UPDATE links SET usages = ? WHERE link = ?", (usages+1, link))
+        self.db.commit()
 
     def clear_links(self):
         """Re-create table. This is the fastest way to clear table :)"""
         self.cur.execute("DROP TABLE links")
         self.cur.execute("""CREATE TABLE IF NOT EXISTS links (link TEXT NOT NULL,
                                                                      email TEXT,
-                                                                     ID INT)""")
+                                                                     ID INT,
+                                                                     usages INT)""")
         self.db.commit()
 
     def __iter__(self):
