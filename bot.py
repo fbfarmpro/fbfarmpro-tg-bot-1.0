@@ -240,20 +240,12 @@ async def change_advertisement():
     while True:
         themes = get_themes()
         # there are any themes and not only default
-        print("here")
         if len(themes) != 1:
-            print("there")
-            ok = False
+            changed = False
             # search for next theme
-            while not ok:
+            while not changed:
                 next_theme = random.choice(themes)
-                # TODO fix cmp files
                 for filename in config.AD_FILES:
-                    """
-                    if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                   os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
-                    """
-
                     file1 = open(os.path.join(config.AD_FOLDER, next_theme, filename), "rb")
                     file2 = open(os.path.join(config.AD_IMG_FOLDER, filename), "rb")
                     if file1.read() != file2.read():  # cmp 2 files
@@ -262,25 +254,21 @@ async def change_advertisement():
                         where_to_copy.write(need_to_copy.read())
                         need_to_copy.close()
                         where_to_copy.close()
-                        ok = True
+                        changed = True
                     file1.close()
                     file2.close()
-                if ok:
-                    print("copy config")
-                    with open(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME), "r") as file:
-                        with open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "w") as file2:
-                            file2.write(file.read())
+                if changed:
+                    file1 = open(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME), "r")
+                    file2 = open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "w")
+                    file2.write(file1.read())  # write new data to bot text
+                    file1.close()
+                    file2.close()
 
             await asyncio.sleep(random.randint(10, 60))  # sleep 'till next change
         else:
             # if there are only default theme and current theme is not default -> change theme
-            ok = True
+            changed = True
             for filename in config.AD_FILES:
-                print("cmp0")
-                """
-                if not filecmp.cmp(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                                   os.path.join(config.AD_IMG_FOLDER, filename)):
-               """
                 file1 = open(os.path.join(config.AD_DEFAULT_FOLDER, filename), "rb")
                 file2 = open(os.path.join(config.AD_IMG_FOLDER, filename), "rb")
                 if file1.read() != file2.read():  # cmp 2 files
@@ -289,8 +277,8 @@ async def change_advertisement():
                     where_to_copy.write(need_to_copy.read())
                     need_to_copy.close()
                     where_to_copy.close()
-                    ok = False
-            if ok:
+                    changed = False
+            if changed:
                 await asyncio.sleep(60)  # wait for updates
 
 
@@ -299,7 +287,6 @@ async def check_advertisement():
         themes = get_themes()
         for theme in themes:
             with open(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME)) as file:
-                print(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME))
                 data = loads(file.read())
                 if data["time"]:
                     difference = (datetime.fromisoformat(data["time"]) - datetime.now()).days
