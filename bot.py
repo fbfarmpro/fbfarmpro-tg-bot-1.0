@@ -224,7 +224,10 @@ async def check_for_bought_products():
                 # remove files from our DB
                 with zipfile.ZipFile(zip_path, "r") as file:
                     for product_name in file.namelist():
-                        os.remove(os.path.join("DB", category_name, product_name))
+                        try:
+                            os.remove(os.path.join("DB", category_name, product_name))
+                        except FileNotFoundError:
+                            print("Can't remove", category_name, product_name)
                         products.remove_product(category_name, product_name)
                 users.remove_purchase_archive(zip_filename)
                 os.remove(zip_path)
