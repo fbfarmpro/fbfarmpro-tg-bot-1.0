@@ -5,13 +5,9 @@ from aiogram import types
 import utils.keyboards as keyboards
 from utils.database import UsersDB, ProductsDB
 from aiogram.dispatcher import FSMContext
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from json import loads, dumps
 from loader import storage
 import os
 import shutil
-import datetime
-from PIL import Image
 
 
 users = UsersDB("tg", "DB/users.db")
