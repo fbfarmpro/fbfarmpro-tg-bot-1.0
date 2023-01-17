@@ -5,6 +5,7 @@ from datetime import datetime
 from json import loads
 from secrets import choice
 from string import ascii_letters, digits
+import logging
 
 import aiohttp
 from aiogram import types
@@ -455,6 +456,7 @@ class AsyncPayment:
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url+f"{paymentID}", json={"id": paymentID}, headers=self.headers) as req:
                 data = await req.text()
+                logging.log(logging.DEBUG, data)
                 return loads(data)
 
     async def get_all_payments(self):
