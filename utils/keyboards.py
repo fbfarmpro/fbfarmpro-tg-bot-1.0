@@ -80,7 +80,6 @@ AD_SETTINGS_BTN = InlineKeyboardButton("Advertising", callback_data="advertising
 AD_ADD_PACK = InlineKeyboardButton("Add pack", callback_data="advertising_add_pack")
 AD_DEL_PACK = InlineKeyboardButton("Delete pack", callback_data="advertising_del_pack")
 AD_UPD_PACK = InlineKeyboardButton("Update pack", callback_data="advertising_upd_pack")
-AD_SET_DEFAULT = InlineKeyboardButton("Set default (for devs)", callback_data="advertising_default")
 
 AD_MOBILE_CHANGE_PIC_BTN = InlineKeyboardButton("Change mobile ad", callback_data="ad_mobile")
 AD_DESKTOP_BOTTOM_CHANGE_PIC_BTN = InlineKeyboardButton("Change desktop bottom ad", callback_data="ad_bottom")

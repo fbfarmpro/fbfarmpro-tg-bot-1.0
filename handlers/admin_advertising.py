@@ -43,17 +43,15 @@ async def _(call: types.CallbackQuery):
         if action == "del_pack":
             await call.message.answer("Enter pack name", reply_markup=kb)
             await storage.set_state(user=call.from_user.id, state="del_pack_name")
+        """
         elif action == "upd_pack":
             await call.message.answer("Enter pack name", reply_markup=kb)
             await storage.set_state(user=call.from_user.id, state="upd_pack_name")
-        elif action == "default":
-            # copy from default to current
-            for filename in config.AD_FILES:
-                shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                            os.path.join(config.AD_CURRENT_FOLDER, filename))
-            await call.message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
+        """
 
 
+"""
+# process update pack
 @dp.callback_query_handler(lambda c: c.data.startswith("ad_"))
 async def _(call: types.CallbackQuery):
     await bot.answer_callback_query(call.id)
@@ -85,6 +83,7 @@ async def _(call: types.CallbackQuery):
     elif action == "time":
         await call.message.answer("When to remove ads? (in days)", reply_markup=types.ReplyKeyboardRemove())
         await storage.set_state(user=call.from_user.id, state="advertising_time")
+"""
 
 
 @dp.message_handler(state="add_pack_name")
@@ -103,6 +102,7 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+"""
 @dp.message_handler(state="upd_pack_name")
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
@@ -118,6 +118,7 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("Update pack", reply_markup=types.ReplyKeyboardRemove())
     await message.answer(message.text, reply_markup=keyboards.ADVERTISING_CHANGE_MENU)
     await state.finish()
+"""
 
 
 @dp.message_handler(state="del_pack_name")
@@ -136,6 +137,7 @@ async def _(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+"""
 @dp.message_handler(state="advertising_photo_bottom", content_types=["animation", "text"])
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
@@ -148,8 +150,10 @@ async def _(message: types.Message, state: FSMContext):
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_BOTTOM_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
+"""
 
 
+"""
 @dp.message_handler(state="advertising_photo_top", content_types=["animation", "text"])
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
@@ -170,8 +174,10 @@ async def _(message: types.Message, state: FSMContext):
         config.AD_FOLDER, data["theme"], config.AD_DESKTOP_TOP_FILENAME))
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.reset_state(with_data=False)
+"""
 
 
+"""
 @dp.message_handler(state="advertising_photo_mobile", content_types=["animation", "text"])
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
@@ -185,8 +191,10 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
     # await state.reset_state(with_data=False)
+    """
 
 
+"""
 @dp.message_handler(state="advertising_photo_bg", content_types=["document", "text"])
 async def _(message: types.Message, state: FSMContext):
     if message.text == keyboards.CANCEL_ADMIN_REPLY_TEXT:
@@ -215,15 +223,19 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     # await state.reset_state(with_data=False)
     await state.finish()
+"""
 
 
+"""
 @dp.message_handler(state="advertising_text_ru")
 async def _(message: types.Message, state: FSMContext):
     await state.update_data(data={"ru": message.text})
     await message.answer("Success. Now send me english text")
     await state.set_state("advertising_text_en")
+"""
 
 
+"""
 @dp.message_handler(state="advertising_text_en")
 async def _(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -243,8 +255,10 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("Success")
     # await state.reset_state(with_data=False)
     await state.finish()
+"""
 
 
+"""
 @dp.message_handler(state="advertising_time")
 async def _(message: types.Message, state: FSMContext):
     try:
@@ -271,3 +285,4 @@ async def _(message: types.Message, state: FSMContext):
     await message.answer("Success", reply_markup=types.ReplyKeyboardRemove())
     # await state.reset_state(with_data=False)
     await state.finish()
+"""
