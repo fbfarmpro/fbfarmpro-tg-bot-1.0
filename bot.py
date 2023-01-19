@@ -224,7 +224,10 @@ async def check_for_bought_products():
                 # remove files from our DB
                 with zipfile.ZipFile(zip_path, "r") as file:
                     for product_name in file.namelist():
-                        os.remove(os.path.join("DB", category_name, product_name))
+                        try:
+                            os.remove(os.path.join("DB", category_name, product_name))
+                        except FileNotFoundError:
+                            print("Can't remove", category_name, product_name)
                         products.remove_product(category_name, product_name)
                 users.remove_purchase_archive(zip_filename)
                 os.remove(zip_path)
@@ -237,57 +240,45 @@ async def change_advertisement():
     while True:
         themes = get_themes()
         # there are any themes and not only default
-        print("here")
         if len(themes) != 1:
-            print("there")
-            ok = False
+            changed = False
             # search for next theme
-            while not ok:
+            while not changed:
                 next_theme = random.choice(themes)
-                # if it is not the same theme as previous
-                # dircmp().diff_files returns list of files that didn't match
-                # So if this list is empty folders have the same content, and we don't need this theme to be next
-                # TODO fix cmp files
                 for filename in config.AD_FILES:
-                    if filecmp.cmp(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                   os.path.join(config.AD_IMG_FOLDER, filename)) != 0:
-                        path1 = os.path.join(config.AD_FOLDER, next_theme, filename)
-                        path2 = os.path.join(config.AD_IMG_FOLDER, filename)
-                        shutil.copyfile(path1,
-                                        path2)
-                        print(path1, path2)
-                        print("found", next_theme)
-                        ok = True
-                if ok:
-                    print("copy config")
-                    shutil.copyfile(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME),
-                                    os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME))
+                    file1 = open(os.path.join(config.AD_FOLDER, next_theme, filename), "rb")
+                    file2 = open(os.path.join(config.AD_IMG_FOLDER, filename), "rb")
+                    if file1.read() != file2.read():  # cmp 2 files
+                        need_to_copy = open(os.path.join(config.AD_FOLDER, next_theme, filename), "rb")
+                        where_to_copy = open(os.path.join(config.AD_IMG_FOLDER, filename), "wb")
+                        where_to_copy.write(need_to_copy.read())
+                        need_to_copy.close()
+                        where_to_copy.close()
+                        changed = True
+                    file1.close()
+                    file2.close()
+                if changed:
+                    file1 = open(os.path.join(config.AD_FOLDER, next_theme, config.AD_TEXT_FILENAME), "r")
+                    file2 = open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "w")
+                    file2.write(file1.read())  # write new data to bot text
+                    file1.close()
+                    file2.close()
 
-                """
-                if len(filecmp.dircmp(os.path.join(config.AD_FOLDER, next_theme), config.AD_CURRENT_FOLDER).diff_files) != 0:
-                    ok = True  # ok, i found new theme
-                    # now copy files from that theme to 'current' folder
-                    for filename in config.AD_FILES:
-                        # copy from next_theme to current
-                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                    os.path.join(config.AD_FOLDER, "current", filename))
-                        # and copy from current to img folder
-                        shutil.copy(os.path.join(config.AD_FOLDER, next_theme, filename),
-                                    os.path.join(config.AD_FOLDER, "current", filename))
-                """
             await asyncio.sleep(random.randint(10, 60))  # sleep 'till next change
         else:
             # if there are only default theme and current theme is not default -> change theme
-            ok = True
+            changed = True
             for filename in config.AD_FILES:
-                print("cmp0")
-                if not filecmp.cmp(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                                   os.path.join(config.AD_IMG_FOLDER, filename)):
-                    print("cmpSUCCESS")
-                    shutil.copyfile(os.path.join(config.AD_DEFAULT_FOLDER, filename),
-                                    os.path.join(config.AD_IMG_FOLDER, filename))
-                    ok = False
-            if ok:
+                file1 = open(os.path.join(config.AD_DEFAULT_FOLDER, filename), "rb")
+                file2 = open(os.path.join(config.AD_IMG_FOLDER, filename), "rb")
+                if file1.read() != file2.read():  # cmp 2 files
+                    need_to_copy = open(os.path.join(config.AD_DEFAULT_FOLDER, filename), "rb")
+                    where_to_copy = open(os.path.join(config.AD_IMG_FOLDER, filename), "wb")
+                    where_to_copy.write(need_to_copy.read())
+                    need_to_copy.close()
+                    where_to_copy.close()
+                    changed = False
+            if changed:
                 await asyncio.sleep(60)  # wait for updates
 
 

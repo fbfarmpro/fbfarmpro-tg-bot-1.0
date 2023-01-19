@@ -8,7 +8,6 @@ services:
     volumes:
       - ./DB:/app/DB
       - ./log.txt:/app/log.txt
-      - ./logsite.txt:/app/logsite.txt
       - ./static/obj:/app/static/obj
       - ./static/img:/app/static/img
     ports:

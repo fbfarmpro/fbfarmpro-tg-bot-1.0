@@ -388,9 +388,9 @@ async def _(call: types.CallbackQuery):
         link = tokens.add_link(userID=userID)
     usages = tokens.get_link_usages(link)
     if userLang == "RU":
-        await call.message.answer(f"Ваша реферальная ссылка:\nhttps://t.me/fbfarm_testbot?start={link}\n{'АКТИВНАЯ' if usages < 5 else 'ИСТЕКШАЯ'} ({usages}/5)")
+        await call.message.answer(f"Ваша реферальная ссылка:\nhttps://t.me/fbfarmprobot?start={link}\n{'АКТИВНАЯ' if usages < 5 else 'ИСТЕКШАЯ'} ({usages}/5)")
     else:
-        await call.message.answer(f"Your referral link is:\nhttps://t.me/fbfarm_testbot?start={link}\n{'ACTIVE' if usages < 5 else 'EXPIRED'} ({usages}/5)")
+        await call.message.answer(f"Your referral link is:\nhttps://t.me/fbfarmprobot?start={link}\n{'ACTIVE' if usages < 5 else 'EXPIRED'} ({usages}/5)")
 
 
 @dp.callback_query_handler(lambda c: c.data == "purchase_history")
