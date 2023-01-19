@@ -929,7 +929,7 @@ p {
     transform: translateX(-50%);
     bottom: 20px;
     width: 100%;
-
+    cursor: pointer;
 
 }
 .content-cont-a img{
