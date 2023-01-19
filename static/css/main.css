@@ -940,6 +940,7 @@ p {
 .block-cont-a{
     text-align: center;
     margin-bottom: 40px;
+    cursor: pointer;
 }
 .block-cont-a img{
     max-width: 90%;
@@ -1015,6 +1016,7 @@ p {
 @media screen and (max-width: 992px) {
     .header-cont-a {
         display: none;
+        cursor: pointer;
     }
 
     .header-inner {
