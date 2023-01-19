@@ -233,7 +233,7 @@ async def _(message: types.Message, state: FSMContext):
     with open(path, "r") as file:
         file_data = file.read()
         if not file_data:
-            content = {"ru": None, "en": None, "time": None}
+            content = {"ru": None, "en": None, "time": None, 'link': None}
         else:
             content = loads(file_data)
     content["ru"] = ru

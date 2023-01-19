@@ -294,9 +294,10 @@ async def change_advertisement():
 async def check_advertisement():
     while True:
         themes = get_themes()
+
         for theme in themes:
+            print(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME))
             with open(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME)) as file:
-                print(os.path.join(config.AD_FOLDER, theme, config.AD_TEXT_FILENAME))
                 data = loads(file.read())
                 if data["time"]:
                     difference = (datetime.fromisoformat(data["time"]) - datetime.now()).days
@@ -337,4 +338,5 @@ if __name__ == "__main__":
     loop.create_task(check_refs())
     loop.create_task(change_advertisement())
     loop.create_task(check_advertisement())
+
     loop.run_forever()

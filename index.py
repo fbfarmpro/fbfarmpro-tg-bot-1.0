@@ -136,6 +136,7 @@ def upload():
 
         bottextru = request.form['bottextru']
         bottexten = request.form['bottexten']
+        link = request.form['link']
         pack = request.form['packname']
         new_folder_path = os.path.join(config.AD_FOLDER, pack)
         os.mkdir(new_folder_path)
@@ -144,9 +145,10 @@ def upload():
 
         if allowed_file(dtop.filename) and allowed_file(dbottom.filename) and allowed_file(mbottom.filename):
             path = os.path.join(config.AD_FOLDER, pack, config.AD_TEXT_FILENAME)
-            content = {"ru": None, "en": None, "time": None}
+            content = {"ru": None, "en": None, "time": None, 'link': None}
             content["ru"] = bottextru
             content["en"] = bottexten
+            content['link'] = link
             with open(path, "w") as file:
                 file.write(dumps(content, ensure_ascii=False))
             dtp = secure_filename(config.AD_DESKTOP_TOP_FILENAME)
@@ -211,10 +213,16 @@ def download_file(file):
         flash("File download link expired!", "error")
         return redirect(url_for("profile"))
 
-
+def readLink():
+    with open(os.path.join(config.AD_FOLDER, config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "r") as file:
+        file_data = file.read()
+        content = loads(file_data)
+        link = content['link']
+        return link
 @app.route("/")
 def index():
-    return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+
+    return render_template("index.html", sost=1, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/login")
@@ -222,7 +230,7 @@ def loginpage():
     if 'userLogged' in session:
         return redirect(url_for("profile"))
     else:
-        return render_template("index.html", sost=3, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+        return render_template("index.html", sost=3, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/register")
@@ -230,12 +238,12 @@ def sign_up():
     if 'userLogged' in session:
         return redirect(url_for("profile"))
     else:
-        return render_template("index.html", sost=4, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+        return render_template("index.html", sost=4, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/rules")
 def rules():
-    return render_template("index.html", sost=2, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template("index.html", sost=2, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 
@@ -249,7 +257,7 @@ def profile():
                 for t in purchases]
             return render_template("index.html", sost=5, username=session['user']['id'],
                                    balance=usersTG.get_balance(userID=session['user']['id']),
-                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
         elif session['method'] == 'all':
             purchases = users.get_purchase_history(email=session['user']['email'])
             purchase_history = [Markup(
@@ -257,7 +265,7 @@ def profile():
                 for t in purchases]
             return render_template("index.html", sost=5, username=f"{session['user']['id']}|{session['user']['email']}",
                                    balance=users.get_balance(email=session['user']['email']),
-                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
         else:
             purchases = users.get_purchase_history(email=session['email'])
             purchase_history = [Markup(
@@ -265,14 +273,14 @@ def profile():
                 for t in purchases]
             return render_template("index.html", sost=5, username=session['email'].split('@')[0],
                                    balance=users.get_balance(email=session['email']),
-                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, tg = 1, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+                                   logined=1 if 'userLogged' in session else 0, history=purchase_history, tg = 1, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
     else:
         return redirect(url_for("loginpage"))
 
 
 @app.route("/order")
 def order():
-    return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/shop")
@@ -283,7 +291,7 @@ def shop():
     for item in x:
         items.append(
             {"category": item.split("|")[-1], "desc": products.get_category_description(item).split("|")[-1], "cost": products.get_category_price(item)})
-    return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME, guest=1 if 'isguest' in session else 0)
+    return render_template("index.html", sost=6, items=items, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME, guest=1 if 'isguest' in session else 0)
 
 
 
@@ -305,7 +313,7 @@ def new():
 def changepage(token):
     if tokens.get_email(token=token):
         session['resettoken'] = token
-        return render_template("index.html", sost=11, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+        return render_template("index.html", sost=11, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
     else:
         flash("Invalid url!", "error")
         return redirect(url_for("loginpage"))
@@ -344,12 +352,12 @@ def code():
         return redirect(url_for('verify'))
 @app.route("/verify")
 def verify():
-    return render_template('index.html', sost = 12, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template('index.html', sost = 12, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/forgot")
 def forgot():
-    return render_template("index.html", sost=10, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template("index.html", sost=10, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/create", methods=['POST'])
@@ -360,18 +368,9 @@ def reg():
 
         if users.is_registered(email=email):
             flash("User is already exists!", "error")
-
             return redirect(url_for("sign_up"))
 
         else:
-            if 'ref' in session:
-                link = tokens.get_link(session['ref'])
-                if link[2]:
-                    usersTG.add_ref_balance(1, userID=link[2])
-                    usersTG.add_balance(1, userID=link[2])
-                elif link[1]:
-                    users.add_ref_balance(1, email=link[1])
-                    users.add_balance(1, email=link[1])
             users.register(email=email, password=passwd)
             session['userLogged'] = True
             session['email'] = email
@@ -457,19 +456,19 @@ def shopp(name):
     count = products.get_count_of_products(name)
     cost = products.get_category_price(name)
     return render_template("index.html", sost=8, logined=1 if 'userLogged' in session else 0, cost=cost, max=count,
-                               name=name.split("|")[-1], mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+                               name=name.split("|")[-1], mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 
 @app.route("/balance")
 def balance():
     if 'userLogged' in session:
-        return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+        return render_template("index.html", sost=7, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
     else:
         return redirect(url_for("loginpage"))
 @app.route("/setguest")
 def setguest():
     session['isguest'] = True
-    return render_template('index.html', sost = 13, mobile = config.AD_MOBILE_FILENAME, ad_link = config.AD_LINK, pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
+    return render_template('index.html', sost = 13, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
 @app.route("/setmail", methods = ['POST'])
 def setguestmail():
