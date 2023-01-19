@@ -214,7 +214,7 @@ def download_file(file):
         return redirect(url_for("profile"))
 
 def readLink():
-    with open(os.path.join(config.AD_FOLDER, config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "r") as file:
+    with open(os.path.join(config.AD_CURRENT_FOLDER, config.AD_TEXT_FILENAME), "r") as file:
         file_data = file.read()
         content = loads(file_data)
         link = content['link']
