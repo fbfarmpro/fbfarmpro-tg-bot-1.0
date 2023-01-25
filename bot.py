@@ -45,7 +45,6 @@ async def _(message: types.Message):
                         users0.add_ref_balance(1, email=referral_user[1])
                         users0.add_balance(1, userID=referral_user[2])
                     tokens.add_link_usages(token)
-                    await message.answer("I'm here")
                 else:
                     await message.answer("This referral link was used more than 5 times")
         elif tokens.get(token):
