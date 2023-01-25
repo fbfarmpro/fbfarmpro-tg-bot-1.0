@@ -5,7 +5,7 @@ import logging
 import smtplib
 import ssl
 import hashlib
-import asyncio
+#import asyncio
 from zipfile import ZipFile
 from markupsafe import Markup
 from email import encoders
@@ -18,7 +18,7 @@ from flask import Flask, session, redirect, url_for, request, render_template, f
 from json import loads, dumps
 from secrets import choice
 from string import ascii_letters, digits
-
+import requests
 import config
 from utils.database import UsersDB, ProductsDB, payment, get_crypto_currency, Tokens, create_random_filename_zip
 from config import MIN_MONEY_PER_BUY
@@ -245,8 +245,6 @@ def sign_up():
 def rules():
     return render_template("index.html", sost=2, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
 
-
-
 @app.route("/profile")
 def profile():
     if 'userLogged' in session:
@@ -342,14 +340,25 @@ def sendpass():
 def code():
     if request.method == "POST":
         email = request.form['r-email']
-        passwd = request.form['r-password']
-        session['mEmail'] = email
-        session['mPasswd'] = passwd
-        code = random.randint(10000, 99999)
-        send_mail(email, f"Your code for verification: {code}")
-        session['mCode'] = code
-        flash("Code was sended to your email!", "error")
-        return redirect(url_for('verify'))
+        response = requests.get(
+            "https://isitarealemail.com/api/email/validate",
+            params={'email': email})
+
+        status = response.json()['status']
+        if status == "valid":
+            flash("Code was sended to your email!", "error")
+            passwd = request.form['r-password']
+            session['mEmail'] = email
+            session['mPasswd'] = passwd
+            code = random.randint(10000, 99999)
+            send_mail(email, f"Your code for verification: {code}")
+            session['mCode'] = code
+
+            return redirect(url_for('verify'))
+        elif status == "invalid":
+            flash("Invalid email!", "error")
+            return redirect(url_for('sign_up'))
+
 @app.route("/verify")
 def verify():
     return render_template('index.html', sost = 12, logined=1 if 'userLogged' in session else 0, mobile = config.AD_MOBILE_FILENAME, ad_link = readLink(), pc_top = config.AD_DESKTOP_TOP_FILENAME, pc_bottom = config.AD_DESKTOP_BOTTOM_FILENAME, bg = config.SITE_BACKGROUND_FILENAME)
@@ -363,21 +372,24 @@ def forgot():
 @app.route("/create", methods=['POST'])
 def reg():
     if request.method == "POST":
-        email = request.form['r-email']
-        passwd = request.form['r-password']
+        email = session['mEmail']
+        passwd = session['mPasswd']
+        code = request.form['code']
+        if code == session['mCode']:
+            if users.is_registered(email=email):
+                flash("User is already exists!", "error")
+                return redirect(url_for("sign_up"))
 
-        if users.is_registered(email=email):
-            flash("User is already exists!", "error")
-            return redirect(url_for("sign_up"))
-
-        else:
-            users.register(email=email, password=passwd)
-            session['userLogged'] = True
-            session['email'] = email
-            session['method'] = "site"
-            send_mail(email, "Thanks for registration!")
-            return redirect(url_for("profile"))
-
+            else:
+                users.register(email=email, password=passwd)
+                session['userLogged'] = True
+                session['email'] = email
+                session['method'] = "site"
+                send_mail(email, "Thanks for registration!")
+                return redirect(url_for("profile"))
+    else:
+        flash("Incorrect code!", 'error')
+        return redirect(url_for("verify"))
 
 @app.route("/auth", methods=['POST'])
 def auth():
