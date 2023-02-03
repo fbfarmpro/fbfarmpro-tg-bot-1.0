@@ -37,7 +37,7 @@ async def process_amount(message: types.Message, state: FSMContext):
         coin = data["coin"].split("_")[0]
         min_pay = data["min_pay"]
 
-    if message.text.lower() == "cancel":
+    if message.text.lower() in ["cancel", "отменить"]:
         if lang == "RU":
             await message.answer("Отменяю", reply_markup=types.ReplyKeyboardRemove())
         else:
