@@ -22,14 +22,28 @@ async def _(callback_query: types.CallbackQuery):
         "min_pay": min_pay
     })
     if lang == "RU":
-        await callback_query.message.answer(f"Сколько вы хотите закинуть (в USD) (мин. {min_pay}$, макс. {config.MAX_MONEY_PER_BUY}$)")
+        await callback_query.message.answer(f"Сколько вы хотите закинуть (в USD) (мин. {min_pay}$, макс. {config.MAX_MONEY_PER_BUY}$)",
+                                            reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add("Отменить"))
     else:
-        await callback_query.message.answer(f"Enter amount (in USD) (min. {min_pay}$, max. {config.MAX_MONEY_PER_BUY}$)")
+        await callback_query.message.answer(f"Enter amount (in USD) (min. {min_pay}$, max. {config.MAX_MONEY_PER_BUY}$)",
+                                            reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add("Cancel"))
     await storage.set_state(user=userID, state="payment")
 
 
 @dp.message_handler(state="payment")
 async def process_amount(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        lang = data["lang"]
+        coin = data["coin"].split("_")[0]
+        min_pay = data["min_pay"]
+
+    if message.text.lower() == "cancel":
+        if lang == "RU":
+            await message.answer("Отменяю", reply_markup=types.ReplyKeyboardRemove())
+        else:
+            await message.answer("Cancelling", reply_markup=types.ReplyKeyboardRemove())
+        await state.finish()
+        return
     try:
         float(message.text)
     except ValueError:
@@ -37,10 +51,6 @@ async def process_amount(message: types.Message, state: FSMContext):
         return
     userID = message.from_user.id
     amount = float(message.text)
-    async with state.proxy() as data:
-        lang = data["lang"]
-        coin = data["coin"].split("_")[0]
-        min_pay = data["min_pay"]
 
     # check for correct value
     if amount > config.MAX_MONEY_PER_BUY or amount < min_pay:
