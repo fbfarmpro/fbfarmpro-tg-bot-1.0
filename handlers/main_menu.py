@@ -124,7 +124,7 @@ async def _(callback_query: types.CallbackQuery):
             full_category_name = category
             break
     userData = await storage.get_data(user=userID)
-    userLang = userData["lang"]
+    userLang = users.get_language(userID=userID)
     userBalance = users.get_balance(userID=userID)
     category_name = full_category_name.split("|")[0] if userLang == "RU" else full_category_name.split("|")[1]
     category_price = products.get_category_price(full_category_name)
@@ -207,7 +207,7 @@ async def _(msg: types.Message, state: FSMContext):
     amount = userData["amount"]
 
     if msg.text.lower() in ["skip", "пропустить"]:
-        await state.update_data(data={"promocode": None})
+        await state.update_data(data={"coupon": None})
         if userLang == "RU":
             await msg.answer(f"Вы покупаете {amount} продуктов по {category_price}$ каждый.\n"
                                  f"Итоговая стоимость: {amount*category_price}\nВы подтверждаете покупку?(да/нет)",

@@ -303,7 +303,7 @@ async def check_refs():
         now = datetime.now()
         # if it is not a last day in month
         if now.day < calendar.monthrange(now.year, now.month)[1]:
-            await asyncio.sleep(2160000)  # sleep 10 hours
+            await asyncio.sleep(36000)  # sleep 10 hours
         else:
             if now.hour >= 20:  # if it is the last 4 hours -> clear referrals
                 for referral in tokens.get_all_links():
@@ -316,8 +316,9 @@ async def check_refs():
                         users.add_ref_balance(-money, userID=referral[2])  # remove ref money
                         users.add_balance(-money, userID=referral[2])
                 tokens.clear_links()
+                await asyncio.sleep(300)
             else:
-                await asyncio.sleep(216000)  # sleep 1 hour
+                await asyncio.sleep(3600)  # sleep 1 hour
 
 
 if __name__ == "__main__":
